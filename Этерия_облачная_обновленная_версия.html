@@ -4063,7 +4063,9 @@ body.dodge-open{overflow:hidden}
     }
     ethRefreshAccountUI();
     await ethRenderLeaderboard();
-    updateMapScreen();
+    // После полного сброса герой намеренно отсутствует; карта требует state.hero.icon.
+    // Не обновляем карту, пока игрок не выбрал нового героя.
+    if (state.hero) updateMapScreen();
     showScreen('hero-select');
     return true;
   }
