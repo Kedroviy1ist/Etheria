@@ -4097,24 +4097,10 @@ body.dodge-open{overflow:hidden}
       evolved: false, evolutionPending: false
     };
     await ethCloudSaveQueue;
-    const saveResult = await ethSupabaseClient.from('game_saves').upsert({
-      user_id: userId, save_data: emptySave, updated_at: now
-    }, { onConflict: 'user_id' });
-    if (saveResult.error) throw saveResult.error;
-
-    const statsResult = await ethSupabaseClient.from('leaderboard_entries').upsert({
-      user_id: userId, completed_runs: 0, gold: 0, best_level: 1,
-      total_xp: 0, hero_name: null, updated_at: now
-    }, { onConflict: 'user_id' });
-    if (statsResult.error) throw statsResult.error;
-
-    const isDeveloper = ethV4.account.role === 'developer';
-    if (!isDeveloper) {
-      const profileResult = await ethSupabaseClient.from('profiles')
-        .update({ titles: ['Путник'], current_title: 'Путник' })
-        .eq('id', userId);
-      if (profileResult.error) throw profileResult.error;
-    }
+    const { data: resetResult, error: resetError } = await ethSupabaseClient.rpc('reset_etheria_progress');
+    if (resetError) throw resetError;
+    if (!resetResult?.success) throw new Error('Сервер не подтвердил полный сброс.');
+    const isDeveloper = !!resetResult.developer;
 
     Object.assign(state, {
       hero: null, level: 1, maxLevel: 50, newGamePlus: 0, totalXpEarned: 0,
