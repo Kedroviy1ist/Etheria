@@ -175,62 +175,6 @@
 </head>
 
 <body>
-    <div id="eth-maintenance-overlay" role="dialog" aria-modal="true" aria-labelledby="eth-maintenance-title">
-        <div class="eth-maintenance-card">
-            <div class="eth-maintenance-icon" aria-hidden="true">🛠️</div>
-            <h1 id="eth-maintenance-title">Технические работы</h1>
-            <p>Этерия временно недоступна.</p>
-            <p class="eth-maintenance-subtitle">Мы проводим технические работы. Пожалуйста, загляните позже.</p>
-        </div>
-    </div>
-    <style>
-        html, body { min-height: 100%; }
-        #eth-maintenance-overlay {
-            position: fixed;
-            inset: 0;
-            z-index: 2147483647;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 24px;
-            background: radial-gradient(ellipse at 50% 35%, #172554 0%, #080d20 55%, #020617 100%);
-            color: #f8fafc;
-            text-align: center;
-            pointer-events: auto;
-            user-select: none;
-        }
-        #eth-maintenance-overlay .eth-maintenance-card {
-            width: min(100%, 620px);
-            padding: clamp(28px, 6vw, 52px);
-            border: 1px solid rgba(251, 191, 36, .35);
-            border-radius: 24px;
-            background: rgba(15, 23, 42, .82);
-            box-shadow: 0 24px 80px rgba(0, 0, 0, .5);
-        }
-        #eth-maintenance-overlay .eth-maintenance-icon {
-            margin-bottom: 18px;
-            font-size: 52px;
-        }
-        #eth-maintenance-overlay h1 {
-            margin: 0 0 18px;
-            color: #fbbf24;
-            font-size: clamp(28px, 6vw, 44px);
-            line-height: 1.15;
-        }
-        #eth-maintenance-overlay p {
-            margin: 8px 0;
-            font-size: clamp(17px, 3vw, 21px);
-        }
-        #eth-maintenance-overlay .eth-maintenance-subtitle {
-            color: #cbd5e1;
-            font-size: 15px;
-        }
-    </style>
-    <script>
-        document.querySelectorAll('body > *:not(#eth-maintenance-overlay)').forEach(function (element) {
-            element.inert = true;
-        });
-    </script>
 
     <script>
 const SUPABASE_URL = 'https://whesykvaxhtbunnjhqqo.supabase.co';
