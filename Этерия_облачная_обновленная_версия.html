@@ -3980,23 +3980,32 @@ body.dodge-open{overflow:hidden}
   };
 
   // Enemy HP still scales with the player's final Attack stat; NG+ adds a per-cycle difficulty layer.
+  function ethApplyNewGamePlusDifficulty() {
+    const inCoop = typeof partyNet !== 'undefined' && !!partyNet.roomId;
+    if (ethV4.practice.active || inCoop || !state.combat?.isActive || !state.combat.enemy) return;
+    const enemy = state.combat.enemy;
+    const cycle = Math.max(0, Number(state.newGamePlus) || 0);
+    if (cycle > 0 && !enemy.ethNgPlusApplied) {
+      enemy.maxHp = Math.max(1, Math.round((Number(enemy.maxHp) || Number(enemy.hp) || 1) * (1 + 0.25 * cycle)));
+      enemy.hp = enemy.maxHp;
+      enemy.atk = Math.max(1, Math.round((Number(enemy.atk) || 1) * (1 + 0.20 * cycle)));
+      enemy.def = Math.max(0, Math.round((Number(enemy.def) || 0) * (1 + 0.15 * cycle)));
+      enemy.xp = Math.max(0, Math.round((Number(enemy.xp) || 0) * (1 + 0.15 * cycle)));
+      enemy.ethNgPlusApplied = true;
+      updateCombatUI();
+    }
+  }
   const ethStartCombatBeforeNgPlus = window.startCombat;
   window.startCombat = function(...args) {
     const result = ethStartCombatBeforeNgPlus.apply(this, args);
-    const inCoop = typeof partyNet !== 'undefined' && !!partyNet.roomId;
-    if (!ethV4.practice.active && !inCoop && state.combat?.isActive && state.combat.enemy) {
-      const enemy = state.combat.enemy;
-      const cycle = Math.max(0, Number(state.newGamePlus) || 0);
-      if (cycle > 0 && !enemy.ethNgPlusApplied) {
-        enemy.maxHp = Math.max(1, Math.round((Number(enemy.maxHp) || Number(enemy.hp) || 1) * (1 + 0.25 * cycle)));
-        enemy.hp = enemy.maxHp;
-        enemy.atk = Math.max(1, Math.round((Number(enemy.atk) || 1) * (1 + 0.20 * cycle)));
-        enemy.def = Math.max(0, Math.round((Number(enemy.def) || 0) * (1 + 0.15 * cycle)));
-        enemy.xp = Math.max(0, Math.round((Number(enemy.xp) || 0) * (1 + 0.15 * cycle)));
-        enemy.ethNgPlusApplied = true;
-        updateCombatUI();
-      }
-    }
+    ethApplyNewGamePlusDifficulty();
+    return result;
+  };
+  // Story scenes start the actual fight from their close callback; apply NG+ scaling there too.
+  const ethCloseStoryBeforeNgPlus = window.closeStoryScene;
+  window.closeStoryScene = function(...args) {
+    const result = ethCloseStoryBeforeNgPlus.apply(this, args);
+    ethApplyNewGamePlusDifficulty();
     return result;
   };
 
