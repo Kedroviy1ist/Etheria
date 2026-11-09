@@ -361,7 +361,7 @@ checkEtheriaConnection();
                 <div id="map-hero-icon" class="text-5xl bg-slate-900/50 p-4 rounded-full border border-slate-600 shadow-inner flex items-center justify-center min-w-[80px] min-h-[80px]">👤</div>
                 <div>
                     <h3 id="map-hero-name" class="text-2xl title-font font-bold text-amber-400 drop-shadow-md">Имя Героя</h3>
-                    <p class="text-slate-300 mt-1">Ур: <span id="map-hero-level" class="text-white font-bold bg-blue-600/30 px-2 py-0.5 rounded">1</span> | Опыт: <span id="map-hero-xp" class="text-green-300">0</span>/<span id="map-hero-next-xp">100</span></p>
+                    <p class="text-slate-300 mt-1">Ур: <span id="map-hero-level" class="text-white font-bold bg-blue-600/30 px-2 py-0.5 rounded">1</span> <span id="map-ngp-label" class="hidden text-fuchsia-200 font-black bg-fuchsia-900/40 border border-fuchsia-400/30 px-2 py-0.5 rounded">NG+1</span> | Опыт: <span id="map-hero-xp" class="text-green-300">0</span>/<span id="map-hero-next-xp">100</span></p>
                 </div>
             </div>
             <div class="flex gap-4 w-full md:w-auto flex-wrap">
@@ -717,9 +717,9 @@ checkEtheriaConnection();
     <div id="modal-victory" class="fixed inset-0 bg-amber-950/90 z-50 flex flex-col items-center justify-center hidden backdrop-blur-xl">
         <div class="text-9xl mb-8 drop-shadow-[0_0_40px_rgba(251,191,36,0.8)] levitate">👑</div>
         <h1 class="text-6xl md:text-8xl title-font text-transparent bg-clip-text bg-gradient-to-r from-amber-300 via-yellow-400 to-orange-500 mb-6 drop-shadow-[0_0_20px_rgba(251,191,36,0.8)] text-center tracking-wider">АБСОЛЮТНАЯ ПОБЕДА</h1>
-        <p class="text-2xl text-amber-100/80 mb-12 max-w-2xl text-center font-light leading-relaxed">Вы одолели всех боссов и спасли мир! Ваше имя навсегда останется в летописях Этерии.</p>
-        <button onclick="location.reload()" class="btn px-12 py-5 bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-500 hover:to-orange-500 rounded-2xl font-bold text-2xl shadow-[0_0_30px_rgba(245,158,11,0.5)] text-white border border-amber-400/30">
-            Начать Новую Эпоху
+        <p class="text-xl text-amber-100/80 mb-8 max-w-2xl text-center font-light leading-relaxed">Кампания завершена. Герой, уровень героя, характеристики, навыки, золото и экипировка сохраняются. Сама кампания начнётся с 1-го уровня, а враги станут сильнее.</p>
+        <button onclick="ethStartNewGamePlus()" class="btn px-12 py-5 bg-gradient-to-r from-fuchsia-700 to-violet-700 hover:from-fuchsia-600 hover:to-violet-600 rounded-2xl font-bold text-2xl shadow-[0_0_30px_rgba(168,85,247,0.35)] text-white border border-fuchsia-400/30">
+            Начать New Game+
         </button>
     </div>
 
@@ -957,9 +957,12 @@ checkEtheriaConnection();
         ];
 
         // --- СОСТОЯНИЕ ИГРЫ ---
+        let ethFullResetInProgress = false;
         let state = {
             hero: null,
             level: 1,
+            newGamePlus: 0,
+            totalXpEarned: 0,
             maxLevel: 50,
             xp: 0,
             nextXp: 100,
@@ -988,6 +991,8 @@ checkEtheriaConnection();
         };
 
         function ensureExpansionState() {
+            state.newGamePlus = Math.max(0, Number(state.newGamePlus) || 0);
+            state.totalXpEarned = Math.max(0, Number(state.totalXpEarned) || 0);
             state.gold = state.gold ?? 0;
             state.pickaxeLevel = state.pickaxeLevel ?? 1;
             state.minerals = state.minerals ?? {};
@@ -1058,6 +1063,8 @@ checkEtheriaConnection();
             state.baseDef = tmpl.baseDef;
             
             state.level = 1;
+            state.newGamePlus = 0;
+            state.totalXpEarned = 0;
             state.xp = 0;
             state.heroLvl = 1;
             state.statPoints = 0;
@@ -1080,6 +1087,8 @@ checkEtheriaConnection();
             getElement('map-hero-icon').innerText = state.hero.icon;
             getElement('map-hero-name').innerText = state.hero.name;
             getElement('map-hero-level').innerText = state.heroLvl;
+            const ngpLabel = getElement('map-ngp-label');
+            if (ngpLabel) { ngpLabel.innerText = `NG+${Math.max(0, Number(state.newGamePlus) || 0)}`; ngpLabel.classList.toggle('hidden', !(Number(state.newGamePlus) > 0)); }
             getElement('map-hero-xp').innerText = state.xp;
             getElement('map-hero-next-xp').innerText = state.nextXp;
             
@@ -2326,7 +2335,7 @@ body.dodge-open{overflow:hidden}
  }
  function dodgeCollision(d,b){const p=d.player;if(b.kind==='beam'||b.kind==='spearBeam'||b.kind==='shock'){if(b.delay>0)return false;if(b.kind==='spearBeam')return Math.abs(p.x-b.x)<b.w/2+8;return p.x>b.x-8&&p.x<b.x+b.w+8&&p.y>b.y-b.h/2-8&&p.y<b.y+b.h/2+8}const r=(b.r||10)+p.r-2;return Math.hypot(p.x-b.x,p.y-b.y)<r}
  function moveDodgePlayer(d,dt){const k=d.keys;let dx=(k.right?1:0)-(k.left?1:0),dy=(k.down?1:0)-(k.up?1:0);if(dx||dy){const n=Math.hypot(dx,dy)||1;d.player.x+=dx/n*255*dt;d.player.y+=dy/n*255*dt}d.player.x=Math.max(22,Math.min(DODGE_W-22,d.player.x));d.player.y=Math.max(22,Math.min(DODGE_H-22,d.player.y))}
- function updateDodgeBullets(d,dt,elapsed){d.bullets.forEach(b=>{b.age+=dt*1000;b.life-=dt*1000;if(b.delay>0)b.delay=Math.max(0,b.delay-dt*1000);if(b.gravity){b.vy+=b.gravity*dt;if(b.y>DODGE_H-25&&b.bounces<1){b.y=DODGE_H-25;b.vy=-Math.abs(b.vy)*.65;b.vx*=.8;b.bounces++}}if(b.homing&&b.age>450){const v=aimVelocity(b.x,b.y,d.player.x,d.player.y,Math.hypot(b.vx,b.vy));b.vx+=(v.vx-b.vx)*b.homing*dt;b.vy+=(v.vy-b.vy)*b.homing*dt}b.x+=(b.vx||0)*dt;b.y+=(b.vy||0)*dt;if(b.wave)b.y+=Math.sin(b.age*.009)*b.wave*dt*30;b.rotation=(b.rotation||0)+dt*2});d.bullets=d.bullets.filter(b=>b.life>0&&b.x>-90&&b.x<DODGE_W+90&&b.y>-100&&b.y<DODGE_H+100);if(elapsed<d.duration)spawnDodgeWave(d,elapsed);if(performance.now()>d.invulnerableUntil){for(const b of d.bullets){if(dodgeCollision(d,b)){d.hits=Math.min(5,d.hits+1);d.invulnerableUntil=performance.now()+720;byId('dodge-hit-count').textContent=d.hits;break}}}}
+ function updateDodgeBullets(d,dt,elapsed){d.bullets.forEach(b=>{b.age+=dt*1000;b.life-=dt*1000;if(b.delay>0)b.delay=Math.max(0,b.delay-dt*1000);if(b.gravity){b.vy+=b.gravity*dt;if(b.y>DODGE_H-25&&b.bounces<1){b.y=DODGE_H-25;b.vy=-Math.abs(b.vy)*.65;b.vx*=.8;b.bounces++}}if(b.homing&&b.age>450){const v=aimVelocity(b.x,b.y,d.player.x,d.player.y,Math.hypot(b.vx,b.vy));b.vx+=(v.vx-b.vx)*b.homing*dt;b.vy+=(v.vy-b.vy)*b.homing*dt}b.x+=(b.vx||0)*dt;b.y+=(b.vy||0)*dt;if(b.wave)b.y+=Math.sin(b.age*.009)*b.wave*dt*30;b.rotation=(b.rotation||0)+dt*2});d.bullets=d.bullets.filter(b=>b.life>0&&b.x>-90&&b.x<DODGE_W+90&&b.y>-100&&b.y<DODGE_H+100);if(elapsed<d.duration)spawnDodgeWave(d,elapsed);if(performance.now()>d.invulnerableUntil){for(const b of d.bullets){if(dodgeCollision(d,b)){d.hits += 1;d.invulnerableUntil=performance.now()+720;byId('dodge-hit-count').textContent=d.hits;break}}}}
  function finishDodgeArena(){if(!dodge.active)return;dodge.active=false;if(dodge.raf)cancelAnimationFrame(dodge.raf);const cb=dodge.onComplete;const result={hits:dodge.hits,elapsed:dodge.duration,pattern:dodge.pattern};byId('soul-dodge-overlay').classList.remove('open');document.body.classList.remove('dodge-open');dodge.onComplete=null;if(cb)cb(result)}
  function dodgeFrame(now){if(!dodge.active)return;const dt=Math.min(.04,Math.max(0,(now-dodge.last)/1000));dodge.last=now;const elapsed=now-dodge.started;moveDodgePlayer(dodge,dt);updateDodgeBullets(dodge,dt,elapsed);drawDodgeArena(dodge,now);byId('dodge-time-fill').style.width=`${Math.max(0,100-elapsed/dodge.duration*100)}%`;byId('dodge-time-text').textContent=`${Math.max(0,(dodge.duration-elapsed)/1000).toFixed(1)} сек.`;if(elapsed>=dodge.duration){finishDodgeArena();return}dodge.raf=requestAnimationFrame(dodgeFrame)}
  function setDodgeKey(dir,on){if(dodge.active)dodge.keys[dir]=on}
@@ -2381,7 +2390,7 @@ body.dodge-open{overflow:hidden}
  let coopMenuMode='root';
  const oldRenderCoopCombatV2=renderCoopCombat;
  renderCoopCombat=function(){oldRenderCoopCombatV2();const b=partyNet.battle;if(!b)return;const model=byId('coop-enemy-model');if(model)model.innerHTML=monsterSVG(b.enemy);const partySprites=byId('coop-party-cards')?.querySelectorAll('.party-sprite')||[];partyNet.players.filter(Boolean).forEach((p,i)=>{if(partySprites[i])partySprites[i].innerHTML=heroSVG(p.heroType)});renderCoopActions();if(b.phase==='dodge')startCoopDodgeForLocal()};
- function recordCoopDodgeResult(slot,hits){if(partyNet.role!=='host'||!partyNet.battle?.active||partyNet.battle.phase!=='dodge')return;const b=partyNet.battle;if(!b.dodgeResults)b.dodgeResults={};if(Object.prototype.hasOwnProperty.call(b.dodgeResults,slot))return;b.dodgeResults[slot]=Math.max(0,Math.min(5,Number(hits)||0));const p=partyNet.players[slot];addPartyLog(`${p?.name||'Герой'}: уклонение завершено, попаданий — ${b.dodgeResults[slot]}.`);broadcastBattle();if(partyNet.players.every((player,i)=>!player||Object.prototype.hasOwnProperty.call(b.dodgeResults,i)))resolvePartyDodge()}
+ function recordCoopDodgeResult(slot,hits){if(partyNet.role!=='host'||!partyNet.battle?.active||partyNet.battle.phase!=='dodge')return;const b=partyNet.battle;if(!b.dodgeResults)b.dodgeResults={};if(Object.prototype.hasOwnProperty.call(b.dodgeResults,slot))return;b.dodgeResults[slot]=Math.max(0,Math.floor(Number(hits)||0));const p=partyNet.players[slot];addPartyLog(`${p?.name||'Герой'}: уклонение завершено, попаданий — ${b.dodgeResults[slot]}.`);broadcastBattle();if(partyNet.players.every((player,i)=>!player||Object.prototype.hasOwnProperty.call(b.dodgeResults,i)))resolvePartyDodge()}
  function startCoopDodgeForLocal(){const b=partyNet.battle;if(!b||b.phase!=='dodge'||partyNet.mySlot===null||partyNet.mySlot===undefined)return;const p=partyNet.players[partyNet.mySlot];if(!p||p.hp<=0)return;const key=b.dodgeKey||`${partyNet.level}-${b.round}`;if(dodge.active&&dodge.sessionKey===key)return;if(dodge.lastCompletedKey===key)return;dodge.sessionKey=key;startDodgeArena({enemy:b.enemy,level:partyNet.level,mode:'coop',duration:b.dodgeDuration||8200,sessionKey:key,onComplete:r=>{dodge.lastCompletedKey=key;if(partyNet.role==='host')recordCoopDodgeResult(partyNet.mySlot,r.hits);else if(partyNet.connection?.open)partyNet.connection.send({type:'dodgeResult',slot:partyNet.mySlot,hits:r.hits,key})}})}
  function resolvePartyDodge(){const b=partyNet.battle;if(!b||!b.active||b.phase!=='dodge')return;if(partyDodgeTimer)clearTimeout(partyDodgeTimer);partyNet.players.forEach((p,i)=>{if(!p)return;const hits=b.dodgeResults?.[i]||0;const dmg=hits?Math.max(3,Math.floor(((b.enemy.atk||20)*.18-p.def*.12)*hits)):0;if(dmg){p.hp=Math.max(0,p.hp-dmg);addPartyLog(`${p.name} пропустил ${hits} попаданий и потерял ${dmg} HP.`)}else addPartyLog(`${p.name} полностью уклонился от атаки.`);if(p.hp<=0){p.alive=false;addPartyLog(`${p.name} выбыл из строя.`)}p.buffs=(p.buffs||[]).filter(buff=>{buff.duration--;if(buff.duration<=0){if(buff.type==='atk')p.atk=Math.max(1,p.atk-buff.amount);if(buff.type==='def')p.def=Math.max(0,p.def-buff.amount);return false}return true})});if(!activeLivingPlayers().length){finishPartyBattle(false);return}b.round++;b.acted=[];b.turnSlot=partyNet.players.findIndex(p=>p&&p.hp>0);b.phase='players';delete b.dodgeResults;delete b.dodgeKey;coopMenuMode='root';broadcastBattle();scheduleBotTurn()}
  let partyDodgeTimer=null;
@@ -3069,6 +3078,54 @@ body.dodge-open{overflow:hidden}
   window.ethPracticeRetry=function(){byId('eth-practice-result').classList.remove('open');const sel=ethV4.practice.selection;if(sel)ethStartPracticeFight(sel)};
   window.ethPracticeReturn=function(){byId('eth-practice-result').classList.remove('open');ethV4.practice.active=false;ethV4.practice.selection=null;window.showScreen('practice')};
 
+
+  // Inventory viewport: keep equipped slots and every item action reachable on small screens.
+  const ethOriginalAddArtifactEquipmentUI = addArtifactEquipmentUI;
+  function ethEnsureInventoryScrollArea() {
+    const list = byId('inventory-list');
+    if (!list || byId('inventory-scroll-area')) return;
+    const parent = list.parentElement;
+    const slots = byId('equipment-slots');
+    const empty = byId('empty-inventory');
+    const heading = slots ? slots.previousElementSibling : list.previousElementSibling;
+    const first = heading || slots || list;
+    const area = document.createElement('div');
+    area.id = 'inventory-scroll-area';
+    area.className = 'flex-1 min-h-0 min-w-0 overflow-y-auto overscroll-contain pr-2 pb-3';
+    parent.insertBefore(area, first);
+    [heading, slots, list, empty].forEach(node => {
+      if (node && node.parentElement === parent) area.appendChild(node);
+    });
+    list.classList.remove('overflow-y-auto', 'flex-1');
+    list.style.overflow = 'visible';
+    if (empty) empty.classList.remove('flex-1');
+  }
+  addArtifactEquipmentUI = function() {
+    ethOriginalAddArtifactEquipmentUI();
+    ethEnsureInventoryScrollArea();
+  };
+  const ethInventoryViewportStyle = document.createElement('style');
+  ethInventoryViewportStyle.textContent = `
+    #screen-inventory > .glass {
+      box-sizing: border-box; height: calc(100dvh - 24px) !important;
+      max-height: calc(100dvh - 24px) !important; min-height: 0 !important;
+      margin-top: 12px !important; padding: clamp(12px, 3vw, 32px) !important;
+    }
+    #inventory-scroll-area { flex: 1 1 0%; min-height: 0; min-width: 0; overflow-x: hidden;
+      overflow-y: auto; overscroll-behavior: contain; -webkit-overflow-scrolling: touch; }
+    #inventory-scroll-area > h3, #equipment-slots { flex: 0 0 auto; }
+    #inventory-list { min-height: 0; overflow: visible !important; flex: none !important;
+      align-content: start; grid-auto-rows: max-content; }
+    #inventory-list > div { min-width: 0; display: flex; flex-direction: column; }
+    #inventory-list > div > button { min-height: 44px; flex-shrink: 0; margin-top: auto; }
+    #empty-inventory { min-height: 180px; }
+    @media (max-width: 640px) {
+      #screen-inventory > .glass { border-radius: 16px !important; }
+      #screen-inventory > .glass > div:first-child h2 { font-size: 1.35rem !important; }
+    }
+  `;
+  document.head.appendChild(ethInventoryViewportStyle);
+
   // --- Local account storage. Passwords are salted PBKDF2 hashes when WebCrypto is available. ---
   function ethLoadAccounts(){try{const raw=ethStorageGet(ETH_ACCOUNT_KEY);const obj=raw?JSON.parse(raw):{};return obj&&typeof obj==='object'?obj:{}}catch(e){return {}}}
   function ethSaveAccounts(){try{return ethStorageSet(ETH_ACCOUNT_KEY,JSON.stringify(ethV4.accounts))}catch(e){console.warn('Account storage unavailable',e);return false}}
@@ -3079,12 +3136,12 @@ body.dodge-open{overflow:hidden}
     return ethFallbackHash(pass,salt);
   }
   function ethNormName(name){return String(name||'').trim().toLocaleLowerCase('ru-RU')}
-  function ethProfileFromState(){return {heroType:state.hero?.type||null,level:state.level||1,xp:state.xp||0,nextXp:state.nextXp||100,heroLvl:state.heroLvl||1,statPoints:state.statPoints||0,baseHp:state.baseHp||0,baseMp:state.baseMp||0,baseAtk:state.baseAtk||0,baseDef:state.baseDef||0,inventory:JSON.parse(JSON.stringify(state.inventory||[])),learnedAbilities:JSON.parse(JSON.stringify(state.learnedAbilities||[])),gold:state.gold||0,pickaxeLevel:state.pickaxeLevel||1,minerals:JSON.parse(JSON.stringify(state.minerals||{})),mineRockHp:state.mineRockHp||5,mineRockMaxHp:state.mineRockMaxHp||5,evolved:!!state.evolved,evolutionPending:!!state.evolutionPending};}
+  function ethProfileFromState(){return {heroType:state.hero?.type||null,level:state.level||1,newGamePlus:Math.max(0,Number(state.newGamePlus)||0),totalXpEarned:Math.max(0,Number(state.totalXpEarned)||0),campaignRecorded:!!state._etheriaCampaignRecorded,xp:state.xp||0,nextXp:state.nextXp||100,heroLvl:state.heroLvl||1,statPoints:state.statPoints||0,baseHp:state.baseHp||0,baseMp:state.baseMp||0,baseAtk:state.baseAtk||0,baseDef:state.baseDef||0,inventory:JSON.parse(JSON.stringify(state.inventory||[])),learnedAbilities:JSON.parse(JSON.stringify(state.learnedAbilities||[])),gold:state.gold||0,pickaxeLevel:state.pickaxeLevel||1,minerals:JSON.parse(JSON.stringify(state.minerals||{})),mineRockHp:state.mineRockHp||5,mineRockMaxHp:state.mineRockMaxHp||5,evolved:!!state.evolved,evolutionPending:!!state.evolutionPending};}
   function ethSaveCurrentAccount(){if(!ethV4.account)return;const record=ethV4.accounts[ethNormName(ethV4.account.username)];if(!record)return;record.profile=ethProfileFromState();record.stats=record.stats||{};record.stats.gold=record.profile.gold;record.stats.bestLevel=Math.max(record.stats.bestLevel||1,record.profile.level||1);record.lastPlayed=new Date().toISOString();ethV4.account=record;ethSaveAccounts();ethRefreshAccountUI()}
   function ethRestoreProfile(record){
     const p=record?.profile;if(!p?.heroType)return false;
     const template=HERO_TEMPLATES[p.heroType]||HERO_TEMPLATES.warrior;
-    state.hero={...template,type:p.heroType};state.level=Math.max(1,Math.min(50,Number(p.level)||1));state.xp=Number(p.xp)||0;state.nextXp=Number(p.nextXp)||100;state.heroLvl=Number(p.heroLvl)||1;state.statPoints=Number(p.statPoints)||0;
+    state.hero={...template,type:p.heroType};state.level=Math.max(1,Math.min(50,Number(p.level)||1));state.newGamePlus=Math.max(0,Number(p.newGamePlus)||0);state.totalXpEarned=Math.max(0,Number(p.totalXpEarned)||0,Number(record?.stats?.totalXp)||0);state._etheriaCampaignRecorded=!!p.campaignRecorded;state.xp=Number(p.xp)||0;state.nextXp=Number(p.nextXp)||100;state.heroLvl=Number(p.heroLvl)||1;state.statPoints=Number(p.statPoints)||0;
     state.baseHp=Number(p.baseHp)||template.baseHp;state.baseMp=Number(p.baseMp)||template.baseMp;state.baseAtk=Number(p.baseAtk)||template.baseAtk;state.baseDef=Number(p.baseDef)||template.baseDef;
     state.inventory=Array.isArray(p.inventory)?p.inventory.map(prepareArtifact):[];state.learnedAbilities=Array.isArray(p.learnedAbilities)?p.learnedAbilities:[];state.gold=Number(p.gold)||0;state.pickaxeLevel=Number(p.pickaxeLevel)||1;state.minerals=p.minerals||{};state.mineRockHp=Number(p.mineRockHp)||5;state.mineRockMaxHp=Number(p.mineRockMaxHp)||5;state.evolved=!!p.evolved;state.evolutionPending=!!p.evolutionPending;
     state.combat={isActive:false,hp:0,mp:0,enemy:null,playerBuffs:[]};updateMapScreen();return true;
@@ -3170,7 +3227,7 @@ body.dodge-open{overflow:hidden}
   const ethV4Markup=`
   <div id="eth-account-modal" class="eth-v4-modal"><div class="eth-v4-modal-inner">
     <div class="flex items-center justify-between gap-3 mb-4"><div><div class="text-xs tracking-[.2em] uppercase text-sky-300">Профиль игрока</div><h2 class="text-3xl font-black">Аккаунт Этерии</h2></div><button class="eth-v4-btn" onclick="document.getElementById('eth-account-modal').classList.remove('open')">Закрыть</button></div>
-    <div id="eth-auth-form" class="eth-v4-panel"><label class="text-sm block mb-1">Email</label><input id="eth-auth-email" type="email" class="eth-v4-input mb-3" autocomplete="email" placeholder="name@example.com"><label class="text-sm block mb-1">Игровой логин</label><input id="eth-auth-username" class="eth-v4-input mb-3" maxlength="18" autocomplete="username" placeholder="Например, EtherKnight"><label class="text-sm block mb-1">Пароль</label><input id="eth-auth-password" type="password" class="eth-v4-input mb-3" minlength="8" autocomplete="current-password" placeholder="Минимум 8 символов"><div class="flex gap-2 flex-wrap"><button class="eth-v4-btn green flex-1" onclick="ethLogin()">Войти</button><button class="eth-v4-btn purple flex-1" onclick="ethRegister()">Создать аккаунт</button></div><p id="eth-auth-message" class="text-sm text-amber-200 mt-3 min-h-5"></p><p id="eth-storage-note" class="eth-v4-muted mt-1"></p><p class="eth-v4-muted mt-2">Для входа используются настоящий email и пароль через Supabase Auth. Игровой логин виден другим игрокам в рейтинге. При регистрации может потребоваться подтверждение email.</p></div>
+    <div id="eth-auth-form" class="eth-v4-panel"><label class="text-sm block mb-1">Email</label><input id="eth-auth-email" type="email" class="eth-v4-input mb-3" autocomplete="email" placeholder="name@example.com"><label class="text-sm block mb-1">Игровой логин</label><input id="eth-auth-username" class="eth-v4-input mb-3" maxlength="18" autocomplete="username" placeholder="Например, EtherKnight"><label class="text-sm block mb-1">Пароль</label><input id="eth-auth-password" type="password" class="eth-v4-input mb-3" minlength="8" autocomplete="current-password" placeholder="Минимум 8 символов"><div class="flex gap-2 flex-wrap"><button class="eth-v4-btn green flex-1" onclick="ethLogin()">Войти</button><button class="eth-v4-btn purple flex-1" onclick="ethRegister()">Создать аккаунт</button></div><button type="button" class="eth-v4-btn w-full mt-3" onclick="ethCloudRequestPasswordReset()">Забыли пароль?</button><p id="eth-auth-message" class="text-sm text-amber-200 mt-3 min-h-5"></p><p id="eth-storage-note" class="eth-v4-muted mt-1"></p><p class="eth-v4-muted mt-2">Для входа используются настоящий email и пароль через Supabase Auth. Игровой логин виден другим игрокам в рейтинге. При регистрации может потребоваться подтверждение email.</p></div>
     <div id="eth-auth-signed" class="eth-v4-panel hidden"><div class="flex items-center justify-between"><div><div class="text-xs text-slate-400">Выполнен вход</div><div id="eth-auth-name" class="text-2xl font-black"></div><div id="eth-auth-title" class="text-amber-300 font-bold"></div></div><div class="text-4xl">🛡️</div></div><div class="eth-v4-stat-grid mt-4"><div class="eth-v4-card"><small>Пройдено кампаний</small><b id="eth-auth-runs">0</b></div><div class="eth-v4-card"><small>Золото</small><b id="eth-auth-gold">0</b></div></div><div class="eth-v4-divider"></div><label class="text-sm block mb-1">Активный титул</label><select id="eth-title-select" class="eth-v4-select mb-3" onchange="ethChooseTitle()"></select><p class="eth-v4-muted mb-3">DEVELOPER — уникальный титул разработчика, другим аккаунтам выдать его нельзя.</p><div id="eth-developer-claim-box" class="eth-v4-panel mb-3"><label class="text-sm block mb-1">Одноразовый код разработчика</label><input id="eth-developer-claim-code" type="password" class="eth-v4-input mb-2" autocomplete="off" placeholder="Введи личный одноразовый код"><button class="eth-v4-btn gold w-full" onclick="ethClaimDeveloper()">Активировать DEVELOPER</button><p id="eth-developer-claim-message" class="eth-v4-muted mt-2"></p></div><div class="flex flex-wrap gap-2"><button id="eth-admin-open" class="eth-v4-btn gold hidden" onclick="ethOpenAdmin()">⚙ Панель разработчика</button><button class="eth-v4-btn" onclick="ethOpenLeaderboard()">Таблица лидеров</button><button class="eth-v4-btn" onclick="ethLogout()">Выйти из аккаунта</button></div></div>
     <p class="eth-v4-muted mt-3">Облачное сохранение синхронизирует прогресс между устройствами. Используется защищённая авторизация Supabase; пароль не хранится в игровом файле.</p>
   </div></div>
@@ -3228,7 +3285,7 @@ body.dodge-open{overflow:hidden}
       const enemy=state.combat.enemy;const reward=Math.max(8,Math.floor((enemy.xp||50)/(enemy.isBoss?5:10)));
       state.gold=(state.gold||0)+reward;enemy.rewardGoldApplied=true;
       const resultModal=byId('modal-result');if(resultModal){let g=byId('eth-result-gold');if(!g){g=document.createElement('div');g.id='eth-result-gold';g.className='text-amber-300 text-sm font-bold mb-3';byId('result-xp')?.parentElement?.after(g)}if(g)g.textContent=`Получено золота: +${reward} 🪙`}
-      if(state.level===state.maxLevel){const a=ethV4.account;if(a){a.stats=a.stats||{};a.titles=Array.isArray(a.titles)?a.titles:['Путник'];a.stats.completedRuns=(a.stats.completedRuns||0)+1;a.stats.gold=state.gold||0;a.stats.bestLevel=50;if(!a.titles.includes('Спаситель Этерии'))a.titles.push('Спаситель Этерии');a.currentTitle='Спаситель Этерии'}}
+      if(state.level===state.maxLevel){const a=ethV4.account;if(a){a.stats=a.stats||{};a.titles=Array.isArray(a.titles)?a.titles:['Путник'];a.stats.gold=state.gold||0;a.stats.bestLevel=50;if(!a.titles.includes('Спаситель Этерии'))a.titles.push('Спаситель Этерии');a.currentTitle='Спаситель Этерии'}}
       if(ethV4.account&&state.level>=5&&state.level%5===0&&ethV4.account.role!=='developer'){const t=state.level===5?'Победитель Короля':'Покоритель Бездны';ethV4.account.titles=Array.isArray(ethV4.account.titles)?ethV4.account.titles:['Путник'];if(!ethV4.account.titles.includes(t))ethV4.account.titles.push(t)}
     }
     const r=ethPreviousEndCombat(isVictory);ethSaveCurrentAccount();ethRenderLeaderboard();return r;
@@ -3492,13 +3549,13 @@ body.dodge-open{overflow:hidden}
   };
 
   async function ethCloudSaveCurrentAccount() {
-    if (!ethSupabaseClient || !ethCloudUser || !ethV4.account) return false;
+    if (ethFullResetInProgress || !ethSupabaseClient || !ethCloudUser || !ethV4.account) return false;
     const userId = ethCloudUser.id;
     const saveData = ethProfileFromState();
     const oldStats = ethV4.account.stats || {};
     const completedRuns = Math.max(0, Number(oldStats.completedRuns) || 0);
     const bestLevel = Math.max(Number(oldStats.bestLevel) || 1, Number(saveData.level) || 1);
-    const totalXp = Math.max(0, Number(saveData.xp) || 0);
+    const totalXp = Math.max(0, Number(saveData.totalXpEarned) || 0);
     const stats = {
       user_id: userId,
       completed_runs: completedRuns,
