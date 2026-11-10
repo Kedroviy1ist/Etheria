@@ -670,9 +670,9 @@ checkEtheriaConnection();
           <div class="mt-4 rounded-full h-3 overflow-hidden border border-[#54351f] bg-[#b98b65]"><div id="eth-level-progress" class="h-full rounded-full" style="width:2%;background:linear-gradient(90deg,#f4d28b,#c66d46)"></div></div>
           <p id="level-description" class="mt-4 text-base leading-relaxed text-[#69462f]">Три главы ждут своего героя. Выбери путь и продолжи путешествие.</p>
           <div class="eth-game-chapters">
-            <button class="eth-game-chapter selected" data-chapter="1" onclick="ethSelectChapter(1)"><b>ГЛАВА I · ПЕПЕЛЬНАЯ ТРОПА</b><span>Уровни 1–10 · Орки и пепельные стражи</span></button>
-            <button class="eth-game-chapter" data-chapter="2" onclick="ethSelectChapter(2)"><b>ГЛАВА II · КАМЕННАЯ ПАМЯТЬ</b><span>Уровни 11–25 · Дракон и Тёмный Маг</span></button>
-            <button class="eth-game-chapter" data-chapter="3" onclick="ethSelectChapter(3)"><b>ГЛАВА III · НЕБЕСНАЯ ЦИТАДЕЛЬ</b><span>Уровни 26–50 · Стражи цитадели и Безымянный</span></button>
+            <button class="eth-game-chapter selected" data-chapter="1" onpointerenter="if(matchMedia('(hover:hover)').matches)ethSelectChapter(1)" onclick="ethSelectChapter(1)"><b>ГЛАВА I · ПЕПЕЛЬНАЯ ТРОПА</b><span>Уровни 1–10 · Орки и пепельные стражи</span></button>
+            <button class="eth-game-chapter" data-chapter="2" onpointerenter="if(matchMedia('(hover:hover)').matches)ethSelectChapter(2)" onclick="ethSelectChapter(2)"><b>ГЛАВА II · КАМЕННАЯ ПАМЯТЬ</b><span>Уровни 11–25 · Дракон и Тёмный Маг</span></button>
+            <button class="eth-game-chapter" data-chapter="3" onpointerenter="if(matchMedia('(hover:hover)').matches)ethSelectChapter(3)" onclick="ethSelectChapter(3)"><b>ГЛАВА III · НЕБЕСНАЯ ЦИТАДЕЛЬ</b><span>Уровни 26–50 · Стражи цитадели и Безымянный</span></button>
           </div>
           <button class="eth-game-action" onclick="startCombat()">НАЧАТЬ СРАЖЕНИЕ</button>
           <div class="mt-4 flex flex-wrap gap-3 text-sm font-bold text-[#714b32]">
@@ -4884,7 +4884,7 @@ body.dodge-open{overflow:hidden}
     const enemy=document.getElementById('eth-scene-enemy');if(enemy)enemy.textContent=info.enemy;
     const mark=document.getElementById('eth-scene-mark');if(mark)mark.textContent=info.mark;
     const d=document.getElementById('level-description');
-    if(d)d.textContent=info.desc;
+    if(d)d.textContent=info.desc+' Это просмотр оформления главы; прохождение продолжится с текущего уровня кампании.';
   };
 
   function ethRefreshGameSettings(){
