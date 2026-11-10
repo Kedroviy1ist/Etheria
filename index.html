@@ -4774,114 +4774,264 @@ body.dodge-open{overflow:hidden}
 (function(){
   let ethCurrentGameTab='main';
   let ethSelectedChapter=1;
-  let ethGameSoundMuted=false;
+  let ethAvatarPreviewUrl=null;
+
   function ethSetAvatarUI(url){
-    const targets=['eth-game-avatar','eth-settings-avatar-preview','map-hero-icon'];
-    targets.forEach(id=>{const el=document.getElementById(id);if(!el)return;el.innerHTML=url?'<img alt="Аватар игрока" src="'+url.replace(/&/g,'&amp;').replace(/"/g,'&quot;')+'">':'<span>👤</span>';});
+    ['eth-game-avatar','eth-settings-avatar-preview'].forEach(id=>{
+      const host=document.getElementById(id);
+      if(!host)return;
+      host.replaceChildren();
+      if(url){
+        const img=document.createElement('img');
+        img.alt='Аватар игрока';
+        img.loading='lazy';
+        img.decoding='async';
+        img.src=String(url);
+        host.appendChild(img);
+      }else{
+        const fallback=document.createElement('span');
+        fallback.textContent='👤';
+        host.appendChild(fallback);
+      }
+    });
   }
+
+  function ethProfileSnapshot(){return window.ethGameAccountSnapshot?.()||{signedIn:false,username:'',title:'Путник',avatarUrl:'',ambientEnabled:true};}
+  function ethRefreshProfileChrome(){
+    const snap=ethProfileSnapshot();
+    const name=document.getElementById('eth-game-profile-name');
+    if(name)name.textContent=snap.username||'Профиль игрока';
+    const title=document.getElementById('eth-game-hero-title');
+    if(title)title.textContent=snap.title||'Путник';
+    ethSetAvatarUI(snap.avatarUrl||'');
+  }
+
   window.ethGameTab=function(tab){
+    if(!['main','map','settings'].includes(tab))tab='main';
     ethCurrentGameTab=tab;
-    const main=document.getElementById('eth-game-main-view'),map=document.getElementById('eth-game-map-view'),settings=document.getElementById('eth-game-settings-view');
-    if(main)main.hidden=tab!=='main';if(map)map.hidden=tab!=='map';if(settings){settings.classList.toggle('open',tab==='settings');settings.setAttribute('aria-hidden',String(tab!=='settings'));}
-    ['main','map','settings'].forEach(k=>{const b=document.getElementById('eth-tab-'+k);if(b)b.classList.toggle('active',k===tab)});
+    const main=document.getElementById('eth-game-main-view');
+    const map=document.getElementById('eth-game-map-view');
+    const settings=document.getElementById('eth-game-settings-view');
+    if(main)main.hidden=tab!=='main';
+    if(map)map.hidden=tab!=='map';
+    if(settings){settings.classList.toggle('open',tab==='settings');settings.setAttribute('aria-hidden',String(tab!=='settings'));}
+    ['main','map','settings'].forEach(k=>{
+      const b=document.getElementById('eth-tab-'+k);
+      if(b)b.classList.toggle('active',k===tab);
+    });
     if(tab==='settings')ethRefreshGameSettings();
   };
-  window.ethSelectChapter=function(n){
-    ethSelectedChapter=n;
-    document.querySelectorAll('.eth-game-chapter').forEach(el=>el.classList.toggle('selected',Number(el.dataset.chapter)===n));
-    const descriptions={1:'Глава I: Пепельная тропа. Первые земли и следы расколотого Сердца.',2:'Глава II: Забытые имена. Город архивов и тайны исчезающих воспоминаний.',3:'Глава III: Каменная память. Горные земли и древние стражи.'};
-    const d=document.getElementById('level-description');if(d)d.textContent=descriptions[n]+' Текущий уровень кампании: '+(document.getElementById('current-level-display')?.textContent||'1')+'.';
+
+  const ethChapterInfo={
+    1:{title:'Пепельная тропа',kicker:'АКТ I · ПУТЬ НАЧИНАЕТСЯ',enemy:'Главный противник: Король Орков',mark:'⚔️',desc:'Пепельные дороги, забытые святилища и первые следы расколотого Сердца. Здесь начинается путь героя.'},
+    2:{title:'Забытые имена',kicker:'АКТ II · ГОРОД АРХИВОВ',enemy:'Главный противник: Некромант архивов',mark:'📜',desc:'Город, где стираются имена и оживают старые записи. Тишина архивов скрывает опасных противников.'},
+    3:{title:'Каменная память',kicker:'АКТ III · ГОРНЫЙ РУБЕЖ',enemy:'Главный противник: Каменный гигант',mark:'⛰️',desc:'Высокие перевалы, древние механизмы и стражи, хранящие память мира. Последний из трёх больших актов.'}
   };
+  window.ethSelectChapter=function(n){
+    n=Math.max(1,Math.min(3,Number(n)||1));
+    ethSelectedChapter=n;
+    const info=ethChapterInfo[n];
+    document.querySelectorAll('.eth-game-chapter').forEach(el=>el.classList.toggle('selected',Number(el.dataset.chapter)===n));
+    const scene=document.getElementById('eth-chapter-scene');
+    if(scene)scene.dataset.chapter=String(n);
+    const title=document.getElementById('eth-scene-title');if(title)title.textContent=info.title;
+    const kicker=document.getElementById('eth-scene-kicker');if(kicker)kicker.textContent=info.kicker;
+    const enemy=document.getElementById('eth-scene-enemy');if(enemy)enemy.textContent=info.enemy;
+    const mark=document.getElementById('eth-scene-mark');if(mark)mark.textContent=info.mark;
+    const d=document.getElementById('level-description');
+    if(d)d.textContent=info.desc;
+  };
+
   function ethRefreshGameSettings(){
+    const snap=ethProfileSnapshot();
     const account=document.getElementById('eth-game-account-state');
-    const snap=window.ethGameAccountSnapshot?.();if(account)account.textContent=snap?.signedIn?'Вход выполнен: '+snap.username:'Не выполнен вход. Для облачного профиля открой окно аккаунта.';
-    const label=document.getElementById('eth-game-mute-button');if(label)label.textContent=(window.ethGameAccountSnapshot?.().ambientEnabled??true)?'Выключить атмосферный звук':'Включить атмосферный звук';
-    const url=window.ethGameAccountSnapshot?.().avatarUrl||'';ethSetAvatarUI(url);
+    if(account)account.textContent=snap.signedIn?'Вход выполнен: '+snap.username:'Не выполнен вход. Для облачного профиля открой окно аккаунта.';
+    const label=document.getElementById('eth-game-mute-button');
+    if(label)label.textContent=snap.ambientEnabled?'Выключить звук':'Включить звук';
+    ethSetAvatarUI(snap.avatarUrl||'');
   }
+
   window.ethGameToggleSound=function(){
-    const current=window.ethGameAccountSnapshot?.().ambientEnabled??true;
-    window.ethGameSetAmbientSound?.(!current);
+    const snap=ethProfileSnapshot();
+    window.ethGameSetAmbientSound?.(!snap.ambientEnabled);
     ethRefreshGameSettings();
   };
-  window.ethPromoPlaceholder=function(){
-    const value=String(document.getElementById('eth-promo-input')?.value||'').trim();
-    const status=document.getElementById('eth-promo-status');
-    if(status)status.textContent=value?'Промокоды ещё не активированы. Этот код не был применён и награда не начислена.':'Сначала введи промокод.';
-  };
+
   window.ethUploadAvatar=async function(){
-    const status=document.getElementById('eth-avatar-status'),file=document.getElementById('eth-avatar-file')?.files?.[0];
-    const say=(m)=>{if(status)status.textContent=m;};
+    const status=document.getElementById('eth-avatar-status');
+    const file=document.getElementById('eth-avatar-file')?.files?.[0];
+    const say=m=>{if(status)status.textContent=m;};
     if(!file){say('Сначала выбери изображение.');return;}
     say('Загружаем изображение…');
-    try{const url=await window.ethGameUploadAvatar(file);ethSetAvatarUI(url);say('Аватар сохранён в облаке.');}
-    catch(e){say('Не удалось сохранить аватар: '+(e.message||e));}
+    try{
+      const url=await window.ethGameUploadAvatar(file);
+      if(ethAvatarPreviewUrl){URL.revokeObjectURL(ethAvatarPreviewUrl);ethAvatarPreviewUrl=null;}
+      ethSetAvatarUI(url);
+      say('Аватар сохранён в облаке и привязан к профилю.');
+    }catch(e){say('Не удалось сохранить аватар: '+(e.message||e));}
   };
+
   window.ethRemoveAvatar=async function(){
-    const status=document.getElementById('eth-avatar-status'),say=(m)=>{if(status)status.textContent=m;};
-    try{await window.ethGameDeleteAvatar();ethSetAvatarUI('');say('Аватар удалён.');}
-    catch(e){say('Не удалось удалить аватар: '+(e.message||e));}
+    const status=document.getElementById('eth-avatar-status');
+    const say=m=>{if(status)status.textContent=m;};
+    try{
+      await window.ethGameDeleteAvatar();
+      if(ethAvatarPreviewUrl){URL.revokeObjectURL(ethAvatarPreviewUrl);ethAvatarPreviewUrl=null;}
+      const input=document.getElementById('eth-avatar-file');if(input)input.value='';
+      ethSetAvatarUI('');
+      say('Аватар удалён.');
+    }catch(e){say('Не удалось удалить аватар: '+(e.message||e));}
   };
+
   const oldShow=window.showScreen;
   window.showScreen=function(id){
-    document.body.classList.toggle('eth-inventory-open',id==='inventory');
     const result=oldShow.apply(this,arguments);
-    if(id==='map'){
-      const snap=window.ethGameAccountSnapshot?.();
-      const name=document.getElementById('eth-game-profile-name');if(name)name.textContent=snap?.username||'Профиль игрока';
-      const title=document.getElementById('eth-game-hero-title');if(title)title.textContent=snap?.title||'Путник';
-      ethSetAvatarUI(snap?.avatarUrl||'');
+    document.body.classList.toggle('eth-inventory-open',id==='inventory');
+    if(id==='inventory'){
+      // Keep MAIN visible beneath the sliding inventory sheet.
+      document.getElementById('screen-map')?.classList.add('active');
+      ethRefreshInventoryHero();
+      window.updateInventoryScreen?.();
+    }else if(id==='map'){
+      ethRefreshProfileChrome();
       const level=Number(document.getElementById('current-level-display')?.textContent||1);
-      const progress=document.getElementById('eth-level-progress');if(progress)progress.style.width=Math.max(2,Math.min(100,level/50*100))+'%';
-      const gold=document.getElementById('eth-map-gold-display');if(gold)gold.textContent=document.getElementById('gold-display')?.textContent||'0';
+      const progress=document.getElementById('eth-level-progress');
+      if(progress)progress.style.width=Math.max(2,Math.min(100,level/50*100))+'%';
+      const gold=document.getElementById('gold-display');if(gold&&typeof state!=='undefined')gold.textContent=String(state.gold||0);
+      ethRefreshInventoryHero();
     }
     return result;
   };
-  const oldUpdate=window.updateMapScreen;
-  if(typeof oldUpdate==='function')window.updateMapScreen=function(){const r=oldUpdate.apply(this,arguments);const level=Number(document.getElementById('current-level-display')?.textContent||1);const progress=document.getElementById('eth-level-progress');if(progress)progress.style.width=Math.max(2,Math.min(100,level/50*100))+'%';const name=document.getElementById('eth-game-profile-name');if(name)name.textContent=window.ethGameAccountSnapshot?.().username||'Профиль игрока';const title=document.getElementById('eth-game-hero-title');if(title)title.textContent=window.ethGameAccountSnapshot?.().title||'Путник';ethSetAvatarUI(window.ethGameAccountSnapshot?.().avatarUrl||'');return r;};
-  const oldRefresh=window.ethRefreshAccountUI;
-  if(typeof oldRefresh==='function')window.ethRefreshAccountUI=function(){const r=oldRefresh.apply(this,arguments);const name=document.getElementById('eth-game-profile-name');if(name)name.textContent=window.ethV4?.account?.username||'Профиль игрока';const title=document.getElementById('eth-game-hero-title');if(title)title.textContent=window.ethV4?.account?.currentTitle||'Путник';ethSetAvatarUI(window.ethV4?.account?.avatarUrl||'');return r;};
 
-  // Inventory item miniatures and pointer/touch-friendly drag-to-slot equipment.
-  const ethOriginalInventoryUpdate = window.updateInventoryScreen;
-  if (typeof ethOriginalInventoryUpdate === 'function') {
-    window.updateInventoryScreen = function () {
-      const result = ethOriginalInventoryUpdate.apply(this, arguments);
-      const list = document.getElementById('inventory-list');
-      if (list) {
-        [...list.children].forEach((card,index) => {
-          const item = state.inventory[index];
-          if (!item) return;
-          const glyph = ({weapon:'⚔️',armor:'🛡️',amulet:'🔮',ring:'💍'})[item.slot] || '✦';
-          const tile = document.createElement('div');
-          tile.className = 'eth-item-miniature';
-          tile.setAttribute('aria-hidden','true');
-          tile.textContent = glyph;
-          card.prepend(tile);
-          card.draggable = true;
-          card.dataset.inventoryIndex = String(index);
-          card.addEventListener('dragstart', event => {
-            event.dataTransfer?.setData('text/plain', String(index));
-            if (event.dataTransfer) event.dataTransfer.effectAllowed = 'move';
-          });
-        });
-      }
-      const slots = document.getElementById('equipment-slots');
-      if (slots) [...slots.children].forEach((slot,index) => {
-        const slotKey = ['weapon','armor','amulet','ring'][index];
-        slot.addEventListener('dragover', event => { event.preventDefault(); slot.classList.add('eth-slot-drop'); });
-        slot.addEventListener('dragleave', () => slot.classList.remove('eth-slot-drop'));
-        slot.addEventListener('drop', event => {
-          event.preventDefault(); slot.classList.remove('eth-slot-drop');
-          const itemIndex = Number(event.dataTransfer?.getData('text/plain'));
-          const item = state.inventory[itemIndex];
-          if (item && item.slot === slotKey) window.equipArtifact(itemIndex);
-        });
-      });
-      return result;
-    };
+  function ethRefreshInventoryHero(){
+    const host=document.getElementById('eth-inventory-hero-model');
+    if(!host)return;
+    const source=document.querySelector('#map-hero-icon svg.hero-model');
+    if(source)host.replaceChildren(source.cloneNode(true));
+    else if(!host.querySelector('svg')){host.innerHTML='<span class="text-7xl">🧙</span>';}
+    const name=document.getElementById('eth-inventory-hero-name');
+    if(name)name.textContent=(typeof state!=='undefined'&&state.hero?.name)||'Герой Этерии';
   }
 
+  const oldUpdate=window.updateMapScreen;
+  if(typeof oldUpdate==='function')window.updateMapScreen=function(){
+    const r=oldUpdate.apply(this,arguments);
+    const level=Number(document.getElementById('current-level-display')?.textContent||1);
+    const progress=document.getElementById('eth-level-progress');
+    if(progress)progress.style.width=Math.max(2,Math.min(100,level/50*100))+'%';
+    const chapter=level<=10?1:(level<=25?2:3);
+    window.ethSelectChapter(chapter);
+    ethRefreshProfileChrome();
+    const gold=document.getElementById('gold-display');if(gold&&typeof state!=='undefined')gold.textContent=String(state.gold||0);
+    ethRefreshInventoryHero();
+    return r;
+  };
+
+  const oldRefresh=window.ethRefreshAccountUI;
+  if(typeof oldRefresh==='function')window.ethRefreshAccountUI=function(){
+    const r=oldRefresh.apply(this,arguments);
+    ethRefreshProfileChrome();
+    if(ethCurrentGameTab==='settings')ethRefreshGameSettings();
+    return r;
+  };
+
+  function ethItemGlyph(item){
+    const n=String(item.name||'').toLowerCase();
+    if(/меч|клинок|экскалибур|сабл|кинжал|оруж|посох/.test(n))return '⚔️';
+    if(/щит|доспех|брон|кольчуг|эгид/.test(n))return '🛡️';
+    if(/амулет|сердце|слеза|грааль|кристалл/.test(n))return '🔮';
+    if(/кольц/.test(n))return '💍';
+    if(/корон/.test(n))return '👑';
+    if(/свет|свящ|свят/.test(n))return '✨';
+    return ({weapon:'⚔️',armor:'🛡️',amulet:'🔮',ring:'💍'})[item.slot]||'✦';
+  }
+
+  function ethShowItemInspector(item,index){
+    const icon=document.getElementById('eth-item-inspector-icon');
+    const title=document.getElementById('eth-item-inspector-title');
+    const copy=document.getElementById('eth-item-inspector-copy');
+    if(!item)return;
+    const stats=item.stats||{};
+    const labels={hp:'HP',mp:'MP',atk:'Атака',def:'Защита'};
+    const bonus=Object.entries(stats).map(([key,value])=>(value>0?'+':'')+value+' '+(labels[key]||key)).join(' · ');
+    if(icon)icon.textContent=ethItemGlyph(item);
+    if(title)title.textContent=item.name||'Предмет';
+    if(copy)copy.textContent=(item.desc||'Артефакт Этерии')+(bonus?' · '+bonus:'')+(item.equipped?' · Уже надет':'');
+    document.querySelectorAll('#inventory-list>div').forEach((card,i)=>card.classList.toggle('eth-item-selected',i===index));
+  }
+
+  const ethOriginalInventoryUpdate=window.updateInventoryScreen;
+  if(typeof ethOriginalInventoryUpdate==='function')window.updateInventoryScreen=function(){
+    const result=ethOriginalInventoryUpdate.apply(this,arguments);
+    const list=document.getElementById('inventory-list');
+    const items=(typeof state!=='undefined'&&Array.isArray(state.inventory))?state.inventory:[];
+    if(list){
+      [...list.children].forEach((card,index)=>{
+        const item=items[index];if(!item)return;
+        const tile=document.createElement('div');
+        tile.className='eth-item-miniature';
+        tile.setAttribute('aria-hidden','true');
+        tile.textContent=ethItemGlyph(item);
+        const rarity=item.rarity||'common';
+        tile.dataset.rarity=rarity;
+        if(rarity==='holy')tile.style.background='radial-gradient(circle at 50% 36%,#fffbd6,#e8ce79 65%,#bf9c54)';
+        else if(rarity==='darkness')tile.style.background='radial-gradient(circle at 50% 36%,#f5c0a8,#bb7469 65%,#64404a)';
+        else if(rarity==='legendary')tile.style.background='radial-gradient(circle at 50% 36%,#fff0c4,#e7a35f 65%,#b66c47)';
+        card.prepend(tile);
+        card.classList.add('eth-item-card');
+        card.dataset.inventoryIndex=String(index);
+        card.setAttribute('tabindex','0');
+        card.addEventListener('mouseenter',()=>ethShowItemInspector(item,index));
+        card.addEventListener('focusin',()=>ethShowItemInspector(item,index));
+        card.addEventListener('touchstart',()=>ethShowItemInspector(item,index),{passive:true});
+        card.draggable=true;
+        card.addEventListener('dragstart',event=>{
+          event.dataTransfer?.setData('text/plain',String(index));
+          if(event.dataTransfer)event.dataTransfer.effectAllowed='move';
+        });
+      });
+      const count=document.getElementById('eth-inventory-count');
+      if(count)count.textContent=items.length+' '+(items.length===1?'предмет':items.length>=2&&items.length<=4?'предмета':'предметов');
+      if(items.length)ethShowItemInspector(items[0],0);
+      else{
+        const icon=document.getElementById('eth-item-inspector-icon');if(icon)icon.textContent='✦';
+        const title=document.getElementById('eth-item-inspector-title');if(title)title.textContent='Сумка пуста';
+        const copy=document.getElementById('eth-item-inspector-copy');if(copy)copy.textContent='Здесь появятся описание и свойства новых находок.';
+      }
+    }
+    const slots=document.getElementById('equipment-slots');
+    if(slots)[...slots.children].forEach((slot,index)=>{
+      const slotKey=['weapon','armor','amulet','ring'][index];
+      slot.addEventListener('dragover',event=>{event.preventDefault();slot.classList.add('eth-slot-drop')});
+      slot.addEventListener('dragleave',()=>slot.classList.remove('eth-slot-drop'));
+      slot.addEventListener('drop',event=>{
+        event.preventDefault();slot.classList.remove('eth-slot-drop');
+        const itemIndex=Number(event.dataTransfer?.getData('text/plain'));
+        const item=items[itemIndex];
+        if(item&&item.slot===slotKey)window.equipArtifact(itemIndex);
+      });
+    });
+    ethRefreshInventoryHero();
+    return result;
+  };
+
+  const avatarInput=document.getElementById('eth-avatar-file');
+  avatarInput?.addEventListener('change',()=>{
+    const file=avatarInput.files?.[0];
+    if(!file)return;
+    const status=document.getElementById('eth-avatar-status');
+    if(!['image/jpeg','image/png','image/webp'].includes(file.type)||file.size>2*1024*1024){
+      if(status)status.textContent='Поддерживаются JPG, PNG и WebP размером до 2 МБ.';
+      avatarInput.value='';return;
+    }
+    if(ethAvatarPreviewUrl)URL.revokeObjectURL(ethAvatarPreviewUrl);
+    ethAvatarPreviewUrl=URL.createObjectURL(file);
+    ethSetAvatarUI(ethAvatarPreviewUrl);
+    if(status)status.textContent='Предпросмотр. Нажми «Сохранить аватар», чтобы загрузить его в облако.';
+  });
+
   window.ethGameTab('main');
+  ethRefreshProfileChrome();
 })();
 </script>
 
