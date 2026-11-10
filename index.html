@@ -813,6 +813,15 @@ body.eth-inventory-open #screen-map.eth-game-shell{transform:translate3d(15vw,0,
 .eth-inventory-items .eth-btn:active{transform:scale(.975);filter:brightness(.86)}
 @media(prefers-reduced-motion:reduce){.eth-game-brand{animation:none!important}}
 </style>
+<style id="eth-hotfix-battle-and-chapters-v1">
+/* Keep chapter markers mathematically centered across fonts and viewport sizes. */
+.eth-game-chapter .eth-chapter-index{
+  display:flex!important;align-items:center!important;justify-content:center!important;
+  box-sizing:border-box!important;flex:0 0 auto!important;align-self:center!important;justify-self:center!important;
+  padding:0!important;line-height:1!important;text-align:center!important;font-variant-numeric:tabular-nums;
+  transform:none!important;white-space:nowrap;
+}
+</style>
 </head>
 
 <body>
@@ -1042,7 +1051,8 @@ checkEtheriaConnection();
                   <span>Опыт <b id="map-hero-xp">0</b>/<b id="map-hero-next-xp">100</b></span>
                   <span>Очки характеристик <b id="stat-points-badge">0</b></span>
                 </div>
-                <button class="eth-game-action" onclick="startCombat()" type="button">НАЧАТЬ СРАЖЕНИЕ <span>↗</span></button>
+                <button class="eth-game-action" onclick="window.ethStartMainBattle()" type="button">НАЧАТЬ СРАЖЕНИЕ <span>↗</span></button>
+                <p id="eth-start-battle-feedback" class="mt-2 min-h-5 text-xs text-rose-300" role="status" aria-live="polite"></p>
               </section>
             </div>
           </main>
@@ -5326,6 +5336,29 @@ body.dodge-open{overflow:hidden}
       ethSetAvatarUI('');
       say('Аватар удалён.');
     }catch(e){say('Не удалось удалить аватар: '+(e.message||e));}
+  };
+
+  function ethReportBattleStartError(error){
+    console.error('[Etheria] Не удалось начать бой:',error);
+    if(state?.combat)state.combat.isActive=false;
+    try{if(document.getElementById('screen-combat')?.classList.contains('active'))window.showScreen('map')}catch(showError){console.error('[Etheria] Не удалось вернуться на карту:',showError)}
+    const feedback=document.getElementById('eth-start-battle-feedback');
+    if(feedback)feedback.textContent='Не удалось начать бой: '+String(error?.message||error||'неизвестная ошибка');
+  }
+  window.ethStartMainBattle=function(){
+    const feedback=document.getElementById('eth-start-battle-feedback');
+    if(feedback)feedback.textContent='';
+    if(!state?.hero){window.showScreen('hero-select');return false;}
+    if(!state.combat||typeof state.combat!=='object')state.combat={isActive:false,hp:0,mp:0,enemy:null,playerBuffs:[]};
+    try{
+      if(typeof window.startCombat!=='function')throw new Error('Обработчик боя не загрузился. Обнови страницу.');
+      return window.startCombat();
+    }catch(error){ethReportBattleStartError(error);return false;}
+  };
+  const ethCloseStoryBeforeBattleGuard=window.closeStoryScene;
+  if(typeof ethCloseStoryBeforeBattleGuard==='function')window.closeStoryScene=function(...args){
+    try{return ethCloseStoryBeforeBattleGuard.apply(this,args)}
+    catch(error){ethReportBattleStartError(error);return false;}
   };
 
   const oldStartCombat=window.startCombat;
