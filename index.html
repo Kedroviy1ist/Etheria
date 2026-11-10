@@ -345,6 +345,71 @@
 
     
 /* Etheria 2026 in-game sunset shell */
+
+/* Refined chapter presentation and inventory atelier */
+.eth-chapter-scene{--scene-a:#e5a06e;--scene-b:#75494b;--scene-c:#3d3038;position:relative;overflow:hidden;min-height:190px;margin:-4px -4px 24px;border:2px solid #352216;border-radius:21px 34px 21px 34px;background:linear-gradient(180deg,var(--scene-a),var(--scene-b) 68%,var(--scene-c));box-shadow:inset 0 1px #fff9,0 11px 24px #4b2c2533}
+.eth-chapter-scene:before{content:"";position:absolute;inset:0;background:radial-gradient(ellipse at 70% 35%,rgba(255,240,188,.95) 0 7%,rgba(255,211,144,.4) 17%,transparent 38%),linear-gradient(180deg,#fff2d51a,transparent 50%,#241a243d)}
+.eth-chapter-scene:after{content:"";position:absolute;left:-5%;right:-5%;bottom:-2px;height:48%;background:linear-gradient(160deg,#754d49,#392f38);clip-path:polygon(0 70%,13% 48%,24% 62%,36% 30%,50% 58%,63% 22%,77% 55%,90% 34%,100% 57%,100% 100%,0 100%);opacity:.75}
+.eth-chapter-scene[data-chapter="2"]{--scene-a:#dca17a;--scene-b:#6c5962;--scene-c:#302f42}
+.eth-chapter-scene[data-chapter="2"]:before{background:radial-gradient(ellipse at 67% 31%,rgba(244,224,181,.8) 0 6%,rgba(226,176,130,.28) 18%,transparent 38%),linear-gradient(180deg,rgba(68,70,96,.14),transparent 52%,rgba(25,26,42,.42))}
+.eth-chapter-scene[data-chapter="2"]:after{background:linear-gradient(160deg,#777078,#302f42);clip-path:polygon(0 50%,10% 48%,10% 15%,15% 15%,15% 47%,28% 47%,28% 5%,34% 5%,34% 48%,49% 48%,49% 18%,56% 18%,56% 50%,70% 50%,70% 10%,76% 10%,76% 50%,100% 58%,100% 100%,0 100%)}
+.eth-chapter-scene[data-chapter="3"]{--scene-a:#f0b47b;--scene-b:#7d7773;--scene-c:#3d454b}
+.eth-chapter-scene[data-chapter="3"]:before{background:radial-gradient(ellipse at 61% 30%,rgba(255,233,176,.92) 0 7%,rgba(255,204,139,.3) 17%,transparent 42%),linear-gradient(180deg,rgba(220,228,220,.18),transparent 55%,rgba(30,43,52,.38))}
+.eth-chapter-scene[data-chapter="3"]:after{background:linear-gradient(160deg,#a4a09a,#3c4850);clip-path:polygon(0 70%,12% 20%,20% 57%,34% 0,43% 48%,58% 9%,69% 58%,82% 17%,100% 67%,100% 100%,0 100%)}
+.eth-scene-copy{position:relative;z-index:2;padding:24px clamp(18px,3vw,32px);color:#fff4db;text-shadow:0 2px 8px #21151399;max-width:70%}
+.eth-scene-mark{position:absolute;right:5%;bottom:15%;z-index:2;font-size:clamp(56px,9vw,98px);filter:drop-shadow(0 8px 12px #21151366);opacity:.82}
+.eth-scene-kicker{font-size:10px;font-weight:1000;letter-spacing:.24em;text-transform:uppercase;opacity:.85}
+.eth-scene-title{font-size:clamp(22px,3vw,36px);line-height:1.05;font-weight:1000;margin:7px 0}
+.eth-scene-enemy{font-size:12px;font-weight:800;opacity:.9}
+.eth-game-chapter{position:relative;overflow:hidden}
+.eth-game-chapter:before{content:"";position:absolute;inset:0;background:linear-gradient(145deg,#fff9 0%,transparent 58%);pointer-events:none;opacity:.45}
+.eth-game-chapter.selected{border-color:#2b1b12;outline:2px solid #fff0bd;outline-offset:2px}
+.eth-game-chapter b,.eth-game-chapter span{position:relative;z-index:1}
+.eth-game-chapter[data-chapter="1"]{background:linear-gradient(145deg,#fff1c9,#e5a16f)}
+.eth-game-chapter[data-chapter="2"]{background:linear-gradient(145deg,#f3e0c4,#c8a5a0)}
+.eth-game-chapter[data-chapter="3"]{background:linear-gradient(145deg,#f6dfbd,#abb7b0)}
+.eth-game-profile{max-width:245px}
+.eth-game-profile span:last-child{max-width:145px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.eth-inventory-frame{display:flex;flex-direction:column;gap:18px}
+.eth-inventory-header{display:flex;justify-content:space-between;align-items:center;gap:12px;padding-bottom:16px;border-bottom:1px solid #a77a5566}
+.eth-inventory-title{font-weight:1000;font-size:clamp(25px,3vw,38px);color:#633b25;letter-spacing:.02em}
+.eth-inventory-bonuses{display:flex;flex-wrap:wrap;gap:9px;padding:12px 15px;border:1px solid #9d704d88;border-radius:16px;background:linear-gradient(120deg,#fff9e8,#f0d2aa)}
+.eth-inventory-bonus{padding:8px 11px;border:1.5px solid #80563b;border-radius:10px;background:#fff9ed;color:#593920;font-size:12px;font-weight:950}
+.eth-inventory-layout{display:grid;grid-template-columns:minmax(245px,330px) minmax(0,1fr);gap:18px;align-items:start}
+.eth-inventory-hero,.eth-inventory-items{min-width:0;padding:17px;border:1.5px solid #9c704e99;border-radius:20px 30px 20px 30px;background:linear-gradient(145deg,#fff8e7d9,#eac99fbb);box-shadow:inset 0 1px #fff}
+.eth-inventory-hero{text-align:center;position:sticky;top:0}
+.eth-inventory-hero-model{height:250px;display:grid;place-items:center;margin:4px auto 14px;border-radius:18px;background:radial-gradient(ellipse at 50% 74%,#d99b6a88,transparent 65%),linear-gradient(180deg,#f7e5c8,#e7bf93);overflow:hidden}
+.eth-inventory-hero-model svg{height:100%;width:100%;max-width:210px;max-height:230px;filter:drop-shadow(0 12px 12px #54321f44)}
+.eth-inventory-hero-caption{color:#70482d;font-size:12px;font-weight:900;letter-spacing:.1em;text-transform:uppercase}
+.eth-inventory-items .equipment-slot{border:1.5px solid #835a3d!important;border-radius:13px 19px 13px 19px!important;background:linear-gradient(145deg,#fff3d9,#e4bd91)!important;color:#59391f!important;min-height:72px;transition:transform .2s,box-shadow .2s}
+.eth-inventory-items .equipment-slot.filled{background:linear-gradient(145deg,#f8e5b7,#dbac72)!important;box-shadow:inset 0 1px #fff,0 3px 8px #5a38221a}
+#eth-inventory-equipment #equipment-slots{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;margin:12px 0 0}
+.eth-inventory-items #inventory-list{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;overflow:visible}
+.eth-inventory-items #inventory-list>div{border:1.5px solid #8f6545!important;border-radius:15px 24px 15px 24px!important;background:linear-gradient(145deg,#fff6e4,#e9c69c)!important;color:#50331f!important;box-shadow:0 7px 18px #5b3a241c;transition:transform .22s,box-shadow .22s}
+.eth-inventory-items #inventory-list>div:hover{transform:translateY(-4px);box-shadow:0 13px 28px #5b3a2433}
+.eth-inventory-items #inventory-list>div .text-white,.eth-inventory-items #inventory-list>div .text-slate-300,.eth-inventory-items #inventory-list>div .text-slate-400{color:#68472f!important}
+.eth-inventory-items #inventory-list>div .bg-slate-950\/60{background:#e6c69d!important}
+.eth-item-miniature{height:122px;margin:-16px -16px 12px;display:grid;place-items:center;position:relative;overflow:hidden;border-bottom:1.5px solid #805738;background:radial-gradient(circle at 50% 36%,#fff2c4,#e4b47d 66%,#c7835f);font-size:62px;text-shadow:0 6px 15px #59321e55}
+.eth-item-miniature:after{content:"";position:absolute;inset:0;background:linear-gradient(145deg,#fff9,transparent 45%,#71442b13);pointer-events:none}
+.eth-item-selected{outline:2px solid #ad6e42;outline-offset:1px}
+.eth-item-inspector{display:grid;grid-template-columns:74px minmax(0,1fr);gap:12px;align-items:center;padding:12px;margin:0 0 14px;border:1.5px solid #9c704e;border-radius:14px 22px 14px 22px;background:linear-gradient(120deg,#fff6df,#e6c198)}
+.eth-item-inspector-icon{font-size:42px;text-align:center;filter:drop-shadow(0 5px 5px #5b352933)}
+.eth-item-inspector-title{font-weight:1000;color:#5d3824}
+.eth-item-inspector-copy{font-size:12px;color:#805c40;line-height:1.4;margin-top:3px}
+.eth-inventory-items .eth-btn{border:1.8px solid #352216!important;border-radius:10px!important;background:linear-gradient(120deg,#ffe5b4,#e9a171)!important;color:#392417!important;font-weight:950}
+.eth-inventory-items .eth-btn:hover{filter:brightness(1.04);transform:translateY(-1px)}
+.eth-game-settings-inner{border-radius:25px 38px 25px 38px}
+.eth-game-setting-row .eth-game-side-button{max-width:100%;cursor:pointer}
+.eth-game-setting-row .eth-game-side-button:disabled{opacity:.55;cursor:not-allowed;filter:grayscale(.2)}
+#eth-account-modal .eth-v4-modal-inner,#eth-leaderboard-modal .eth-v4-modal-inner,#eth-admin-modal .eth-v4-modal-inner{background:linear-gradient(145deg,#fff5df,#e8c39b);color:#4b2d1d;border:2px solid #2b1b12;border-radius:25px 38px 25px 38px;box-shadow:0 25px 80px #301d1b88}
+#eth-account-modal .eth-v4-modal-inner h2,#eth-leaderboard-modal .eth-v4-modal-inner h2,#eth-admin-modal .eth-v4-modal-inner h2{color:#653d25}
+#eth-account-modal .eth-v4-modal-inner .eth-v4-panel,#eth-leaderboard-modal .eth-v4-modal-inner .eth-v4-panel,#eth-admin-modal .eth-v4-modal-inner .eth-v4-panel{background:#fff9edcc;border:1px solid #956d4b77;color:#52351f}
+#eth-account-modal .eth-v4-muted,#eth-leaderboard-modal .eth-v4-muted,#eth-admin-modal .eth-v4-muted{color:#78583e}
+#eth-account-modal .eth-v4-input,#eth-admin-modal .eth-v4-input,#eth-admin-modal .eth-v4-select{background:#fffdf5;color:#402b1b;border:1.5px solid #52331e}
+#eth-account-modal .eth-v4-btn,#eth-leaderboard-modal .eth-v4-btn,#eth-admin-modal .eth-v4-btn{border:2px solid #2b1b12;border-radius:11px;background:linear-gradient(120deg,#ffe5b4,#e9a171);color:#392417}
+@media(max-width:850px){.eth-inventory-layout{grid-template-columns:1fr}.eth-inventory-hero{position:relative}.eth-inventory-hero-model{height:205px}.eth-inventory-items #inventory-list{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:540px){.eth-game-topbar{gap:8px;padding:10px}.eth-game-tabs{order:3;width:100%}.eth-game-tab{flex:1;padding:8px 6px}.eth-game-profile{margin-left:auto}.eth-game-profile .eth-game-avatar{width:43px;height:43px}.eth-inventory-layout{gap:12px}.eth-inventory-hero,.eth-inventory-items{padding:12px}.eth-inventory-items #inventory-list{grid-template-columns:1fr}.eth-inventory-hero-model{height:185px}.eth-game-inventory.screen{padding:7px!important}.eth-game-inventory>.eth-inventory-frame{min-height:calc(100vh - 14px);padding:13px!important}.eth-inventory-header{align-items:flex-start}.eth-inventory-title{font-size:23px}}
+
 .eth-item-miniature{height:116px;margin:-16px -16px 12px;display:grid;place-items:center;background:radial-gradient(circle at 50% 40%,#fff2c8,#e4b27e 68%,#c77c5c);border-bottom:2px solid #5a3825;font-size:62px;text-shadow:0 5px 12px #59321e55}.eth-game-inventory .eth-slot-drop{outline:3px dashed #a45d38;outline-offset:2px;transform:translateY(-2px)}
 
 #screen-map.eth-game-shell{position:relative;isolation:isolate;overflow:hidden;min-height:100svh;padding:0!important;color:#382317;background:linear-gradient(180deg,#f8e8c9 0%,#f4c99a 35%,#d98b70 72%,#78595b 100%)}
@@ -379,9 +444,9 @@
 .eth-game-settings-inner{width:min(760px,100%);margin:20px auto;border:2px solid #2c1c12;border-radius:26px 40px 26px 40px;padding:clamp(18px,3vw,30px);background:linear-gradient(145deg,#fff5df,#edc49a);box-shadow:0 20px 60px #301d1b66}
 .eth-game-setting-row{padding:16px 0;border-bottom:1px solid #9d704d66}
 .eth-game-input{width:100%;border:2px solid #382317;border-radius:12px;background:#fffdf5;color:#3c281a;padding:12px}
-.eth-game-inventory.screen{position:fixed!important;inset:0;z-index:1000;width:100%;height:100%;min-height:100%;padding:18px!important;background:linear-gradient(130deg,#d78d70ee,#513d43f5)!important;backdrop-filter:blur(13px);overflow:auto;transform:translateX(-105%);transition:transform .65s cubic-bezier(.2,.8,.2,1);display:flex!important;pointer-events:none}
-.eth-game-inventory.screen.active{transform:translateX(0);pointer-events:auto}
-.eth-game-inventory>div{margin:0!important;width:min(1120px,100%)!important;height:auto!important;min-height:calc(100vh - 36px);max-height:none!important;padding:clamp(16px,3vw,30px)!important;border:2px solid #2b1b12!important;border-radius:28px 40px 28px 40px!important;background:linear-gradient(145deg,#fff4dc,#eac59b)!important;color:#4a2e1e!important}
+.eth-game-inventory.screen{position:fixed!important;inset:0;z-index:1000;width:100%;height:100%;min-height:100%;padding:18px!important;background:linear-gradient(130deg,rgba(215,141,112,.88),rgba(81,61,67,.94))!important;backdrop-filter:blur(13px);overflow:auto;transform:translateX(-105%);transition:transform .65s cubic-bezier(.2,.8,.2,1);pointer-events:none}
+.eth-game-inventory.screen.active{display:flex!important;transform:translateX(0);pointer-events:auto;box-shadow:20px 0 70px #28191366}
+.eth-game-inventory>.eth-inventory-frame{margin:0!important;width:min(1320px,100%)!important;height:auto!important;min-height:calc(100vh - 36px);max-height:none!important;padding:clamp(16px,3vw,30px)!important;border:2px solid #2b1b12!important;border-radius:28px 40px 28px 40px!important;background:linear-gradient(145deg,#fff4dc,#eac59b)!important;color:#4a2e1e!important}
 .eth-game-inventory h2,.eth-game-inventory h3{color:#744328!important}
 .eth-game-inventory .bg-slate-900\/60,.eth-game-inventory .bg-slate-800\/70,.eth-game-inventory .equipment-slot{background:rgba(255,248,231,.82)!important;color:#4a2e1e!important;border-color:#81563866!important}
 .eth-game-inventory .text-slate-300,.eth-game-inventory .text-slate-400,.eth-game-inventory .text-white{color:#69462f!important}
@@ -552,18 +617,22 @@ checkEtheriaConnection();
       <header class="eth-game-topbar">
         <div class="eth-game-brand">ЭТЕРИЯ</div>
         <nav class="eth-game-tabs" aria-label="Разделы игры">
-          <button class="eth-game-tab active" id="eth-tab-main" onclick="ethGameTab('main')">MAIN</button>
-          <button class="eth-game-tab" id="eth-tab-map" onclick="ethGameTab('map')">MAP</button>
-          <button class="eth-game-tab" id="eth-tab-settings" onclick="ethGameTab('settings')">SETTINGS</button>
+          <button class="eth-game-tab active" id="eth-tab-main" onpointerenter="if(matchMedia('(hover:hover)').matches)ethGameTab('main')" onclick="ethGameTab('main')">MAIN</button>
+          <button class="eth-game-tab" id="eth-tab-map" onpointerenter="if(matchMedia('(hover:hover)').matches)ethGameTab('map')" onclick="ethGameTab('map')">MAP</button>
+          <button class="eth-game-tab" id="eth-tab-settings" onpointerenter="if(matchMedia('(hover:hover)').matches)ethGameTab('settings')" onclick="ethGameTab('settings')">SETTINGS</button>
         </nav>
         <button class="eth-game-profile" type="button" onclick="showScreen('inventory')" aria-label="Открыть инвентарь">
           <span class="eth-game-avatar" id="eth-game-avatar"><span>👤</span></span>
-          <span id="eth-game-profile-name">Профиль игрока</span>
+          <span><small class="block text-[9px] tracking-[.18em]">ПРОФИЛЬ</small><b id="eth-game-profile-name">Профиль игрока</b></span>
         </button>
       </header>
 
       <section id="eth-game-main-view" class="eth-game-main">
         <div class="eth-game-card">
+          <div id="eth-chapter-scene" class="eth-chapter-scene" data-chapter="1">
+            <div class="eth-scene-copy"><div class="eth-scene-kicker" id="eth-scene-kicker">АКТ I · ПУТЬ НАЧИНАЕТСЯ</div><div class="eth-scene-title" id="eth-scene-title">Пепельная тропа</div><div class="eth-scene-enemy" id="eth-scene-enemy">Главный противник: Король Орков</div></div>
+            <div class="eth-scene-mark" id="eth-scene-mark">⚔️</div>
+          </div>
           <div class="eth-game-eyebrow">Путь героя · кампания</div>
           <div class="flex items-end justify-between gap-4 flex-wrap mt-2">
             <div><div class="text-sm font-black tracking-widest">ТЕКУЩИЙ УРОВЕНЬ</div><div class="eth-game-level"><span id="current-level-display">1</span><small class="text-2xl"> / 50</small></div></div>
@@ -572,9 +641,9 @@ checkEtheriaConnection();
           <div class="mt-4 rounded-full h-3 overflow-hidden border border-[#54351f] bg-[#b98b65]"><div id="eth-level-progress" class="h-full rounded-full" style="width:2%;background:linear-gradient(90deg,#f4d28b,#c66d46)"></div></div>
           <p id="level-description" class="mt-4 text-base leading-relaxed text-[#69462f]">Три главы ждут своего героя. Выбери путь и продолжи путешествие.</p>
           <div class="eth-game-chapters">
-            <button class="eth-game-chapter selected" data-chapter="1" onclick="ethSelectChapter(1)"><b>ГЛАВА I · ПЕПЕЛЬНАЯ ТРОПА</b><span>Забытые дороги, первые хранители и древние руины</span></button>
-            <button class="eth-game-chapter" data-chapter="2" onclick="ethSelectChapter(2)"><b>ГЛАВА II · ЗАБЫТЫЕ ИМЕНА</b><span>Город архивов, потерянные воспоминания и тайны</span></button>
-            <button class="eth-game-chapter" data-chapter="3" onclick="ethSelectChapter(3)"><b>ГЛАВА III · КАМЕННАЯ ПАМЯТЬ</b><span>Горные земли, древние стражи и путь к Истоку</span></button>
+            <button class="eth-game-chapter selected" data-chapter="1" onclick="ethSelectChapter(1)"><b>ГЛАВА I · ПЕПЕЛЬНАЯ ТРОПА</b><span>Уровни 1–10 · Орки и пепельные стражи</span></button>
+            <button class="eth-game-chapter" data-chapter="2" onclick="ethSelectChapter(2)"><b>ГЛАВА II · ЗАБЫТЫЕ ИМЕНА</b><span>Уровни 11–25 · Призраки и некромант</span></button>
+            <button class="eth-game-chapter" data-chapter="3" onclick="ethSelectChapter(3)"><b>ГЛАВА III · КАМЕННАЯ ПАМЯТЬ</b><span>Уровни 26–50 · Големы и горные титаны</span></button>
           </div>
           <button class="eth-game-action" onclick="startCombat()">НАЧАТЬ СРАЖЕНИЕ</button>
           <div class="mt-4 flex flex-wrap gap-3 text-sm font-bold text-[#714b32]">
@@ -596,7 +665,7 @@ checkEtheriaConnection();
               <div id="map-hero-icon" class="eth-game-avatar" style="width:62px;height:62px">👤</div>
               <div><div id="eth-game-hero-title" class="font-black text-lg">Путник</div><div class="text-xs">Хроники Этерии</div></div>
             </div>
-            <div class="mt-3 text-sm">Золото: <b id="eth-map-gold-display">0</b> 🪙</div>
+            <div class="mt-3 text-sm">Золото: <b id="gold-display">0</b> 🪙</div>
           </div>
         </aside>
       </section>
@@ -620,18 +689,18 @@ checkEtheriaConnection();
           </div>
           <div class="eth-game-setting-row">
             <h3 class="text-xl font-black mb-2">Промокод</h3>
-            <input id="eth-promo-input" class="eth-game-input" maxlength="40" placeholder="Введи промокод">
-            <button class="eth-game-side-button mt-2" onclick="ethPromoPlaceholder()">Проверить код</button>
-            <p id="eth-promo-status" class="text-sm mt-2">Система промокодов будет активирована после запуска выпуска кодов. Сейчас коды не принимаются.</p>
+            <input id="eth-promo-input" class="eth-game-input" maxlength="40" placeholder="Промокоды скоро появятся" disabled>
+            <button class="eth-game-side-button mt-2" disabled>АКТИВАЦИЯ СКОРО</button>
+            <p id="eth-promo-status" class="text-sm mt-2">Поле подготовлено. Система активации будет подключена, когда появятся первые промокоды.</p>
           </div>
           <div class="eth-game-setting-row">
-            <h3 class="text-xl font-black mb-2">Звук</h3>
-            <p class="text-sm mb-3">Отключает атмосферный звук меню. Игровые звуковые эффекты будут подключены к этой настройке по мере переноса звуков в общую систему.</p>
-            <button id="eth-game-mute-button" class="eth-game-side-button" onclick="ethGameToggleSound()">Выключить атмосферный звук</button>
+            <h3 class="text-xl font-black mb-2">Звуки</h3>
+            <p class="text-sm mb-3">Общий переключатель атмосферного звука и будущих игровых эффектов.</p>
+            <button id="eth-game-mute-button" class="eth-game-side-button" onclick="ethGameToggleSound()">Выключить звук</button>
           </div>
           <div class="eth-game-setting-row">
             <h3 class="text-xl font-black mb-2">Аккаунт</h3><p id="eth-game-account-state" class="text-sm mb-3">Проверяем состояние аккаунта…</p>
-            <button class="eth-game-side-button" onclick="ethOpenAccount()">Открыть профиль / войти</button>
+            <button class="eth-game-side-button" onclick="ethOpenAccount()">Профиль и безопасность аккаунта</button>
           </div>
         </div>
       </section>
@@ -811,33 +880,43 @@ checkEtheriaConnection();
 
     <!-- Экран Инвентаря -->
     <div id="screen-inventory" class="screen flex-col items-center p-4 eth-game-inventory">
-        <div class="w-full max-w-5xl glass p-10 rounded-3xl mt-10 shadow-2xl flex flex-col h-[85vh]">
-            <div class="flex justify-between items-center mb-8 border-b border-slate-700 pb-4">
-                <h2 class="text-4xl title-font text-transparent bg-clip-text bg-gradient-to-r from-amber-300 to-yellow-600">Инвентарь и Навыки</h2>
-                <button onclick="showScreen('map')" class="btn px-6 py-2 bg-slate-700/80 hover:bg-slate-600 rounded-xl border border-slate-500/30">Назад</button>
-            </div>
-            
-            <div class="bg-slate-900/60 p-5 rounded-2xl mb-6 flex flex-wrap gap-6 text-base justify-center border border-slate-700/50 shadow-inner">
-                <div class="text-slate-400 font-bold uppercase tracking-wider">Бонусы экипировки:</div>
-                <div class="flex gap-2 items-center"><span class="text-green-400 bg-green-900/20 px-2 py-1 rounded">+<span id="bonus-hp">0</span> HP</span></div>
-                <div class="flex gap-2 items-center"><span class="text-blue-400 bg-blue-900/20 px-2 py-1 rounded">+<span id="bonus-mp">0</span> MP</span></div>
-                <div class="flex gap-2 items-center"><span class="text-red-400 bg-red-900/20 px-2 py-1 rounded">+<span id="bonus-atk">0</span> АТК</span></div>
-                <div class="flex gap-2 items-center"><span class="text-indigo-400 bg-indigo-900/20 px-2 py-1 rounded">+<span id="bonus-def">0</span> ЗАЩ</span></div>
-            </div>
-
-            <div id="learned-skills-section" class="mb-6 hidden">
-                <h3 class="text-xl font-bold mb-3 text-slate-300">Изученные Навыки</h3>
-                <div id="skills-list" class="flex gap-3 overflow-x-auto pb-2"></div>
-            </div>
-
-            <h3 class="text-xl font-bold mb-3 text-slate-300">Артефакты</h3>
-            <div id="inventory-list" class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4 overflow-y-auto pr-2 pb-4 flex-1"></div>
-            
-            <div id="empty-inventory" class="m-auto text-center text-slate-500 hidden flex-1 flex flex-col justify-center">
-                <div class="text-7xl mb-6 opacity-50">🎒</div>
-                <p class="text-xl font-light">У вас пока нет артефактов.<br>Сражайтесь или покупайте сундуки в шахте!</p>
-            </div>
+      <div class="eth-inventory-frame">
+        <header class="eth-inventory-header">
+          <div><div class="eth-game-eyebrow">Снаряжение и находки</div><h2 class="eth-inventory-title">Инвентарь героя</h2></div>
+          <button onclick="showScreen('map')" class="eth-game-side-button" style="width:auto">← Назад в MAIN</button>
+        </header>
+        <div class="eth-inventory-bonuses">
+          <span class="eth-inventory-bonus">❤️ +<b id="bonus-hp">0</b> HP</span>
+          <span class="eth-inventory-bonus">💧 +<b id="bonus-mp">0</b> MP</span>
+          <span class="eth-inventory-bonus">⚔️ +<b id="bonus-atk">0</b> АТК</span>
+          <span class="eth-inventory-bonus">🛡️ +<b id="bonus-def">0</b> ЗАЩ</span>
         </div>
+        <div class="eth-inventory-layout">
+          <aside class="eth-inventory-hero">
+            <div class="eth-game-eyebrow">Твой герой</div>
+            <div id="eth-inventory-hero-model" class="eth-inventory-hero-model"><span class="text-7xl">🧙</span></div>
+            <div id="eth-inventory-hero-name" class="text-xl font-black text-[#5e3a24]">Герой Этерии</div>
+            <div class="eth-inventory-hero-caption mt-1">Активное снаряжение</div>
+            <div id="eth-inventory-equipment" class="mt-3"></div>
+            <p class="text-xs text-[#805b3e] mt-4">Перетащи предмет в подходящий слот или используй кнопку «Надеть» на карточке.</p>
+          </aside>
+          <section class="eth-inventory-items">
+            <div id="learned-skills-section" class="mb-5 hidden">
+              <h3 class="text-lg font-black mb-2">Изученные навыки</h3>
+              <div id="skills-list" class="flex gap-2 overflow-x-auto pb-2"></div>
+            </div>
+            <div id="eth-item-inspector" class="eth-item-inspector">
+              <div id="eth-item-inspector-icon" class="eth-item-inspector-icon">✦</div>
+              <div><div id="eth-item-inspector-title" class="eth-item-inspector-title">Выбери предмет</div><div id="eth-item-inspector-copy" class="eth-item-inspector-copy">При наведении или нажатии здесь появятся его свойства и бонусы.</div></div>
+            </div>
+            <div class="flex items-center justify-between gap-3 mb-3"><h3 class="text-xl font-black">Предметы</h3><span id="eth-inventory-count" class="text-xs font-black text-[#805b3e]">0 предметов</span></div>
+            <div id="inventory-list" class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4 pr-1 pb-4"></div>
+            <div id="empty-inventory" class="m-auto text-center text-[#805b3e] hidden flex-1 flex-col justify-center py-12">
+              <div class="text-7xl mb-4 opacity-70">🎒</div><p class="text-lg font-semibold">Сумка пока пуста</p><p class="text-sm mt-2">Исследуй мир и побеждай противников, чтобы находить экипировку.</p>
+            </div>
+          </section>
+        </div>
+      </div>
     </div>
 
     <!-- Экран Боя -->
@@ -2383,7 +2462,7 @@ body.dodge-open{overflow:hidden}
  function artifactSlot(item){const s=item.stats||{};if((s.atk||0)>0)return 'weapon';if((s.def||0)>0)return 'armor';if((s.mp||0)>0)return 'amulet';return 'ring'}
  function prepareArtifact(item){return {...item,id:item.id||('art-'+Date.now()+'-'+Math.random().toString(36).slice(2,8)),slot:item.slot||artifactSlot(item),equipped:!!item.equipped}}
  state.inventory=state.inventory.map(prepareArtifact);
- function addArtifactEquipmentUI(){const inv=byId('screen-inventory');const list=byId('inventory-list');if(!inv||!list||byId('equipment-slots'))return;const slots=document.createElement('div');slots.id='equipment-slots';slots.className='grid grid-cols-2 md:grid-cols-4 gap-3 mb-5';list.parentElement.insertBefore(slots,list)}
+ function addArtifactEquipmentUI(){const inv=byId('screen-inventory');const list=byId('inventory-list');if(!inv||!list||byId('equipment-slots'))return;const slots=document.createElement('div');slots.id='equipment-slots';slots.className='grid grid-cols-2 md:grid-cols-4 gap-3 mb-5';const equipmentHost=byId('eth-inventory-equipment');if(equipmentHost)equipmentHost.appendChild(slots);else list.parentElement.insertBefore(slots,list)}
  const slotInfo={weapon:{label:'Оружие',icon:'⚔️'},armor:{label:'Броня',icon:'🛡️'},amulet:{label:'Амулет',icon:'🔮'},ring:{label:'Кольцо',icon:'💍'}};
  window.equipArtifact=function(index){const item=state.inventory[index];if(!item)return;state.inventory.forEach(x=>{if(x.slot===item.slot)x.equipped=false});item.equipped=true;updateInventoryScreen();if(state.combat?.isActive)updateCombatUI()};
  window.unequipArtifact=function(index){const item=state.inventory[index];if(!item)return;item.equipped=false;updateInventoryScreen()};
@@ -4426,6 +4505,7 @@ body.dodge-open{overflow:hidden}
   // Main-menu panels reuse the existing Supabase account and leaderboard markup.
   let ethMenuMovedModal = null;
   let ethMenuAudioEnabled = true;
+  try { ethMenuAudioEnabled = localStorage.getItem('etheria-audio-enabled') !== 'false'; } catch (error) {}
   let ethMenuAudioContext = null;
   let ethMenuAudioMaster = null;
 
@@ -4529,6 +4609,7 @@ body.dodge-open{overflow:hidden}
 
   window.ethMenuToggleAudio = function () {
     ethMenuAudioEnabled = !ethMenuAudioEnabled;
+    try { localStorage.setItem('etheria-audio-enabled', String(ethMenuAudioEnabled)); } catch (error) {}
     ethMenuUpdateAudioButtons();
     if (ethMenuAudioEnabled) ethMenuStartAudio();
     else ethMenuSetAudioLevel(0);
@@ -4646,6 +4727,7 @@ body.dodge-open{overflow:hidden}
   };
   window.ethGameSetAmbientSound = function (enabled) {
     ethMenuAudioEnabled = !!enabled;
+    try { localStorage.setItem('etheria-audio-enabled', String(ethMenuAudioEnabled)); } catch (error) {}
     ethMenuUpdateAudioButtons();
     if (ethMenuAudioEnabled) ethMenuStartAudio(); else ethMenuSetAudioLevel(0);
   };
