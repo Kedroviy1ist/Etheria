@@ -4640,8 +4640,14 @@ body.dodge-open{overflow:hidden}
       signedIn: !!(ethCloudUser && ethV4.account),
       username: ethV4.account?.username || '',
       title: ethV4.account?.currentTitle || 'Путник',
-      avatarUrl: ethV4.account?.avatarUrl || ''
+      avatarUrl: ethV4.account?.avatarUrl || '',
+      ambientEnabled: ethMenuAudioEnabled
     };
+  };
+  window.ethGameSetAmbientSound = function (enabled) {
+    ethMenuAudioEnabled = !!enabled;
+    ethMenuUpdateAudioButtons();
+    if (ethMenuAudioEnabled) ethMenuStartAudio(); else ethMenuSetAudioLevel(0);
   };
   window.ethGameUploadAvatar = async function (file) {
     if (!ethCloudUser || !ethSupabaseClient || !ethV4.account) throw new Error('Сначала войди в облачный аккаунт.');
@@ -4707,15 +4713,12 @@ body.dodge-open{overflow:hidden}
   function ethRefreshGameSettings(){
     const account=document.getElementById('eth-game-account-state');
     const snap=window.ethGameAccountSnapshot?.();if(account)account.textContent=snap?.signedIn?'Вход выполнен: '+snap.username:'Не выполнен вход. Для облачного профиля открой окно аккаунта.';
-    const label=document.getElementById('eth-game-mute-button');if(label)label.textContent=ethGameSoundMuted?'Включить атмосферный звук':'Выключить атмосферный звук';
+    const label=document.getElementById('eth-game-mute-button');if(label)label.textContent=(window.ethGameAccountSnapshot?.().ambientEnabled??true)?'Выключить атмосферный звук':'Включить атмосферный звук';
     const url=window.ethGameAccountSnapshot?.().avatarUrl||'';ethSetAvatarUI(url);
   }
   window.ethGameToggleSound=function(){
-    ethGameSoundMuted=!ethGameSoundMuted;
-    if(typeof window.ethMenuToggleAudio==='function'){
-      const enabledNow=!ethGameSoundMuted;
-      if((window.__ethGameAmbientEnabled??true)!==enabledNow){window.ethMenuToggleAudio();window.__ethGameAmbientEnabled=enabledNow;}
-    }
+    const current=window.ethGameAccountSnapshot?.().ambientEnabled??true;
+    window.ethGameSetAmbientSound?.(!current);
     ethRefreshGameSettings();
   };
   window.ethPromoPlaceholder=function(){
