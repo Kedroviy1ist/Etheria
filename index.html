@@ -181,7 +181,14 @@
             background:
                 linear-gradient(180deg, #f8e6c3 0%, #f6cb9b 24%, #edaa7b 49%, #d98268 72%, #805b59 100%);
         }
-        .eth-sunset-scenery { position: absolute; inset: 0; z-index: -1; overflow: hidden; pointer-events: none; }
+        .eth-sunset-scenery {
+            position: absolute; inset: 0; z-index: -1; overflow: hidden; pointer-events: none;
+            background-image:
+                linear-gradient(180deg, rgba(255,239,211,.20) 0%, rgba(238,166,119,.17) 52%, rgba(45,34,40,.43) 100%),
+                url("https://images.unsplash.com/photo-1757301310756-b092d8bea774?auto=format&fit=crop&w=2400&q=85");
+            background-size: cover;
+            background-position: center 54%;
+        }
         .eth-sunset-scenery::before {
             content: ""; position: absolute; inset: 0;
             background:
@@ -193,19 +200,19 @@
             aspect-ratio: 1; transform: translate(-50%,-50%); border-radius: 50%;
             background: linear-gradient(145deg, #fff5c8 0%, #ffd58d 52%, #f4a06d 100%);
             box-shadow: 0 0 55px rgba(255,221,160,.55), 0 0 150px rgba(255,190,120,.32);
-            opacity: .88;
+            opacity: .42;
         }
         .eth-sunset-hills {
             position: absolute; left: -8%; right: -8%; bottom: 7%; height: 42%;
             background: linear-gradient(165deg, #b97565, #865b5b 75%);
             clip-path: polygon(0 62%, 10% 48%, 20% 57%, 32% 28%, 43% 48%, 54% 22%, 67% 54%, 78% 35%, 90% 55%, 100% 38%, 100% 100%, 0 100%);
-            opacity: .85;
+            opacity: .20;
         }
         .eth-sunset-foreground {
             position: absolute; left: -8%; right: -8%; bottom: -2%; height: 30%;
             background: linear-gradient(160deg, #674b4c 0%, #463a42 75%);
             clip-path: polygon(0 50%, 12% 36%, 24% 54%, 39% 28%, 50% 47%, 65% 22%, 78% 50%, 90% 31%, 100% 45%, 100% 100%, 0 100%);
-            opacity: .92;
+            opacity: .30;
         }
         .eth-menu-content {
             position: relative; z-index: 2; display: flex; flex-direction: column;
