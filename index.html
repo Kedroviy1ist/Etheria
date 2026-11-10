@@ -404,6 +404,7 @@
 .eth-inventory-items #inventory-list>div .bg-slate-950\/60{background:#e6c69d!important}
 .eth-item-miniature{height:122px;margin:-16px -16px 12px;display:grid;place-items:center;position:relative;overflow:hidden;border-bottom:1.5px solid #805738;background:radial-gradient(circle at 50% 36%,#fff2c4,#e4b47d 66%,#c7835f);font-size:62px;text-shadow:0 6px 15px #59321e55}
 .eth-item-miniature:after{content:"";position:absolute;inset:0;background:linear-gradient(145deg,#fff9,transparent 45%,#71442b13);pointer-events:none}
+.eth-item-miniature svg{position:relative;z-index:1;width:min(150px,90%);height:112px;overflow:visible;filter:drop-shadow(0 9px 8px #55321f55);animation:ethItemFloat 4.5s ease-in-out infinite}.eth-item-miniature[data-rarity="holy"] svg{filter:drop-shadow(0 0 12px #f7d77d) drop-shadow(0 9px 8px #55321f55)}.eth-item-miniature[data-rarity="darkness"] svg{filter:drop-shadow(0 0 12px #b56b74) drop-shadow(0 9px 8px #55321f55)}@keyframes ethItemFloat{0%,100%{transform:translateY(1px) rotate(-1deg)}50%{transform:translateY(-4px) rotate(1deg)}}
 .eth-item-selected{outline:2px solid #ad6e42;outline-offset:1px}
 .eth-item-inspector{display:grid;grid-template-columns:74px minmax(0,1fr);gap:12px;align-items:center;padding:12px;margin:0 0 14px;border:1.5px solid #9c704e;border-radius:14px 22px 14px 22px;background:linear-gradient(120deg,#fff6df,#e6c198)}
 .eth-item-inspector-icon{font-size:42px;text-align:center;filter:drop-shadow(0 5px 5px #5b352933)}
@@ -4983,6 +4984,29 @@ body.dodge-open{overflow:hidden}
     return ({weapon:'⚔️',armor:'🛡️',amulet:'🔮',ring:'💍'})[item.slot]||'✦';
   }
 
+  function ethItemArtwork(item){
+    const rarity=item.rarity||'common';
+    const metal=rarity==='holy'?'#fff0a9':rarity==='darkness'?'#c77b82':rarity==='legendary'?'#f3be70':rarity==='epic'?'#bba0df':rarity==='rare'?'#91b8d6':'#d5d0bd';
+    const edge=rarity==='darkness'?'#592e3b':'#65432e';
+    const jewel=rarity==='holy'?'#fff7d0':rarity==='darkness'?'#9d435c':rarity==='legendary'?'#dc7a42':'#7ba5ad';
+    const slot=item.slot||'weapon';
+    let shape='';
+    if(slot==='weapon' && /посох/.test(String(item.name||'').toLowerCase())){
+      shape='<path d="M72 12 L87 27 L79 104 L66 104Z" fill="#8c6447" stroke="'+edge+'" stroke-width="4"/><path d="M79 9 C55 7 53 33 77 42 C100 36 100 10 79 9Z" fill="'+jewel+'" stroke="'+metal+'" stroke-width="4"/><path d="M78 13 L78 36" stroke="#fff5d5" stroke-width="3"/><path d="M61 49 L91 49 M59 58 L89 58" stroke="'+metal+'" stroke-width="4" stroke-linecap="round"/>';
+    }else if(slot==='weapon'){
+      shape='<path d="M88 10 L105 26 L67 79 L54 66Z" fill="'+metal+'" stroke="'+edge+'" stroke-width="4"/><path d="M88 10 L96 18 L63 67 L57 63Z" fill="#fff5dc" opacity=".8"/><path d="M51 59 L77 83 L67 94 L41 70Z" fill="#b47b4f" stroke="'+edge+'" stroke-width="4"/><path d="M43 67 L33 79 L58 103 L69 91Z" fill="#7a4932" stroke="'+edge+'" stroke-width="4"/><path d="M42 81 L55 94" stroke="'+metal+'" stroke-width="3"/><circle cx="62" cy="91" r="5" fill="'+jewel+'" stroke="'+edge+'" stroke-width="2"/>';
+    }else if(slot==='armor'){
+      shape='<path d="M46 23 L64 13 L78 24 L93 13 L111 23 L124 46 L108 60 L104 105 L52 105 L48 60 L32 46Z" fill="'+metal+'" stroke="'+edge+'" stroke-width="4" stroke-linejoin="round"/><path d="M64 15 L78 42 L93 15 M78 42 L78 103 M49 59 L64 71 L78 58 L93 71 L108 59" fill="none" stroke="'+edge+'" stroke-width="4" stroke-linecap="round"/><path d="M69 70 L78 81 L87 70" fill="'+jewel+'" stroke="'+edge+'" stroke-width="3"/><path d="M57 95 L99 95" stroke="#fff4d0" stroke-width="3" opacity=".8"/>';
+    }else if(slot==='amulet'){
+      shape='<path d="M44 15 Q78 75 112 15" fill="none" stroke="'+metal+'" stroke-width="5" stroke-linecap="round"/><path d="M78 43 L101 68 L78 108 L55 68Z" fill="'+jewel+'" stroke="'+edge+'" stroke-width="4" stroke-linejoin="round"/><path d="M78 43 L78 108 M55 68 L101 68" stroke="'+metal+'" stroke-width="3" opacity=".85"/><path d="M78 51 L91 68 L78 92 L65 68Z" fill="#fff5d7" opacity=".36"/><circle cx="78" cy="108" r="4" fill="'+metal+'"/>';
+    }else if(slot==='ring'){
+      shape='<ellipse cx="78" cy="74" rx="35" ry="27" fill="none" stroke="'+metal+'" stroke-width="13"/><ellipse cx="78" cy="74" rx="35" ry="27" fill="none" stroke="#fff5d9" stroke-width="3" opacity=".85"/><path d="M78 17 L95 39 L78 57 L61 39Z" fill="'+jewel+'" stroke="'+edge+'" stroke-width="4"/><path d="M78 21 L86 39 L78 49 L70 39Z" fill="#fff5d7" opacity=".52"/>';
+    }else{
+      shape='<path d="M34 43 L45 20 L63 35 L78 9 L93 35 L111 20 L122 43 L115 99 L41 99Z" fill="'+metal+'" stroke="'+edge+'" stroke-width="4" stroke-linejoin="round"/><path d="M43 65 L113 65 L109 99 L47 99Z" fill="'+jewel+'" opacity=".8"/><circle cx="78" cy="56" r="9" fill="'+jewel+'" stroke="'+edge+'" stroke-width="3"/>';
+    }
+    return '<svg viewBox="0 0 156 120" aria-hidden="true" focusable="false"><ellipse cx="78" cy="108" rx="41" ry="6" fill="#56351f" opacity=".16"/><g>'+shape+'</g><path d="M20 20 Q28 12 38 18" fill="none" stroke="#fff8e2" stroke-width="3" stroke-linecap="round" opacity=".65"/></svg>';
+  }
+
   function ethShowItemInspector(item,index){
     const icon=document.getElementById('eth-item-inspector-icon');
     const title=document.getElementById('eth-item-inspector-title');
@@ -5008,7 +5032,7 @@ body.dodge-open{overflow:hidden}
         const tile=document.createElement('div');
         tile.className='eth-item-miniature';
         tile.setAttribute('aria-hidden','true');
-        tile.textContent=ethItemGlyph(item);
+        tile.innerHTML=ethItemArtwork(item);
         const rarity=item.rarity||'common';
         tile.dataset.rarity=rarity;
         if(rarity==='holy')tile.style.background='radial-gradient(circle at 50% 36%,#fffbd6,#e8ce79 65%,#bf9c54)';
