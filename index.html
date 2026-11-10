@@ -4632,6 +4632,50 @@ body.dodge-open{overflow:hidden}
 
   ethMenuUpdateAudioButtons();
 
+  // Public, narrowly scoped avatar API. Auth identity and Supabase client remain private to this closure.
+  window.ethGameAccountSnapshot = function () {
+    return {
+      signedIn: !!(ethCloudUser && ethV4.account),
+      username: ethV4.account?.username || '',
+      title: ethV4.account?.currentTitle || 'Путник',
+      avatarUrl: ethV4.account?.avatarUrl || ''
+    };
+  };
+  window.ethGameUploadAvatar = async function (file) {
+    if (!ethCloudUser || !ethSupabaseClient || !ethV4.account) throw new Error('Сначала войди в облачный аккаунт.');
+    if (!(file instanceof File)) throw new Error('Не выбран файл изображения.');
+    if (!['image/jpeg','image/png','image/webp'].includes(file.type)) throw new Error('Поддерживаются только JPG, PNG и WebP.');
+    if (file.size > 2 * 1024 * 1024) throw new Error('Файл больше 2 МБ.');
+    const ext = file.type === 'image/png' ? 'png' : file.type === 'image/webp' ? 'webp' : 'jpg';
+    const path = ethCloudUser.id + '/' + Date.now() + '-' + crypto.randomUUID() + '.' + ext;
+    const uploaded = await ethSupabaseClient.storage.from('avatars').upload(path, file, { contentType:file.type, upsert:false });
+    if (uploaded.error) throw uploaded.error;
+    const url = ethSupabaseClient.storage.from('avatars').getPublicUrl(path).data.publicUrl;
+    const updated = await ethSupabaseClient.from('profiles').update({avatar_url:url}).eq('id',ethCloudUser.id);
+    if (updated.error) {
+      await ethSupabaseClient.storage.from('avatars').remove([path]);
+      throw updated.error;
+    }
+    ethV4.account.avatarUrl = url;
+    ethRefreshAccountUI();
+    return url;
+  };
+  window.ethGameDeleteAvatar = async function () {
+    if (!ethCloudUser || !ethSupabaseClient || !ethV4.account) throw new Error('Сначала войди в облачный аккаунт.');
+    const old = ethV4.account.avatarUrl || '';
+    const marker = '/storage/v1/object/public/avatars/';
+    if (old.includes(marker + ethCloudUser.id + '/')) {
+      const path = decodeURIComponent(old.split(marker)[1].split('?')[0]);
+      const removed = await ethSupabaseClient.storage.from('avatars').remove([path]);
+      if (removed.error) throw removed.error;
+    }
+    const updated = await ethSupabaseClient.from('profiles').update({avatar_url:null}).eq('id',ethCloudUser.id);
+    if (updated.error) throw updated.error;
+    ethV4.account.avatarUrl = '';
+    ethRefreshAccountUI();
+    return true;
+  };
+
 })();
 </script>
 
@@ -4662,7 +4706,7 @@ body.dodge-open{overflow:hidden}
     const account=document.getElementById('eth-game-account-state');
     if(account)account.textContent=window.ethCloudUser&&window.ethV4?.account?'Вход выполнен: '+(window.ethV4.account.username||'игрок'):'Не выполнен вход. Для облачного профиля открой окно аккаунта.';
     const label=document.getElementById('eth-game-mute-button');if(label)label.textContent=ethGameSoundMuted?'Включить атмосферный звук':'Выключить атмосферный звук';
-    const url=window.ethV4?.account?.avatarUrl||'';ethSetAvatarUI(url);
+    const url=window.ethGameAccountSnapshot?.().avatarUrl||'';ethSetAvatarUI(url);
   }
   window.ethGameToggleSound=function(){
     ethGameSoundMuted=!ethGameSoundMuted;
@@ -4679,40 +4723,16 @@ body.dodge-open{overflow:hidden}
   };
   window.ethUploadAvatar=async function(){
     const status=document.getElementById('eth-avatar-status'),file=document.getElementById('eth-avatar-file')?.files?.[0];
-    const user=window.ethCloudUser,client=window.ethSupabaseClient,account=window.ethV4?.account;
     const say=(m)=>{if(status)status.textContent=m;};
-    if(!user||!client||!account){say('Сначала войди в облачный аккаунт.');return;}
     if(!file){say('Сначала выбери изображение.');return;}
-    if(!['image/jpeg','image/png','image/webp'].includes(file.type)){say('Поддерживаются только JPG, PNG и WebP.');return;}
-    if(file.size>2*1024*1024){say('Файл больше 2 МБ. Выбери изображение поменьше.');return;}
     say('Загружаем изображение…');
-    try{
-      const ext=file.type==='image/png'?'png':file.type==='image/webp'?'webp':'jpg';
-      const path=user.id+'/'+Date.now()+'-'+crypto.randomUUID()+'.'+ext;
-      const upload=await client.storage.from('avatars').upload(path,file,{contentType:file.type,upsert:false});
-      if(upload.error)throw upload.error;
-      const pub=client.storage.from('avatars').getPublicUrl(path).data.publicUrl;
-      const saved=await client.from('profiles').update({avatar_url:pub}).eq('id',user.id);
-      if(saved.error)throw saved.error;
-      account.avatarUrl=pub;ethSetAvatarUI(pub);say('Аватар сохранён в облаке.');
-    }catch(e){say('Не удалось сохранить аватар: '+(e.message||e));}
+    try{const url=await window.ethGameUploadAvatar(file);ethSetAvatarUI(url);say('Аватар сохранён в облаке.');}
+    catch(e){say('Не удалось сохранить аватар: '+(e.message||e));}
   };
   window.ethRemoveAvatar=async function(){
-    const status=document.getElementById('eth-avatar-status'),user=window.ethCloudUser,client=window.ethSupabaseClient,account=window.ethV4?.account;
-    const say=(m)=>{if(status)status.textContent=m;};
-    if(!user||!client||!account){say('Сначала войди в облачный аккаунт.');return;}
-    try{
-      const old=account.avatarUrl||'';
-      const prefix=client.storage.from('avatars').getPublicUrl(user.id+'/').data.publicUrl;
-      if(old&&old.includes('/storage/v1/object/public/avatars/'+user.id+'/')){
-        const path=old.split('/storage/v1/object/public/avatars/')[1].split('?')[0];
-        const removed=await client.storage.from('avatars').remove([decodeURIComponent(path)]);
-        if(removed.error)throw removed.error;
-      }
-      const saved=await client.from('profiles').update({avatar_url:null}).eq('id',user.id);
-      if(saved.error)throw saved.error;
-      account.avatarUrl='';ethSetAvatarUI('');say('Аватар удалён.');
-    }catch(e){say('Не удалось удалить аватар: '+(e.message||e));}
+    const status=document.getElementById('eth-avatar-status'),say=(m)=>{if(status)status.textContent=m;};
+    try{await window.ethGameDeleteAvatar();ethSetAvatarUI('');say('Аватар удалён.');}
+    catch(e){say('Не удалось удалить аватар: '+(e.message||e));}
   };
   const oldShow=window.showScreen;
   window.showScreen=function(id){
@@ -4725,7 +4745,7 @@ body.dodge-open{overflow:hidden}
     return oldShow.apply(this,arguments);
   };
   const oldUpdate=window.updateMapScreen;
-  if(typeof oldUpdate==='function')window.updateMapScreen=function(){const r=oldUpdate.apply(this,arguments);const level=Number(document.getElementById('current-level-display')?.textContent||1);const progress=document.getElementById('eth-level-progress');if(progress)progress.style.width=Math.max(2,Math.min(100,level/50*100))+'%';const name=document.getElementById('eth-game-profile-name');if(name)name.textContent=window.ethV4?.account?.username||'Профиль игрока';const title=document.getElementById('eth-game-hero-title');if(title)title.textContent=window.ethV4?.account?.currentTitle||'Путник';ethSetAvatarUI(window.ethV4?.account?.avatarUrl||'');return r;};
+  if(typeof oldUpdate==='function')window.updateMapScreen=function(){const r=oldUpdate.apply(this,arguments);const level=Number(document.getElementById('current-level-display')?.textContent||1);const progress=document.getElementById('eth-level-progress');if(progress)progress.style.width=Math.max(2,Math.min(100,level/50*100))+'%';const name=document.getElementById('eth-game-profile-name');if(name)name.textContent=window.ethGameAccountSnapshot?.().username||'Профиль игрока';const title=document.getElementById('eth-game-hero-title');if(title)title.textContent=window.ethGameAccountSnapshot?.().title||'Путник';ethSetAvatarUI(window.ethGameAccountSnapshot?.().avatarUrl||'');return r;};
   const oldRefresh=window.ethRefreshAccountUI;
   if(typeof oldRefresh==='function')window.ethRefreshAccountUI=function(){const r=oldRefresh.apply(this,arguments);const name=document.getElementById('eth-game-profile-name');if(name)name.textContent=window.ethV4?.account?.username||'Профиль игрока';const title=document.getElementById('eth-game-hero-title');if(title)title.textContent=window.ethV4?.account?.currentTitle||'Путник';ethSetAvatarUI(window.ethV4?.account?.avatarUrl||'');return r;};
   window.ethGameTab('main');
