@@ -345,6 +345,8 @@
 
     
 /* Etheria 2026 in-game sunset shell */
+.eth-item-miniature{height:116px;margin:-16px -16px 12px;display:grid;place-items:center;background:radial-gradient(circle at 50% 40%,#fff2c8,#e4b27e 68%,#c77c5c);border-bottom:2px solid #5a3825;font-size:62px;text-shadow:0 5px 12px #59321e55}.eth-game-inventory .eth-slot-drop{outline:3px dashed #a45d38;outline-offset:2px;transform:translateY(-2px)}
+
 #screen-map.eth-game-shell{position:relative;isolation:isolate;overflow:hidden;min-height:100svh;padding:0!important;color:#382317;background:linear-gradient(180deg,#f8e8c9 0%,#f4c99a 35%,#d98b70 72%,#78595b 100%)}
 #screen-map.eth-game-shell:before{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(180deg,rgba(255,244,220,.12),rgba(65,39,40,.28)),url("https://images.unsplash.com/photo-1757301310756-b092d8bea774?auto=format&fit=crop&w=2400&q=85") center 56%/cover}
 .eth-game-topbar{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:16px clamp(14px,3vw,34px);background:linear-gradient(110deg,rgba(255,246,224,.94),rgba(238,194,151,.88));border-bottom:2px solid #2b1b12;box-shadow:0 8px 28px #482b2433;position:relative;z-index:3}
@@ -4753,6 +4755,47 @@ body.dodge-open{overflow:hidden}
   if(typeof oldUpdate==='function')window.updateMapScreen=function(){const r=oldUpdate.apply(this,arguments);const level=Number(document.getElementById('current-level-display')?.textContent||1);const progress=document.getElementById('eth-level-progress');if(progress)progress.style.width=Math.max(2,Math.min(100,level/50*100))+'%';const name=document.getElementById('eth-game-profile-name');if(name)name.textContent=window.ethGameAccountSnapshot?.().username||'Профиль игрока';const title=document.getElementById('eth-game-hero-title');if(title)title.textContent=window.ethGameAccountSnapshot?.().title||'Путник';ethSetAvatarUI(window.ethGameAccountSnapshot?.().avatarUrl||'');return r;};
   const oldRefresh=window.ethRefreshAccountUI;
   if(typeof oldRefresh==='function')window.ethRefreshAccountUI=function(){const r=oldRefresh.apply(this,arguments);const name=document.getElementById('eth-game-profile-name');if(name)name.textContent=window.ethV4?.account?.username||'Профиль игрока';const title=document.getElementById('eth-game-hero-title');if(title)title.textContent=window.ethV4?.account?.currentTitle||'Путник';ethSetAvatarUI(window.ethV4?.account?.avatarUrl||'');return r;};
+
+  // Inventory item miniatures and pointer/touch-friendly drag-to-slot equipment.
+  const ethOriginalInventoryUpdate = window.updateInventoryScreen;
+  if (typeof ethOriginalInventoryUpdate === 'function') {
+    window.updateInventoryScreen = function () {
+      const result = ethOriginalInventoryUpdate.apply(this, arguments);
+      const list = document.getElementById('inventory-list');
+      if (list) {
+        [...list.children].forEach((card,index) => {
+          const item = state.inventory[index];
+          if (!item) return;
+          const glyph = ({weapon:'⚔️',armor:'🛡️',amulet:'🔮',ring:'💍'})[item.slot] || '✦';
+          const tile = document.createElement('div');
+          tile.className = 'eth-item-miniature';
+          tile.setAttribute('aria-hidden','true');
+          tile.textContent = glyph;
+          card.prepend(tile);
+          card.draggable = true;
+          card.dataset.inventoryIndex = String(index);
+          card.addEventListener('dragstart', event => {
+            event.dataTransfer?.setData('text/plain', String(index));
+            if (event.dataTransfer) event.dataTransfer.effectAllowed = 'move';
+          });
+        });
+      }
+      const slots = document.getElementById('equipment-slots');
+      if (slots) [...slots.children].forEach((slot,index) => {
+        const slotKey = ['weapon','armor','amulet','ring'][index];
+        slot.addEventListener('dragover', event => { event.preventDefault(); slot.classList.add('eth-slot-drop'); });
+        slot.addEventListener('dragleave', () => slot.classList.remove('eth-slot-drop'));
+        slot.addEventListener('drop', event => {
+          event.preventDefault(); slot.classList.remove('eth-slot-drop');
+          const itemIndex = Number(event.dataTransfer?.getData('text/plain'));
+          const item = state.inventory[itemIndex];
+          if (item && item.slot === slotKey) window.equipArtifact(itemIndex);
+        });
+      });
+      return result;
+    };
+  }
+
   window.ethGameTab('main');
 })();
 </script>
