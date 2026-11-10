@@ -347,6 +347,18 @@
 /* Etheria 2026 in-game sunset shell */
 
 /* Refined chapter presentation and inventory atelier */
+
+.eth-combat-backdrop{position:absolute;inset:0;overflow:hidden;background:linear-gradient(180deg,#e9aa70 0%,#a9645c 47%,#292d39 100%);opacity:1}
+.eth-combat-backdrop:before{content:"";position:absolute;inset:0;background:radial-gradient(ellipse at 72% 24%,#fff0c4 0 7%,#ffd08b88 16%,transparent 36%),linear-gradient(180deg,#ffdfb31c,transparent 44%,#19192388)}
+.eth-combat-backdrop:after{content:"";position:absolute;left:-8%;right:-8%;bottom:-5%;height:55%;background:linear-gradient(160deg,#986458,#3b343d);clip-path:polygon(0 52%,10% 35%,20% 58%,32% 18%,45% 54%,57% 12%,69% 53%,81% 23%,93% 54%,100% 39%,100% 100%,0 100%)}
+#screen-combat[data-chapter="2"] .eth-combat-backdrop{background:linear-gradient(180deg,#c99b88 0%,#655b70 48%,#222c3b 100%)}
+#screen-combat[data-chapter="2"] .eth-combat-backdrop:before{background:radial-gradient(ellipse at 70% 25%,#f2dfbf 0 6%,#ddba9577 16%,transparent 34%),linear-gradient(180deg,#d8c8d522,transparent 45%,#191c3888)}
+#screen-combat[data-chapter="2"] .eth-combat-backdrop:after{background:linear-gradient(160deg,#82727b,#252b3c);clip-path:polygon(0 58%,9% 55%,9% 13%,15% 13%,15% 54%,27% 54%,27% 4%,34% 4%,34% 57%,48% 57%,48% 18%,56% 18%,56% 57%,72% 57%,72% 8%,79% 8%,79% 58%,100% 48%,100% 100%,0 100%)}
+#screen-combat[data-chapter="3"] .eth-combat-backdrop{background:linear-gradient(180deg,#edc08b 0%,#8a9b9b 48%,#2d4149 100%)}
+#screen-combat[data-chapter="3"] .eth-combat-backdrop:before{background:radial-gradient(ellipse at 64% 22%,#fff0c7 0 7%,#f4d19a88 18%,transparent 38%),linear-gradient(180deg,#eaf2f01c,transparent 45%,#182d3c88)}
+#screen-combat[data-chapter="3"] .eth-combat-backdrop:after{background:linear-gradient(160deg,#a9b5b0,#34464f);clip-path:polygon(0 70%,12% 20%,20% 58%,34% 0,43% 48%,58% 8%,69% 57%,82% 17%,100% 68%,100% 100%,0 100%)}
+#screen-combat .glass{backdrop-filter:blur(9px);background:rgba(255,242,219,.10);border-color:rgba(255,231,193,.2)}
+
 .eth-game-main,.eth-game-placeholder{transition:opacity .38s ease,transform .43s cubic-bezier(.2,.8,.2,1),filter .38s ease}.eth-game-main.eth-view-entering,.eth-game-placeholder.eth-view-entering{opacity:0;transform:translateX(24px) scale(.985);filter:blur(3px)}.eth-game-main.eth-view-leaving,.eth-game-placeholder.eth-view-leaving{opacity:0;transform:translateX(-22px) scale(.985);filter:blur(3px);pointer-events:none}.eth-game-main[hidden],.eth-game-placeholder[hidden]{display:none!important}.eth-game-tabs{position:relative}.eth-game-tab:not(.active){filter:saturate(.78);opacity:.82}.eth-game-tab.active{transform:translateY(-2px) scale(1.045);box-shadow:0 7px 0 #38231866,0 12px 25px #5b382344}.eth-game-tab:focus-visible{outline:3px solid #fff4d2;outline-offset:3px}.eth-game-inventory.screen{overscroll-behavior:contain}.eth-inventory-items #empty-inventory.flex{display:flex}.eth-game-shell #map-hero-icon.map-hero-model{background:linear-gradient(145deg,#ffe8bd,#dc9e70);border-color:#593a24}.eth-game-profile .eth-game-avatar{width:52px;height:52px;min-width:52px}
 .eth-chapter-scene{--scene-a:#e5a06e;--scene-b:#75494b;--scene-c:#3d3038;position:relative;overflow:hidden;min-height:190px;margin:-4px -4px 24px;border:2px solid #352216;border-radius:21px 34px 21px 34px;background:linear-gradient(180deg,var(--scene-a),var(--scene-b) 68%,var(--scene-c));box-shadow:inset 0 1px #fff9,0 11px 24px #4b2c2533}
 .eth-chapter-scene:before{content:"";position:absolute;inset:0;background:radial-gradient(ellipse at 70% 35%,rgba(255,240,188,.95) 0 7%,rgba(255,211,144,.4) 17%,transparent 38%),linear-gradient(180deg,#fff2d51a,transparent 50%,#241a243d)}
@@ -922,7 +934,7 @@ checkEtheriaConnection();
 
     <!-- Экран Боя -->
     <div id="screen-combat" class="screen flex-col relative overflow-hidden">
-        <div class="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1542281286-9e0a16bb7366?q=80&w=1920')] opacity-20 bg-cover bg-center z-0"></div>
+        <div id="eth-combat-backdrop" class="eth-combat-backdrop absolute inset-0 z-0" aria-hidden="true"></div>
         <div class="absolute inset-0 bg-gradient-to-b from-transparent via-[#0f172a]/80 to-[#0f172a] z-0"></div>
         
         <div class="z-10 text-center py-5 glass border-b-0 shadow-lg">
@@ -4898,6 +4910,14 @@ body.dodge-open{overflow:hidden}
       ethSetAvatarUI('');
       say('Аватар удалён.');
     }catch(e){say('Не удалось удалить аватар: '+(e.message||e));}
+  };
+
+  const oldStartCombat=window.startCombat;
+  if(typeof oldStartCombat==='function')window.startCombat=function(){
+    const level=Number(typeof state!=='undefined'?state.level:1)||1;
+    const chapter=level<=10?1:(level<=25?2:3);
+    document.getElementById('screen-combat')?.setAttribute('data-chapter',String(chapter));
+    return oldStartCombat.apply(this,arguments);
   };
 
   const oldShow=window.showScreen;
