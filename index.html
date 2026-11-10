@@ -4453,6 +4453,7 @@ body.dodge-open{overflow:hidden}
           '<p>Здесь можно включать и выключать спокойный звук ветра и мягкий фоновый тон. Звук запускается после первого нажатия, потому что браузеры блокируют автоматическое воспроизведение.</p>' +
           '<button id="eth-menu-audio-panel-toggle" type="button" class="eth-menu-settings-toggle" onclick="ethMenuToggleAudio()">Выключить атмосферный звук</button>' +
           '<p class="mt-4">Плавные анимации и тёплая цветовая тема применяются ко всему главному меню. Игровые настройки прогресса остаются внутри самой игры.</p>' +
+          '<button type="button" class="eth-menu-settings-toggle" style="margin-top:10px;background:linear-gradient(120deg,#f1dfc4,#d9b895)" onclick="ethMenuClosePanel()">Вернуться в меню</button>' +
         '</section>';
       ethMenuUpdateAudioButtons();
     }
@@ -4477,8 +4478,12 @@ body.dodge-open{overflow:hidden}
         }
       }, 780);
     } else {
-      const slot = byId('eth-menu-panel-content');
-      if (slot) slot.replaceChildren();
+      window.setTimeout(() => {
+        if (!layout.classList.contains('panel-open') && !ethMenuMovedModal) {
+          const slot = byId('eth-menu-panel-content');
+          if (slot) slot.replaceChildren();
+        }
+      }, 780);
     }
   };
 
