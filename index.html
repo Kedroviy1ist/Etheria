@@ -816,11 +816,14 @@ body.eth-inventory-open #screen-map.eth-game-shell{transform:translate3d(15vw,0,
 <style id="eth-hotfix-battle-and-chapters-v1">
 /* Keep chapter markers mathematically centered across fonts and viewport sizes. */
 .eth-game-chapter .eth-chapter-index{
-  display:flex!important;align-items:center!important;justify-content:center!important;
-  box-sizing:border-box!important;flex:0 0 auto!important;align-self:center!important;justify-self:center!important;
-  padding:0!important;line-height:1!important;text-align:center!important;font-variant-numeric:tabular-nums;
-  transform:none!important;white-space:nowrap;
+  display:grid!important;place-items:center!important;box-sizing:border-box!important;
+  width:36px!important;height:36px!important;min-width:36px!important;flex:0 0 36px!important;
+  align-self:center!important;justify-self:center!important;margin:0!important;padding:0!important;
+  font-family:'Ubuntu',sans-serif!important;font-size:13px!important;font-weight:900!important;
+  font-variant-numeric:tabular-nums;line-height:1!important;letter-spacing:0!important;
+  text-align:center!important;text-indent:0!important;white-space:nowrap;transform:none!important;
 }
+@media(max-width:520px){.eth-game-chapter .eth-chapter-index{width:30px!important;height:30px!important;min-width:30px!important;flex-basis:30px!important;font-size:12px!important}}
 </style>
 </head>
 
@@ -828,7 +831,7 @@ body.eth-inventory-open #screen-map.eth-game-shell{transform:translate3d(15vw,0,
 
     <script>
         // Переключатель технических работ: true — показать экран, false — обычный вход в игру.
-        const ETH_MAINTENANCE_MODE = false;
+        const ETH_MAINTENANCE_MODE = true;
         if (ETH_MAINTENANCE_MODE) {
             document.body.insertAdjacentHTML('afterbegin', "<div id=\"eth-maintenance-overlay\" role=\"dialog\" aria-modal=\"true\" aria-labelledby=\"eth-maintenance-title\">\n        <div class=\"eth-maintenance-card\">\n            <div class=\"eth-maintenance-icon\" aria-hidden=\"true\">🛠️</div>\n            <h1 id=\"eth-maintenance-title\">Технические работы</h1>\n            <p>Этерия временно недоступна.</p>\n            <p class=\"eth-maintenance-subtitle\">Мы проводим технические работы. Пожалуйста, загляните позже.</p>\n        </div>\n    </div>\n    <style>\n        html, body { min-height: 100%; }\n        #eth-maintenance-overlay {\n            position: fixed;\n            inset: 0;\n            z-index: 2147483647;\n            display: flex;\n            align-items: center;\n            justify-content: center;\n            padding: 24px;\n            background: radial-gradient(ellipse at 50% 35%, #172554 0%, #080d20 55%, #020617 100%);\n            color: #f8fafc;\n            text-align: center;\n            pointer-events: auto;\n            user-select: none;\n        }\n        #eth-maintenance-overlay .eth-maintenance-card {\n            width: min(100%, 620px);\n            padding: clamp(28px, 6vw, 52px);\n            border: 1px solid rgba(251, 191, 36, .35);\n            border-radius: 24px;\n            background: rgba(15, 23, 42, .82);\n            box-shadow: 0 24px 80px rgba(0, 0, 0, .5);\n        }\n        #eth-maintenance-overlay .eth-maintenance-icon {\n            margin-bottom: 18px;\n            font-size: 52px;\n        }\n        #eth-maintenance-overlay h1 {\n            margin: 0 0 18px;\n            color: #fbbf24;\n            font-size: clamp(28px, 6vw, 44px);\n            line-height: 1.15;\n        }\n        #eth-maintenance-overlay p {\n            margin: 8px 0;\n            font-size: clamp(17px, 3vw, 21px);\n        }\n        #eth-maintenance-overlay .eth-maintenance-subtitle {\n            color: #cbd5e1;\n            font-size: 15px;\n        }\n    </style>");
             document.querySelectorAll('body > *:not(#eth-maintenance-overlay)').forEach(function (element) {
@@ -1002,17 +1005,17 @@ checkEtheriaConnection();
               <p>Три части одного пути. Каждая меняет мир, врагов и атмосферу.</p>
             </div>
             <button class="eth-game-chapter selected" data-chapter="1" onclick="ethSelectChapter(1)" type="button">
-              <span class="eth-chapter-index">I</span>
+              <span class="eth-chapter-index">01</span>
               <span class="eth-chapter-copy"><b>ПЕПЕЛЬНАЯ ТРОПА</b><small>Уровни 1–10 · Орки и пепельные стражи</small></span>
               <span class="eth-chapter-chevron">›</span>
             </button>
             <button class="eth-game-chapter" data-chapter="2" onclick="ethSelectChapter(2)" type="button">
-              <span class="eth-chapter-index">II</span>
+              <span class="eth-chapter-index">02</span>
               <span class="eth-chapter-copy"><b>КАМЕННАЯ ПАМЯТЬ</b><small>Уровни 11–25 · Дракон и Тёмный Маг</small></span>
               <span class="eth-chapter-chevron">›</span>
             </button>
             <button class="eth-game-chapter" data-chapter="3" onclick="ethSelectChapter(3)" type="button">
-              <span class="eth-chapter-index">III</span>
+              <span class="eth-chapter-index">03</span>
               <span class="eth-chapter-copy"><b>НЕБЕСНАЯ ЦИТАДЕЛЬ</b><small>Уровни 26–50 · Стражи цитадели и Безымянный</small></span>
               <span class="eth-chapter-chevron">›</span>
             </button>
@@ -3427,6 +3430,67 @@ body.dodge-open{overflow:hidden}
     const hero=byId('player-sprite');if(hero&&state.hero)hero.innerHTML=heroSVG(state.hero.type);
     if(typeof updateCombatUI==='function')updateCombatUI();
   }
+
+  // Stable solo entry point: initialise the battle directly instead of passing through
+  // the legacy chain of startCombat wrappers, which could abort after opening the story.
+  window.ethStartSoloCombatDirect=function(skipStory=false){
+    if(!state?.hero){showScreen('hero-select');return false;}
+    if(partyNet.role==='host'&&partyNet.roomId){if(!partyNet.started)startCoopAdventure();return true;}
+    if(partyNet.role==='guest'&&partyNet.roomId){setCoopStatus('Только ведущий начинает следующий бой.');return false;}
+    const level=Math.max(1,Number(state.level)||1);
+    if(!skipStory&&STORY[level]&&!storySeen.has(level)){
+      showStoryScene(level,()=>window.ethStartSoloCombatDirect(true));
+      return true;
+    }
+    setEnemyPool(level);
+    const stats=getFinalStats();
+    const screen=byId('screen-combat');
+    if(!screen)throw new Error('Не найден экран боя (#screen-combat).');
+    const playerSprite=byId('player-sprite'),playerName=byId('player-name');
+    const enemySprite=byId('enemy-sprite'),enemyName=byId('enemy-name');
+    const bossWarning=byId('combat-boss-warning'),combatLog=byId('combat-log');
+    if(!playerSprite||!playerName||!enemySprite||!enemyName||!bossWarning||!combatLog)throw new Error('Не найдены элементы боевого интерфейса.');
+    document.querySelectorAll('.screen').forEach(node=>node.classList.remove('active'));
+    screen.classList.add('active');
+    screen.dataset.chapter=String(level<=10?1:(level<=25?2:3));
+    document.body.classList.remove('eth-inventory-open');
+    if(!state.combat||typeof state.combat!=='object')state.combat={isActive:false,hp:0,mp:0,enemy:null,playerBuffs:[]};
+    state.combat.isActive=true;
+    state.combat.hp=stats.hp;
+    state.combat.mp=stats.mp;
+    state.combat.playerBuffs=[];
+    state.combat.phase='player';
+    state.combat.potions=3;
+    playerSprite.textContent=state.hero.icon||'⚔️';
+    playerName.textContent=state.hero.name||'Герой';
+    const isBoss=level%5===0;
+    let enemyTemplate;
+    if(isBoss){
+      enemyTemplate=BOSSES[level];
+      if(!enemyTemplate)throw new Error('Для уровня '+level+' не настроен противник-босс.');
+      bossWarning.classList.remove('hidden');
+    }else{
+      const randomName=REGULAR_ENEMIES[Math.floor(Math.random()*REGULAR_ENEMIES.length)]||{name:'Гоблин',icon:'👹'};
+      enemyTemplate={name:randomName.name,icon:randomName.icon,hp:40+(level*30),atk:8+(level*8),def:Math.floor(level*3),xp:30+(level*120)};
+      bossWarning.classList.add('hidden');
+    }
+    state.combat.enemy={...enemyTemplate,maxHp:enemyTemplate.hp,isBoss};
+    enemySprite.textContent=state.combat.enemy.icon||'👹';
+    enemyName.textContent=state.combat.enemy.name||'Противник';
+    if(isBoss)enemyName.classList.add('text-amber-500','text-4xl','drop-shadow-[0_0_10px_rgba(245,158,11,0.6)]');
+    else enemyName.classList.remove('text-amber-500','text-4xl','drop-shadow-[0_0_10px_rgba(245,158,11,0.6)]');
+    const levelLabel=byId('combat-level-display');if(levelLabel)levelLabel.textContent=String(level);
+    combatLog.innerHTML='';
+    logMsg('Вы встретили врага: '+state.combat.enemy.name+'!','text-yellow-400');
+    buildAbilitiesUI();
+    updateCombatUI();
+    // The battle is already active and visible. Add enhanced models/menu without
+    // letting a decorative enhancement failure cancel the actual encounter.
+    try{tuneSoloEnemy()}catch(error){console.warn('[Etheria] Enemy styling skipped:',error)}
+    try{renderSoloModels()}catch(error){console.warn('[Etheria] Model styling skipped:',error)}
+    try{renderSoloBattleMenu()}catch(error){console.warn('[Etheria] Battle menu styling skipped:',error)}
+    return true;
+  };
   const previousWindowStartCombatForStages=window.startCombat;
   window.startCombat=function(){
     setEnemyPool(state.level||1);
@@ -5339,20 +5403,29 @@ body.dodge-open{overflow:hidden}
   };
 
   function ethReportBattleStartError(error){
-    console.error('[Etheria] Не удалось начать бой:',error);
-    if(state?.combat)state.combat.isActive=false;
-    try{if(document.getElementById('screen-combat')?.classList.contains('active'))window.showScreen('map')}catch(showError){console.error('[Etheria] Не удалось вернуться на карту:',showError)}
+    const message=String(error?.message||error||'неизвестная ошибка');
+    console.error('[Etheria] Ошибка запуска боя:',error);
+    const combat=document.getElementById('screen-combat');
+    if(state?.combat?.isActive&&combat){
+      document.querySelectorAll('.screen').forEach(node=>node.classList.toggle('active',node===combat));
+    }else if(combat?.classList.contains('active')){
+      document.querySelectorAll('.screen').forEach(node=>node.classList.toggle('active',node.id==='screen-map'));
+    }
     const feedback=document.getElementById('eth-start-battle-feedback');
-    if(feedback)feedback.textContent='Не удалось начать бой: '+String(error?.message||error||'неизвестная ошибка');
+    if(feedback)feedback.textContent='Не удалось начать бой: '+message;
   }
+  window.ethHandleBattleStartError=ethReportBattleStartError;
   window.ethStartMainBattle=function(){
     const feedback=document.getElementById('eth-start-battle-feedback');
     if(feedback)feedback.textContent='';
-    if(!state?.hero){window.showScreen('hero-select');return false;}
-    if(!state.combat||typeof state.combat!=='object')state.combat={isActive:false,hp:0,mp:0,enemy:null,playerBuffs:[]};
+    if(!state?.hero){
+      const heroScreen=document.getElementById('screen-hero-select');
+      if(heroScreen){document.querySelectorAll('.screen').forEach(node=>node.classList.remove('active'));heroScreen.classList.add('active');}
+      return false;
+    }
     try{
-      if(typeof window.startCombat!=='function')throw new Error('Обработчик боя не загрузился. Обнови страницу.');
-      return window.startCombat();
+      if(typeof window.ethStartSoloCombatDirect!=='function')throw new Error('Прямой обработчик боя не загрузился. Обнови страницу.');
+      return window.ethStartSoloCombatDirect();
     }catch(error){ethReportBattleStartError(error);return false;}
   };
   const ethCloseStoryBeforeBattleGuard=window.closeStoryScene;
@@ -5361,13 +5434,8 @@ body.dodge-open{overflow:hidden}
     catch(error){ethReportBattleStartError(error);return false;}
   };
 
-  const oldStartCombat=window.startCombat;
-  if(typeof oldStartCombat==='function')window.startCombat=function(){
-    const level=Number(typeof state!=='undefined'?state.level:1)||1;
-    const chapter=level<=10?1:(level<=25?2:3);
-    document.getElementById('screen-combat')?.setAttribute('data-chapter',String(chapter));
-    return oldStartCombat.apply(this,arguments);
-  };
+  // Make every solo entry route through the deterministic battle initializer above.
+  window.startCombat=function(){return window.ethStartSoloCombatDirect();};
 
   const oldShow=window.showScreen;
   window.showScreen=function(id){
