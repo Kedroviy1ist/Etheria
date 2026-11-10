@@ -666,7 +666,7 @@ checkEtheriaConnection();
               <div id="map-hero-icon" class="eth-game-avatar" style="width:62px;height:62px">👤</div>
               <div><div id="eth-game-hero-title" class="font-black text-lg">Путник</div><div class="text-xs">Хроники Этерии</div></div>
             </div>
-            <div class="mt-3 text-sm">Золото: <b id="gold-display">0</b> 🪙</div>
+            <div class="mt-3 text-sm">Золото: <b id="eth-map-gold-display">0</b> 🪙</div>
           </div>
         </aside>
       </section>
@@ -912,7 +912,7 @@ checkEtheriaConnection();
             </div>
             <div class="flex items-center justify-between gap-3 mb-3"><h3 class="text-xl font-black">Предметы</h3><span id="eth-inventory-count" class="text-xs font-black text-[#805b3e]">0 предметов</span></div>
             <div id="inventory-list" class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4 pr-1 pb-4"></div>
-            <div id="empty-inventory" class="m-auto text-center text-[#805b3e] hidden flex-1 flex-col justify-center py-12">
+            <div id="empty-inventory" class="m-auto text-center text-[#805b3e] hidden flex flex-1 flex-col justify-center py-12">
               <div class="text-7xl mb-4 opacity-70">🎒</div><p class="text-lg font-semibold">Сумка пока пуста</p><p class="text-sm mt-2">Исследуй мир и побеждай противников, чтобы находить экипировку.</p>
             </div>
           </section>
@@ -4914,7 +4914,7 @@ body.dodge-open{overflow:hidden}
       const level=Number(document.getElementById('current-level-display')?.textContent||1);
       const progress=document.getElementById('eth-level-progress');
       if(progress)progress.style.width=Math.max(2,Math.min(100,level/50*100))+'%';
-      const gold=document.getElementById('gold-display');if(gold&&typeof state!=='undefined')gold.textContent=String(state.gold||0);
+      const gold=document.getElementById('eth-map-gold-display');if(gold&&typeof state!=='undefined')gold.textContent=String(state.gold||0);
       ethRefreshInventoryHero();
     }
     return result;
@@ -4939,7 +4939,7 @@ body.dodge-open{overflow:hidden}
     const chapter=level<=10?1:(level<=25?2:3);
     window.ethSelectChapter(chapter);
     ethRefreshProfileChrome();
-    const gold=document.getElementById('gold-display');if(gold&&typeof state!=='undefined')gold.textContent=String(state.gold||0);
+    const gold=document.getElementById('eth-map-gold-display');if(gold&&typeof state!=='undefined')gold.textContent=String(state.gold||0);
     ethRefreshInventoryHero();
     return r;
   };
