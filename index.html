@@ -343,7 +343,52 @@
             .eth-menu-button, .eth-menu-nav, .eth-menu-panel { transition-duration: .01ms; }
         }
 
-    </style>
+    
+/* Etheria 2026 in-game sunset shell */
+#screen-map.eth-game-shell{position:relative;isolation:isolate;overflow:hidden;min-height:100svh;padding:0!important;color:#382317;background:linear-gradient(180deg,#f8e8c9 0%,#f4c99a 35%,#d98b70 72%,#78595b 100%)}
+#screen-map.eth-game-shell:before{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(180deg,rgba(255,244,220,.12),rgba(65,39,40,.28)),url("https://images.unsplash.com/photo-1757301310756-b092d8bea774?auto=format&fit=crop&w=2400&q=85") center 56%/cover}
+.eth-game-topbar{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:16px clamp(14px,3vw,34px);background:linear-gradient(110deg,rgba(255,246,224,.94),rgba(238,194,151,.88));border-bottom:2px solid #2b1b12;box-shadow:0 8px 28px #482b2433;position:relative;z-index:3}
+.eth-game-brand{font-size:clamp(23px,3vw,36px);font-weight:1000;letter-spacing:.1em;color:#693c27;text-shadow:1px 2px #fff1d2}
+.eth-game-tabs{display:flex;gap:8px;align-items:center}
+.eth-game-tab{border:2px solid #2b1b12;border-radius:12px 24px 12px 24px;padding:10px 18px;background:linear-gradient(130deg,#fff0c9,#e9ae7d);color:#382317;font-weight:950;box-shadow:0 4px 0 #38231866;transition:.3s}
+.eth-game-tab:hover,.eth-game-tab.active{transform:translateY(-2px);background:linear-gradient(130deg,#fff7d9,#f4b879);box-shadow:0 6px 0 #38231866,0 9px 22px #5b382333}
+.eth-game-profile{display:flex;align-items:center;gap:10px;border:2px solid #2b1b12;border-radius:999px;padding:5px 14px 5px 5px;background:#fff0d6d9;color:#422719;font-weight:900;cursor:pointer;transition:.25s}
+.eth-game-profile:hover{transform:scale(1.04)}
+.eth-game-avatar{width:52px;height:52px;border:2px solid #2b1b12;border-radius:50%;display:grid;place-items:center;overflow:hidden;background:linear-gradient(145deg,#ffe8b8,#d98b68);font-size:26px;flex:none}
+.eth-game-avatar img{width:100%;height:100%;object-fit:cover}
+.eth-game-main{width:min(1180px,calc(100% - 28px));margin:clamp(22px,5vh,54px) auto 30px;display:grid;grid-template-columns:minmax(0,1fr) minmax(230px,310px);gap:20px;align-items:stretch}
+.eth-game-card{border:2px solid #2c1c12;border-radius:28px 42px 28px 42px;background:linear-gradient(145deg,rgba(255,247,225,.95),rgba(237,201,160,.92));box-shadow:0 18px 55px #40271e55,inset 0 1px #fff; padding:clamp(18px,3vw,32px);color:#4a2e1e}
+.eth-game-eyebrow{font-size:11px;font-weight:1000;letter-spacing:.22em;text-transform:uppercase;color:#a35d39}
+.eth-game-level{font-size:clamp(48px,7vw,76px);line-height:1;font-weight:1000;color:#9b512f;text-shadow:2px 3px #f8dfb7}
+.eth-game-action{width:100%;padding:17px 22px;border:2.5px solid #24180f;border-radius:18px 38px 18px 38px;background:linear-gradient(120deg,#ffe9b7,#ed9a67);color:#382317;font-size:clamp(20px,2.5vw,28px);font-weight:1000;box-shadow:0 6px 0 #39251988,0 15px 26px #5b382333;transition:transform .2s,filter .2s;margin-top:12px}
+.eth-game-action:hover{transform:translateY(-3px) scale(1.02);filter:saturate(1.12)}
+.eth-game-action:active{transform:translateY(3px) scale(.98);filter:brightness(.9);box-shadow:0 2px 0 #39251988}
+.eth-game-chapters{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:20px}
+.eth-game-chapter{min-height:118px;text-align:left;border:2px solid #332014;border-radius:15px 25px 15px 25px;padding:13px;background:linear-gradient(145deg,#fff1ce,#e9bb8e);color:#4b2b1a;box-shadow:0 4px 0 #3a241844;transition:.25s}
+.eth-game-chapter:hover,.eth-game-chapter.selected{transform:translateY(-3px);background:linear-gradient(145deg,#fff7d8,#efad75);box-shadow:0 7px 0 #3a241844}
+.eth-game-chapter b{display:block;font-size:13px;letter-spacing:.06em}.eth-game-chapter span{display:block;margin-top:7px;font-size:11px;line-height:1.4;color:#80563c}
+.eth-game-side{display:flex;flex-direction:column;gap:12px}
+.eth-game-side .eth-game-card{padding:20px}
+.eth-game-side-button{width:100%;padding:13px 15px;text-align:left;border:2px solid #2c1c12;border-radius:12px 24px 12px 24px;background:linear-gradient(120deg,#fff0c7,#e9ae7d);font-weight:950;color:#422719;transition:.2s}
+.eth-game-side-button:hover{transform:translateX(4px);filter:brightness(1.04)}
+.eth-game-placeholder{width:min(1000px,calc(100% - 28px));margin:clamp(24px,7vh,70px) auto;padding:clamp(28px,5vw,56px);text-align:center;border:2px dashed #432719;border-radius:28px;background:#fff0d5dd;color:#59351f;box-shadow:0 18px 50px #3b241e44}
+.eth-game-settings{position:absolute;inset:90px 0 0;z-index:5;display:none;padding:20px;overflow:auto;background:linear-gradient(180deg,#d99577ee,#5a4148f2);backdrop-filter:blur(12px)}
+.eth-game-settings.open{display:block;animation:ethGamePanelIn .45s cubic-bezier(.2,.8,.2,1)}
+.eth-game-settings-inner{width:min(760px,100%);margin:20px auto;border:2px solid #2c1c12;border-radius:26px 40px 26px 40px;padding:clamp(18px,3vw,30px);background:linear-gradient(145deg,#fff5df,#edc49a);box-shadow:0 20px 60px #301d1b66}
+.eth-game-setting-row{padding:16px 0;border-bottom:1px solid #9d704d66}
+.eth-game-input{width:100%;border:2px solid #382317;border-radius:12px;background:#fffdf5;color:#3c281a;padding:12px}
+.eth-game-inventory.screen{position:fixed!important;inset:0;z-index:1000;width:100%;height:100%;min-height:100%;padding:18px!important;background:linear-gradient(130deg,#d78d70ee,#513d43f5)!important;backdrop-filter:blur(13px);overflow:auto;transform:translateX(-105%);transition:transform .65s cubic-bezier(.2,.8,.2,1);display:flex!important;pointer-events:none}
+.eth-game-inventory.screen.active{transform:translateX(0);pointer-events:auto}
+.eth-game-inventory>div{margin:0!important;width:min(1120px,100%)!important;height:auto!important;min-height:calc(100vh - 36px);max-height:none!important;padding:clamp(16px,3vw,30px)!important;border:2px solid #2b1b12!important;border-radius:28px 40px 28px 40px!important;background:linear-gradient(145deg,#fff4dc,#eac59b)!important;color:#4a2e1e!important}
+.eth-game-inventory h2,.eth-game-inventory h3{color:#744328!important}
+.eth-game-inventory .bg-slate-900\/60,.eth-game-inventory .bg-slate-800\/70,.eth-game-inventory .equipment-slot{background:rgba(255,248,231,.82)!important;color:#4a2e1e!important;border-color:#81563866!important}
+.eth-game-inventory .text-slate-300,.eth-game-inventory .text-slate-400,.eth-game-inventory .text-white{color:#69462f!important}
+.eth-game-inventory .eth-btn{border:2px solid #2c1c12!important;border-radius:12px!important;background:linear-gradient(120deg,#ffe5b4,#e9a171)!important;color:#392417!important}
+@keyframes ethGamePanelIn{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
+@media(max-width:760px){.eth-game-topbar{flex-wrap:wrap}.eth-game-brand{width:100%;text-align:center}.eth-game-tabs{flex:1;justify-content:center}.eth-game-tab{padding:9px 12px;font-size:13px}.eth-game-main{grid-template-columns:1fr;margin-top:18px}.eth-game-chapters{grid-template-columns:1fr}.eth-game-chapter{min-height:0}.eth-game-settings{inset:150px 0 0;padding:10px}.eth-game-profile span{display:none}.eth-game-inventory{padding:8px!important}.eth-game-inventory>div{min-height:calc(100vh - 16px)}}
+@media(prefers-reduced-motion:reduce){.eth-game-tab,.eth-game-profile,.eth-game-action,.eth-game-chapter,.eth-game-inventory{transition-duration:.01ms!important;animation:none!important}}
+
+</style>
 </head>
 
 <body>
@@ -501,42 +546,93 @@ checkEtheriaConnection();
     </div>
 
     <!-- Карта / База -->
-    <div id="screen-map" class="screen flex-col p-4 md:p-8">
-        <header class="glass flex flex-col md:flex-row justify-between items-center p-5 rounded-2xl mb-8 gap-4 z-10">
-            <div class="flex items-center gap-5">
-                <div id="map-hero-icon" class="text-5xl bg-slate-900/50 p-4 rounded-full border border-slate-600 shadow-inner flex items-center justify-center min-w-[80px] min-h-[80px]">👤</div>
-                <div>
-                    <h3 id="map-hero-name" class="text-2xl title-font font-bold text-amber-400 drop-shadow-md">Имя Героя</h3>
-                    <p class="text-slate-300 mt-1">Ур: <span id="map-hero-level" class="text-white font-bold bg-blue-600/30 px-2 py-0.5 rounded">1</span> <span id="map-ngp-label" class="hidden text-fuchsia-200 font-black bg-fuchsia-900/40 border border-fuchsia-400/30 px-2 py-0.5 rounded">NG+1</span> | Опыт: <span id="map-hero-xp" class="text-green-300">0</span>/<span id="map-hero-next-xp">100</span></p>
-                </div>
-            </div>
-            <div class="flex gap-4 w-full md:w-auto flex-wrap">
-                <button onclick="showScreen('upgrade')" class="btn flex-1 md:flex-none px-6 py-3 bg-indigo-600/80 hover:bg-indigo-500 backdrop-blur-md rounded-xl font-bold shadow border border-indigo-400/30">
-                    Прокачка (<span id="stat-points-badge" class="text-yellow-300 font-extrabold">0</span>)
-                </button>
-                <button onclick="showScreen('inventory')" class="btn flex-1 md:flex-none px-6 py-3 bg-slate-600/80 hover:bg-slate-500 backdrop-blur-md rounded-xl font-bold shadow border border-slate-400/30">
-                    Инвентарь
-                </button>
-                <button onclick="showScreen('mine')" class="btn flex-1 md:flex-none px-6 py-3 bg-amber-700/80 hover:bg-amber-600 backdrop-blur-md rounded-xl font-bold shadow border border-amber-400/30">
-                    ⛏ Шахта
-                </button>
-            </div>
-        </header>
+    <div id="screen-map" class="screen flex-col eth-game-shell">
+      <header class="eth-game-topbar">
+        <div class="eth-game-brand">ЭТЕРИЯ</div>
+        <nav class="eth-game-tabs" aria-label="Разделы игры">
+          <button class="eth-game-tab active" id="eth-tab-main" onclick="ethGameTab('main')">MAIN</button>
+          <button class="eth-game-tab" id="eth-tab-map" onclick="ethGameTab('map')">MAP</button>
+          <button class="eth-game-tab" id="eth-tab-settings" onclick="ethGameTab('settings')">SETTINGS</button>
+        </nav>
+        <button class="eth-game-profile" type="button" onclick="showScreen('inventory')" aria-label="Открыть инвентарь">
+          <span class="eth-game-avatar" id="eth-game-avatar"><span>👤</span></span>
+          <span id="eth-game-profile-name">Профиль игрока</span>
+        </button>
+      </header>
 
-        <div class="flex-1 flex flex-col items-center justify-center z-10">
-            <div class="glass p-12 rounded-[3rem] text-center max-w-2xl w-full border-t border-l border-white/10 shadow-2xl relative overflow-hidden">
-                <div class="absolute -top-20 -right-20 w-64 h-64 bg-red-600/20 rounded-full blur-3xl"></div>
-                <div class="absolute -bottom-20 -left-20 w-64 h-64 bg-blue-600/20 rounded-full blur-3xl"></div>
-                
-                <h2 class="text-4xl title-font mb-4">Уровень <span id="current-level-display" class="text-amber-400 text-6xl drop-shadow-[0_0_15px_rgba(251,191,36,0.5)]">1</span> <span class="text-2xl text-slate-500">/ 50</span></h2>
-                <p id="level-description" class="text-lg text-slate-300 mb-10">Обычные враги бродят в этих землях. Будьте осторожны.</p>
-                
-                <button onclick="startCombat()" class="btn px-12 py-6 bg-gradient-to-r from-red-600 to-rose-700 hover:from-red-500 hover:to-rose-600 rounded-2xl text-4xl font-bold shadow-[0_0_30px_rgba(225,29,72,0.4)] border border-red-400/50 title-font text-white relative overflow-hidden group">
-                    <span class="relative z-10 tracking-widest">В БОЙ!</span>
-                    <div class="absolute inset-0 h-full w-full bg-white/20 -skew-x-12 -translate-x-full group-hover:animate-[shimmer_1s_forwards]"></div>
-                </button>
-            </div>
+      <section id="eth-game-main-view" class="eth-game-main">
+        <div class="eth-game-card">
+          <div class="eth-game-eyebrow">Путь героя · кампания</div>
+          <div class="flex items-end justify-between gap-4 flex-wrap mt-2">
+            <div><div class="text-sm font-black tracking-widest">ТЕКУЩИЙ УРОВЕНЬ</div><div class="eth-game-level"><span id="current-level-display">1</span><small class="text-2xl"> / 50</small></div></div>
+            <div class="text-right"><div class="text-sm font-black">ГЕРОЙ</div><div id="map-hero-name" class="text-2xl font-black">Имя героя</div><div class="text-sm">Ур. героя <b id="map-hero-level">1</b> · <span id="map-ngp-label" class="hidden">NG+1</span></div></div>
+          </div>
+          <div class="mt-4 rounded-full h-3 overflow-hidden border border-[#54351f] bg-[#b98b65]"><div id="eth-level-progress" class="h-full rounded-full" style="width:2%;background:linear-gradient(90deg,#f4d28b,#c66d46)"></div></div>
+          <p id="level-description" class="mt-4 text-base leading-relaxed text-[#69462f]">Три главы ждут своего героя. Выбери путь и продолжи путешествие.</p>
+          <div class="eth-game-chapters">
+            <button class="eth-game-chapter selected" data-chapter="1" onclick="ethSelectChapter(1)"><b>ГЛАВА I · ПЕПЕЛЬНАЯ ТРОПА</b><span>Забытые дороги, первые хранители и древние руины</span></button>
+            <button class="eth-game-chapter" data-chapter="2" onclick="ethSelectChapter(2)"><b>ГЛАВА II · ЗАБЫТЫЕ ИМЕНА</b><span>Город архивов, потерянные воспоминания и тайны</span></button>
+            <button class="eth-game-chapter" data-chapter="3" onclick="ethSelectChapter(3)"><b>ГЛАВА III · КАМЕННАЯ ПАМЯТЬ</b><span>Горные земли, древние стражи и путь к Истоку</span></button>
+          </div>
+          <button class="eth-game-action" onclick="startCombat()">НАЧАТЬ СРАЖЕНИЕ</button>
+          <div class="mt-4 flex flex-wrap gap-3 text-sm font-bold text-[#714b32]">
+            <span>Опыт: <b id="map-hero-xp">0</b>/<b id="map-hero-next-xp">100</b></span>
+            <span>Очки характеристик: <b id="stat-points-badge">0</b></span>
+          </div>
         </div>
+        <aside class="eth-game-side">
+          <div class="eth-game-card">
+            <div class="eth-game-eyebrow mb-3">Быстрый доступ</div>
+            <button class="eth-game-side-button mb-3" onclick="showScreen('upgrade')">✦ Прокачка героя</button>
+            <button class="eth-game-side-button mb-3" onclick="showScreen('inventory')">🎒 Инвентарь и экипировка</button>
+            <button class="eth-game-side-button mb-3" onclick="showScreen('mine')">⛏ Шахта Этерии</button>
+            <button class="eth-game-side-button" onclick="ethOpenAccount()">◉ Аккаунт и облако</button>
+          </div>
+          <div class="eth-game-card">
+            <div class="eth-game-eyebrow">Профиль героя</div>
+            <div class="flex items-center gap-3 mt-3">
+              <div id="map-hero-icon" class="eth-game-avatar" style="width:62px;height:62px">👤</div>
+              <div><div id="eth-game-hero-title" class="font-black text-lg">Путник</div><div class="text-xs">Хроники Этерии</div></div>
+            </div>
+            <div class="mt-3 text-sm">Золото: <b id="gold-display">0</b> 🪙</div>
+          </div>
+        </aside>
+      </section>
+
+      <section id="eth-game-map-view" class="eth-game-placeholder" hidden>
+        <div class="text-6xl mb-4">🗺️</div><div class="eth-game-eyebrow">Следующая область обновления</div>
+        <h2 class="text-3xl font-black my-3">Карта Этерии</h2>
+        <p class="text-base">Эта область пока готовится. Переход доступен, содержимое карты появится в следующем этапе разработки.</p>
+        <button class="eth-game-action" style="max-width:280px" onclick="ethGameTab('main')">Вернуться в MAIN</button>
+      </section>
+
+      <section id="eth-game-settings-view" class="eth-game-settings" aria-hidden="true">
+        <div class="eth-game-settings-inner">
+          <div class="flex justify-between items-center gap-3 mb-3"><div><div class="eth-game-eyebrow">Профиль и предпочтения</div><h2 class="text-3xl font-black">Настройки</h2></div><button class="eth-game-side-button" style="width:auto" onclick="ethGameTab('main')">Закрыть ✕</button></div>
+          <div class="eth-game-setting-row">
+            <h3 class="text-xl font-black mb-2">Аватар игрока</h3>
+            <div class="flex items-center gap-4 flex-wrap">
+              <div id="eth-settings-avatar-preview" class="eth-game-avatar" style="width:86px;height:86px"><span>👤</span></div>
+              <div class="flex-1 min-w-[190px]"><input id="eth-avatar-file" class="eth-game-input" type="file" accept="image/png,image/jpeg,image/webp"><p class="text-xs mt-2">PNG, JPG или WebP · до 2 МБ. Картинка будет видна другим игрокам.</p><div class="flex gap-2 mt-2"><button class="eth-game-side-button" onclick="ethUploadAvatar()">Сохранить аватар</button><button class="eth-game-side-button" onclick="ethRemoveAvatar()">Удалить</button></div><p id="eth-avatar-status" class="text-sm mt-2" aria-live="polite"></p></div>
+            </div>
+          </div>
+          <div class="eth-game-setting-row">
+            <h3 class="text-xl font-black mb-2">Промокод</h3>
+            <input id="eth-promo-input" class="eth-game-input" maxlength="40" placeholder="Введи промокод">
+            <button class="eth-game-side-button mt-2" onclick="ethPromoPlaceholder()">Проверить код</button>
+            <p id="eth-promo-status" class="text-sm mt-2">Система промокодов будет активирована после запуска выпуска кодов. Сейчас коды не принимаются.</p>
+          </div>
+          <div class="eth-game-setting-row">
+            <h3 class="text-xl font-black mb-2">Звук</h3>
+            <p class="text-sm mb-3">Отключает атмосферный звук меню. Игровые звуковые эффекты будут подключены к этой настройке по мере переноса звуков в общую систему.</p>
+            <button id="eth-game-mute-button" class="eth-game-side-button" onclick="ethGameToggleSound()">Выключить атмосферный звук</button>
+          </div>
+          <div class="eth-game-setting-row">
+            <h3 class="text-xl font-black mb-2">Аккаунт</h3><p id="eth-game-account-state" class="text-sm mb-3">Проверяем состояние аккаунта…</p>
+            <button class="eth-game-side-button" onclick="ethOpenAccount()">Открыть профиль / войти</button>
+          </div>
+        </div>
+      </section>
     </div>
 
     <!-- Подлокация: Шахта -->
@@ -712,7 +808,7 @@ checkEtheriaConnection();
     </div>
 
     <!-- Экран Инвентаря -->
-    <div id="screen-inventory" class="screen flex-col items-center p-4">
+    <div id="screen-inventory" class="screen flex-col items-center p-4 eth-game-inventory">
         <div class="w-full max-w-5xl glass p-10 rounded-3xl mt-10 shadow-2xl flex flex-col h-[85vh]">
             <div class="flex justify-between items-center mb-8 border-b border-slate-700 pb-4">
                 <h2 class="text-4xl title-font text-transparent bg-clip-text bg-gradient-to-r from-amber-300 to-yellow-600">Инвентарь и Навыки</h2>
@@ -3538,7 +3634,7 @@ body.dodge-open{overflow:hidden}
 
     const results = await Promise.all([
       ethSupabaseClient.from('profiles')
-        .select('id,display_name,current_title,titles,created_at')
+        .select('id,display_name,current_title,titles,created_at,avatar_url')
         .eq('id', user.id)
         .single(),
       ethSupabaseClient.from('game_saves')
@@ -3579,7 +3675,8 @@ body.dodge-open{overflow:hidden}
         bestLevel: Number(stats.best_level ?? legacy?.stats?.bestLevel) || 1,
         totalXp: Number(stats.total_xp) || 0
       },
-      createdAt: profile.created_at
+      createdAt: profile.created_at,
+      avatarUrl: profile.avatar_url || ''
     };
 
     ethCloudUser = user;
@@ -4535,6 +4632,103 @@ body.dodge-open{overflow:hidden}
 
   ethMenuUpdateAudioButtons();
 
+})();
+</script>
+
+
+<script>
+(function(){
+  let ethCurrentGameTab='main';
+  let ethSelectedChapter=1;
+  let ethGameSoundMuted=false;
+  function ethSetAvatarUI(url){
+    const targets=['eth-game-avatar','eth-settings-avatar-preview','map-hero-icon'];
+    targets.forEach(id=>{const el=document.getElementById(id);if(!el)return;el.innerHTML=url?'<img alt="Аватар игрока" src="'+url.replace(/&/g,'&amp;').replace(/"/g,'&quot;')+'">':'<span>👤</span>';});
+  }
+  window.ethGameTab=function(tab){
+    ethCurrentGameTab=tab;
+    const main=document.getElementById('eth-game-main-view'),map=document.getElementById('eth-game-map-view'),settings=document.getElementById('eth-game-settings-view');
+    if(main)main.hidden=tab!=='main';if(map)map.hidden=tab!=='map';if(settings){settings.classList.toggle('open',tab==='settings');settings.setAttribute('aria-hidden',String(tab!=='settings'));}
+    ['main','map','settings'].forEach(k=>{const b=document.getElementById('eth-tab-'+k);if(b)b.classList.toggle('active',k===tab)});
+    if(tab==='settings')ethRefreshGameSettings();
+  };
+  window.ethSelectChapter=function(n){
+    ethSelectedChapter=n;
+    document.querySelectorAll('.eth-game-chapter').forEach(el=>el.classList.toggle('selected',Number(el.dataset.chapter)===n));
+    const descriptions={1:'Глава I: Пепельная тропа. Первые земли и следы расколотого Сердца.',2:'Глава II: Забытые имена. Город архивов и тайны исчезающих воспоминаний.',3:'Глава III: Каменная память. Горные земли и древние стражи.'};
+    const d=document.getElementById('level-description');if(d)d.textContent=descriptions[n]+' Текущий уровень кампании: '+(document.getElementById('current-level-display')?.textContent||'1')+'.';
+  };
+  function ethRefreshGameSettings(){
+    const account=document.getElementById('eth-game-account-state');
+    if(account)account.textContent=window.ethCloudUser&&window.ethV4?.account?'Вход выполнен: '+(window.ethV4.account.username||'игрок'):'Не выполнен вход. Для облачного профиля открой окно аккаунта.';
+    const label=document.getElementById('eth-game-mute-button');if(label)label.textContent=ethGameSoundMuted?'Включить атмосферный звук':'Выключить атмосферный звук';
+    const url=window.ethV4?.account?.avatarUrl||'';ethSetAvatarUI(url);
+  }
+  window.ethGameToggleSound=function(){
+    ethGameSoundMuted=!ethGameSoundMuted;
+    if(typeof window.ethMenuToggleAudio==='function'){
+      const enabledNow=!ethGameSoundMuted;
+      if((window.__ethGameAmbientEnabled??true)!==enabledNow){window.ethMenuToggleAudio();window.__ethGameAmbientEnabled=enabledNow;}
+    }
+    ethRefreshGameSettings();
+  };
+  window.ethPromoPlaceholder=function(){
+    const value=String(document.getElementById('eth-promo-input')?.value||'').trim();
+    const status=document.getElementById('eth-promo-status');
+    if(status)status.textContent=value?'Промокоды ещё не активированы. Этот код не был применён и награда не начислена.':'Сначала введи промокод.';
+  };
+  window.ethUploadAvatar=async function(){
+    const status=document.getElementById('eth-avatar-status'),file=document.getElementById('eth-avatar-file')?.files?.[0];
+    const user=window.ethCloudUser,client=window.ethSupabaseClient,account=window.ethV4?.account;
+    const say=(m)=>{if(status)status.textContent=m;};
+    if(!user||!client||!account){say('Сначала войди в облачный аккаунт.');return;}
+    if(!file){say('Сначала выбери изображение.');return;}
+    if(!['image/jpeg','image/png','image/webp'].includes(file.type)){say('Поддерживаются только JPG, PNG и WebP.');return;}
+    if(file.size>2*1024*1024){say('Файл больше 2 МБ. Выбери изображение поменьше.');return;}
+    say('Загружаем изображение…');
+    try{
+      const ext=file.type==='image/png'?'png':file.type==='image/webp'?'webp':'jpg';
+      const path=user.id+'/'+Date.now()+'-'+crypto.randomUUID()+'.'+ext;
+      const upload=await client.storage.from('avatars').upload(path,file,{contentType:file.type,upsert:false});
+      if(upload.error)throw upload.error;
+      const pub=client.storage.from('avatars').getPublicUrl(path).data.publicUrl;
+      const saved=await client.from('profiles').update({avatar_url:pub}).eq('id',user.id);
+      if(saved.error)throw saved.error;
+      account.avatarUrl=pub;ethSetAvatarUI(pub);say('Аватар сохранён в облаке.');
+    }catch(e){say('Не удалось сохранить аватар: '+(e.message||e));}
+  };
+  window.ethRemoveAvatar=async function(){
+    const status=document.getElementById('eth-avatar-status'),user=window.ethCloudUser,client=window.ethSupabaseClient,account=window.ethV4?.account;
+    const say=(m)=>{if(status)status.textContent=m;};
+    if(!user||!client||!account){say('Сначала войди в облачный аккаунт.');return;}
+    try{
+      const old=account.avatarUrl||'';
+      const prefix=client.storage.from('avatars').getPublicUrl(user.id+'/').data.publicUrl;
+      if(old&&old.includes('/storage/v1/object/public/avatars/'+user.id+'/')){
+        const path=old.split('/storage/v1/object/public/avatars/')[1].split('?')[0];
+        const removed=await client.storage.from('avatars').remove([decodeURIComponent(path)]);
+        if(removed.error)throw removed.error;
+      }
+      const saved=await client.from('profiles').update({avatar_url:null}).eq('id',user.id);
+      if(saved.error)throw saved.error;
+      account.avatarUrl='';ethSetAvatarUI('');say('Аватар удалён.');
+    }catch(e){say('Не удалось удалить аватар: '+(e.message||e));}
+  };
+  const oldShow=window.showScreen;
+  window.showScreen=function(id){
+    if(id==='inventory'){
+      const result=oldShow.apply(this,arguments);
+      document.body.classList.add('eth-inventory-open');
+      return result;
+    }
+    document.body.classList.remove('eth-inventory-open');
+    return oldShow.apply(this,arguments);
+  };
+  const oldUpdate=window.updateMapScreen;
+  if(typeof oldUpdate==='function')window.updateMapScreen=function(){const r=oldUpdate.apply(this,arguments);const level=Number(document.getElementById('current-level-display')?.textContent||1);const progress=document.getElementById('eth-level-progress');if(progress)progress.style.width=Math.max(2,Math.min(100,level/50*100))+'%';const name=document.getElementById('eth-game-profile-name');if(name)name.textContent=window.ethV4?.account?.username||'Профиль игрока';const title=document.getElementById('eth-game-hero-title');if(title)title.textContent=window.ethV4?.account?.currentTitle||'Путник';ethSetAvatarUI(window.ethV4?.account?.avatarUrl||'');return r;};
+  const oldRefresh=window.ethRefreshAccountUI;
+  if(typeof oldRefresh==='function')window.ethRefreshAccountUI=function(){const r=oldRefresh.apply(this,arguments);const name=document.getElementById('eth-game-profile-name');if(name)name.textContent=window.ethV4?.account?.username||'Профиль игрока';const title=document.getElementById('eth-game-hero-title');if(title)title.textContent=window.ethV4?.account?.currentTitle||'Путник';ethSetAvatarUI(window.ethV4?.account?.avatarUrl||'');return r;};
+  window.ethGameTab('main');
 })();
 </script>
 
