@@ -348,6 +348,21 @@
 
 /* Refined chapter presentation and inventory atelier */
 
+/* Align the three larger story acts with the existing campaign lore */
+.eth-chapter-scene[data-chapter="2"]{--scene-a:#d9b58d;--scene-b:#7d8883;--scene-c:#36434a}
+.eth-chapter-scene[data-chapter="2"]:before{background:radial-gradient(ellipse at 65% 28%,rgba(255,237,192,.9) 0 7%,rgba(226,203,163,.3) 18%,transparent 40%),linear-gradient(180deg,rgba(221,234,223,.12),transparent 50%,rgba(27,42,49,.4))}
+.eth-chapter-scene[data-chapter="2"]:after{background:linear-gradient(160deg,#b0b1a3,#3d4b50);clip-path:polygon(0 74%,12% 21%,20% 60%,35% 4%,43% 47%,58% 14%,70% 60%,83% 8%,100% 70%,100% 100%,0 100%)}
+.eth-chapter-scene[data-chapter="3"]{--scene-a:#f4c58c;--scene-b:#8d7673;--scene-c:#473b4a}
+.eth-chapter-scene[data-chapter="3"]:before{background:radial-gradient(ellipse at 62% 23%,rgba(255,240,197,.94) 0 7%,rgba(255,214,159,.35) 18%,transparent 39%),linear-gradient(180deg,rgba(255,237,206,.16),transparent 48%,rgba(33,26,44,.42))}
+.eth-chapter-scene[data-chapter="3"]:after{background:linear-gradient(160deg,#a4867d,#423744);clip-path:polygon(0 68%,8% 68%,8% 38%,13% 38%,13% 62%,21% 62%,21% 17%,27% 17%,27% 64%,40% 64%,40% 35%,46% 35%,46% 62%,58% 62%,58% 8%,65% 8%,65% 63%,77% 63%,77% 28%,83% 28%,83% 68%,100% 53%,100% 100%,0 100%)}
+#screen-combat[data-chapter="2"] .eth-combat-backdrop{background:linear-gradient(180deg,#d9b58d 0%,#7d8883 48%,#36434a 100%)}
+#screen-combat[data-chapter="2"] .eth-combat-backdrop:before{background:radial-gradient(ellipse at 65% 24%,#fff0c6 0 7%,#e4c89a88 18%,transparent 38%),linear-gradient(180deg,#e2ebdf22,transparent 44%,#182d3c88)}
+#screen-combat[data-chapter="2"] .eth-combat-backdrop:after{background:linear-gradient(160deg,#aab4ad,#34464f);clip-path:polygon(0 70%,12% 20%,20% 58%,34% 0,43% 48%,58% 8%,69% 57%,82% 17%,100% 68%,100% 100%,0 100%)}
+#screen-combat[data-chapter="3"] .eth-combat-backdrop{background:linear-gradient(180deg,#f4c58c 0%,#8d7673 48%,#473b4a 100%)}
+#screen-combat[data-chapter="3"] .eth-combat-backdrop:before{background:radial-gradient(ellipse at 62% 22%,#fff0c7 0 7%,#f4d19a88 18%,transparent 38%),linear-gradient(180deg,#f8e5ce1c,transparent 45%,#241c3888)}
+#screen-combat[data-chapter="3"] .eth-combat-backdrop:after{background:linear-gradient(160deg,#a4867d,#423744);clip-path:polygon(0 66%,8% 66%,8% 35%,14% 35%,14% 63%,22% 63%,22% 15%,28% 15%,28% 63%,41% 63%,41% 32%,47% 32%,47% 63%,59% 63%,59% 5%,66% 5%,66% 63%,78% 63%,78% 25%,84% 25%,84% 66%,100% 52%,100% 100%,0 100%)}
+
+
 .eth-combat-backdrop{position:absolute;inset:0;overflow:hidden;background:linear-gradient(180deg,#e9aa70 0%,#a9645c 47%,#292d39 100%);opacity:1}
 .eth-combat-backdrop:before{content:"";position:absolute;inset:0;background:radial-gradient(ellipse at 72% 24%,#fff0c4 0 7%,#ffd08b88 16%,transparent 36%),linear-gradient(180deg,#ffdfb31c,transparent 44%,#19192388)}
 .eth-combat-backdrop:after{content:"";position:absolute;left:-8%;right:-8%;bottom:-5%;height:55%;background:linear-gradient(160deg,#986458,#3b343d);clip-path:polygon(0 52%,10% 35%,20% 58%,32% 18%,45% 54%,57% 12%,69% 53%,81% 23%,93% 54%,100% 39%,100% 100%,0 100%)}
@@ -656,8 +671,8 @@ checkEtheriaConnection();
           <p id="level-description" class="mt-4 text-base leading-relaxed text-[#69462f]">Три главы ждут своего героя. Выбери путь и продолжи путешествие.</p>
           <div class="eth-game-chapters">
             <button class="eth-game-chapter selected" data-chapter="1" onclick="ethSelectChapter(1)"><b>ГЛАВА I · ПЕПЕЛЬНАЯ ТРОПА</b><span>Уровни 1–10 · Орки и пепельные стражи</span></button>
-            <button class="eth-game-chapter" data-chapter="2" onclick="ethSelectChapter(2)"><b>ГЛАВА II · ЗАБЫТЫЕ ИМЕНА</b><span>Уровни 11–25 · Призраки и некромант</span></button>
-            <button class="eth-game-chapter" data-chapter="3" onclick="ethSelectChapter(3)"><b>ГЛАВА III · КАМЕННАЯ ПАМЯТЬ</b><span>Уровни 26–50 · Големы и горные титаны</span></button>
+            <button class="eth-game-chapter" data-chapter="2" onclick="ethSelectChapter(2)"><b>ГЛАВА II · КАМЕННАЯ ПАМЯТЬ</b><span>Уровни 11–25 · Дракон и Тёмный Маг</span></button>
+            <button class="eth-game-chapter" data-chapter="3" onclick="ethSelectChapter(3)"><b>ГЛАВА III · НЕБЕСНАЯ ЦИТАДЕЛЬ</b><span>Уровни 26–50 · Стражи цитадели и Безымянный</span></button>
           </div>
           <button class="eth-game-action" onclick="startCombat()">НАЧАТЬ СРАЖЕНИЕ</button>
           <div class="mt-4 flex flex-wrap gap-3 text-sm font-bold text-[#714b32]">
@@ -4854,8 +4869,8 @@ body.dodge-open{overflow:hidden}
 
   const ethChapterInfo={
     1:{title:'Пепельная тропа',kicker:'АКТ I · ПУТЬ НАЧИНАЕТСЯ',enemy:'Главный противник: Король Орков',mark:'⚔️',desc:'Пепельные дороги, забытые святилища и первые следы расколотого Сердца. Здесь начинается путь героя.'},
-    2:{title:'Забытые имена',kicker:'АКТ II · ГОРОД АРХИВОВ',enemy:'Главный противник: Некромант архивов',mark:'📜',desc:'Город, где стираются имена и оживают старые записи. Тишина архивов скрывает опасных противников.'},
-    3:{title:'Каменная память',kicker:'АКТ III · ГОРНЫЙ РУБЕЖ',enemy:'Главный противник: Каменный гигант',mark:'⛰️',desc:'Высокие перевалы, древние механизмы и стражи, хранящие память мира. Последний из трёх больших актов.'}
+    2:{title:'Каменная память',kicker:'АКТ II · КАМЕННЫЙ РУБЕЖ',enemy:'Главный противник: Тёмный Маг',mark:'⛰️',desc:'Высокие перевалы, древние механизмы и стражи, хранящие память мира. Здесь сходятся силы драконов и забытых магов.'},
+    3:{title:'Небесная цитадель',kicker:'АКТ III · ПЕРЕД РАССВЕТОМ',enemy:'Главный противник: Безымянный',mark:'🏰',desc:'Небесные башни, древние стражи и последние тайны расколотого Сердца. Здесь завершается путь к Истоку.'}
   };
   window.ethSelectChapter=function(n){
     n=Math.max(1,Math.min(3,Number(n)||1));
