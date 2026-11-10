@@ -485,13 +485,327 @@
 @media(prefers-reduced-motion:reduce){.eth-game-tab,.eth-game-profile,.eth-game-action,.eth-game-chapter,.eth-game-inventory{transition-duration:.01ms!important;animation:none!important}}
 
 </style>
+
+<style id="eth-visual-rework-v2">
+/* Etheria: asymmetrical world-first layout */
+#screen-map.eth-game-shell{
+  --eth-ink:#0a1721;--eth-panel:#142633;--eth-panel-2:#1b3442;--eth-gold:#f1bd79;--eth-gold-bright:#ffd99b;--eth-muted:#aebcc3;
+  position:relative;isolation:isolate;display:flex;flex-direction:column;width:100%;height:100svh;min-height:620px;overflow:hidden;padding:0!important;
+  color:#f2eee6;background:radial-gradient(ellipse at 76% 14%,rgba(225,133,77,.20),transparent 34%),linear-gradient(135deg,#0d1c27 0%,#142c38 47%,#241f2a 100%);
+  transition:transform .64s cubic-bezier(.2,.78,.2,1),filter .64s,opacity .64s,border-radius .64s;
+}
+#screen-map.eth-game-shell:before{
+  content:"";position:absolute;inset:0;z-index:-2;pointer-events:none;
+  background:
+    radial-gradient(ellipse at 78% 13%,rgba(238,159,94,.21),transparent 32%),
+    radial-gradient(ellipse at 11% 86%,rgba(50,122,130,.18),transparent 38%),
+    linear-gradient(115deg,rgba(6,17,25,.86) 0%,rgba(14,32,43,.78) 44%,rgba(30,30,39,.82) 100%);
+}
+#screen-map.eth-game-shell:after{
+  content:"";position:absolute;z-index:-1;left:-5%;right:-5%;bottom:-3%;height:34%;pointer-events:none;opacity:.28;
+  background:linear-gradient(160deg,#a56f54,#3c4a50 70%,#182a35);
+  clip-path:polygon(0 62%,9% 35%,18% 55%,29% 18%,39% 52%,52% 9%,63% 51%,73% 27%,84% 55%,94% 31%,100% 49%,100% 100%,0 100%);
+}
+body.eth-inventory-open #screen-map.eth-game-shell{transform:translate3d(15vw,0,0) scale(.965);filter:brightness(.58) blur(2px);opacity:.78;border-radius:0 28px 28px 0;pointer-events:none}
+.eth-game-topbar{
+  position:relative;z-index:8;flex:none;min-height:78px;display:flex;align-items:center;justify-content:space-between;gap:20px;
+  padding:12px clamp(16px,2.6vw,42px);background:linear-gradient(90deg,rgba(8,20,29,.94),rgba(17,38,49,.91) 56%,rgba(29,38,43,.90));
+  border-bottom:1px solid rgba(241,189,121,.42);box-shadow:0 10px 34px rgba(0,0,0,.25);backdrop-filter:blur(18px);
+}
+.eth-game-brand{font-size:clamp(24px,2.6vw,34px);font-weight:1000;letter-spacing:.17em;color:#f3c383;text-shadow:0 0 24px rgba(239,169,101,.24),0 2px 0 #080f15;white-space:nowrap}
+.eth-game-tabs{display:flex;align-items:center;gap:8px}
+.eth-game-tab{
+  position:relative;min-width:86px;padding:10px 17px;border:1.5px solid #090f13;border-radius:10px 19px 10px 19px;
+  background:linear-gradient(145deg,rgba(34,57,68,.94),rgba(15,31,41,.96));color:#dce4e5;font-size:12px;font-weight:1000;letter-spacing:.16em;
+  box-shadow:0 4px 0 #050c10, inset 0 1px rgba(255,255,255,.10);transition:transform .22s ease,background .28s,border-color .28s,box-shadow .28s,color .28s;
+}
+.eth-game-tab:hover{transform:translateY(-2px);color:#ffe0ad;border-color:#9f7047;background:linear-gradient(145deg,#304b55,#172e3a);box-shadow:0 6px 0 #050c10,0 10px 20px rgba(0,0,0,.18)}
+.eth-game-tab.active{color:#ffe0ad;border-color:#1a1110;background:linear-gradient(125deg,#9d6144,#63423b 60%,#34424a);box-shadow:0 4px 0 #050c10,inset 0 1px rgba(255,238,203,.16)}
+.eth-game-tab:focus-visible,.eth-game-profile:focus-visible,.eth-game-action:focus-visible,.eth-game-side-button:focus-visible{outline:2px solid #ffd89a;outline-offset:3px}
+.eth-game-profile{display:flex;align-items:center;gap:10px;max-width:250px;padding:5px 14px 5px 5px;border:1.5px solid #0a1014;border-radius:999px;background:linear-gradient(120deg,rgba(39,62,70,.96),rgba(18,34,43,.96));color:#f3e7d6;box-shadow:0 4px 0 #050c10;transition:transform .22s,border-color .22s,box-shadow .22s}
+.eth-game-profile:hover{transform:translateY(-2px);border-color:#c18a56;box-shadow:0 6px 0 #050c10,0 10px 20px rgba(0,0,0,.2)}
+.eth-game-profile .eth-game-avatar{width:54px;height:54px;min-width:54px;border:2px solid #101315;background:radial-gradient(circle at 35% 25%,#f4c77f,#9f5f4a 76%);box-shadow:0 0 0 2px rgba(241,189,121,.55)}
+.eth-game-profile small{color:#d6a976}
+.eth-game-profile b{color:#fff4e4;font-size:12px}
+.eth-game-view-stage{position:relative;z-index:1;flex:1;min-height:0;overflow:hidden}
+.eth-game-view{
+  position:absolute;inset:0;min-width:0;min-height:0;overflow:auto;overscroll-behavior:contain;
+  padding:clamp(16px,2.2vw,32px) clamp(14px,2vw,30px) 38px;
+  opacity:0;visibility:hidden;transform:translate3d(18px,0,0) scale(.995);filter:blur(2px);pointer-events:none;
+  transition:opacity .42s ease,transform .56s cubic-bezier(.2,.78,.2,1),filter .42s ease,visibility .42s;
+  scrollbar-color:#8e694c #142631;scrollbar-width:thin;
+}
+.eth-game-view.eth-view-active{opacity:1;visibility:visible;transform:translate3d(0,0,0) scale(1);filter:none;pointer-events:auto}
+.eth-game-view.eth-view-entering{opacity:0;transform:translate3d(22px,0,0) scale(.992);filter:blur(2px)}
+.eth-game-view.eth-view-leaving{opacity:0;visibility:hidden;transform:translate3d(-18px,0,0) scale(.995);filter:blur(2px);pointer-events:none}
+.eth-game-view[hidden]{display:none!important}
+.eth-game-main{
+  display:grid;width:100%;max-width:none;margin:0;grid-template-columns:minmax(218px,250px) minmax(360px,1fr) minmax(205px,245px);
+  gap:clamp(12px,1.35vw,22px);align-items:start;
+}
+.eth-game-chapter-rail{display:flex;flex-direction:column;gap:11px;min-width:0;padding:18px 14px;border:1px solid rgba(235,185,125,.27);border-radius:18px 28px 18px 28px;background:linear-gradient(155deg,rgba(21,42,53,.94),rgba(13,28,38,.94));box-shadow:0 17px 40px rgba(0,0,0,.24),inset 0 1px rgba(255,255,255,.06)}
+.eth-chapter-rail-heading{padding:4px 7px 10px}
+.eth-game-eyebrow{font-size:10px;font-weight:1000;letter-spacing:.2em;text-transform:uppercase;color:#d7a36d}
+.eth-chapter-rail-heading h2{margin:6px 0 7px;color:#f7e7ce;font-size:23px;letter-spacing:.08em}
+.eth-chapter-rail-heading p{max-width:220px;color:#9eafb5;font-size:11px;line-height:1.55}
+.eth-game-chapter{
+  position:relative;display:grid;grid-template-columns:39px minmax(0,1fr) 12px;align-items:center;gap:9px;min-height:82px;width:100%;padding:12px 10px;text-align:left;
+  border:1px solid rgba(228,177,118,.24);border-left:3px solid rgba(207,151,97,.38);border-radius:10px 18px 10px 18px;
+  background:linear-gradient(125deg,rgba(49,67,73,.88),rgba(24,43,53,.96));color:#e9e1d5;box-shadow:0 5px 13px rgba(0,0,0,.14);
+  transition:transform .24s ease,border-color .25s,background .28s,box-shadow .28s;
+}
+.eth-game-chapter:hover{transform:translateX(3px);border-color:rgba(242,190,127,.72);background:linear-gradient(125deg,rgba(68,78,75,.96),rgba(31,48,55,.98));box-shadow:0 8px 18px rgba(0,0,0,.2)}
+.eth-game-chapter.selected{border-color:#dfa96e;border-left-color:#ffd394;background:linear-gradient(125deg,rgba(128,83,57,.88),rgba(37,52,57,.98));box-shadow:inset 0 0 0 1px rgba(255,218,164,.09),0 8px 20px rgba(0,0,0,.22)}
+.eth-chapter-index{display:grid;place-items:center;width:36px;height:36px;border:1px solid rgba(235,193,141,.48);border-radius:50%;color:#f1c48a;font-family:'Russo One',sans-serif;font-size:13px;background:rgba(6,17,24,.46)}
+.eth-chapter-copy{display:flex;min-width:0;flex-direction:column;gap:6px}
+.eth-chapter-copy b{color:#fff0db;font-size:10px;line-height:1.35;letter-spacing:.07em}
+.eth-chapter-copy small{color:#a9b6b7;font-size:10px;line-height:1.4}
+.eth-chapter-chevron{color:#e7b77d;font-size:23px;opacity:.55}
+.eth-chapter-rail-note{display:flex;align-items:flex-start;gap:8px;padding:12px 7px 2px;color:#9eafb5;font-size:10px;line-height:1.5}
+.eth-chapter-rail-note span{color:#eab879}
+.eth-game-main-stage{min-width:0;padding:clamp(15px,1.8vw,25px);border:1px solid rgba(237,184,122,.32);border-radius:20px 32px 20px 32px;background:linear-gradient(145deg,rgba(21,42,53,.94),rgba(13,27,37,.94));box-shadow:0 18px 50px rgba(0,0,0,.28),inset 0 1px rgba(255,255,255,.06)}
+.eth-main-stage-topline{display:flex;justify-content:space-between;align-items:center;gap:12px;margin:0 0 14px}
+.eth-main-stage-subtitle{margin-top:5px;color:#91a6ac;font-size:10px;font-weight:900;letter-spacing:.16em}
+.eth-main-stage-subtitle span{color:#c18b5c}
+.eth-main-current-chapter{padding:7px 11px;border:1px solid rgba(239,187,126,.36);border-radius:999px;color:#f0c58d;font-size:9px;font-weight:1000;letter-spacing:.15em;background:rgba(7,19,27,.38)}
+.eth-chapter-scene{
+  --scene-a:#d47b51;--scene-b:#5b3c45;--scene-c:#1b2d38;
+  position:relative;isolation:isolate;overflow:hidden;min-height:clamp(235px,27vw,330px);margin:0 0 18px;
+  border:1px solid rgba(255,222,174,.55);border-radius:15px 29px 15px 29px;
+  background:linear-gradient(155deg,var(--scene-a) 0%,var(--scene-b) 58%,var(--scene-c) 100%);
+  box-shadow:inset 0 1px rgba(255,255,255,.28),0 15px 35px rgba(0,0,0,.28);
+  transition:background .5s ease,filter .5s ease;
+}
+.eth-chapter-scene:before{content:"";position:absolute;inset:0;z-index:-1;background:radial-gradient(ellipse at 76% 25%,rgba(255,224,166,.96) 0 5%,rgba(255,180,111,.35) 16%,transparent 39%),linear-gradient(180deg,rgba(255,232,195,.12),transparent 48%,rgba(9,17,26,.45))}
+.eth-chapter-scene:after{content:"";position:absolute;left:-4%;right:-4%;bottom:-2%;height:48%;z-index:0;background:linear-gradient(165deg,#80564e,#29313c 86%);clip-path:polygon(0 58%,10% 44%,19% 59%,31% 17%,42% 52%,54% 8%,65% 49%,77% 24%,88% 54%,100% 35%,100% 100%,0 100%);opacity:.92}
+.eth-chapter-scene[data-chapter="1"]{--scene-a:#d98758;--scene-b:#70424a;--scene-c:#182c39}
+.eth-chapter-scene[data-chapter="1"]:after{background:linear-gradient(165deg,#97604c,#263541 85%);clip-path:polygon(0 67%,11% 40%,20% 60%,31% 13%,41% 50%,55% 21%,65% 57%,78% 30%,89% 62%,100% 41%,100% 100%,0 100%)}
+.eth-chapter-scene[data-chapter="2"]{--scene-a:#6b8e98;--scene-b:#4c5368;--scene-c:#1b2939}
+.eth-chapter-scene[data-chapter="2"]:before{background:radial-gradient(ellipse at 75% 28%,rgba(213,224,212,.82) 0 5%,rgba(148,188,190,.3) 17%,transparent 40%),linear-gradient(180deg,rgba(197,225,222,.18),transparent 52%,rgba(8,19,31,.52))}
+.eth-chapter-scene[data-chapter="2"]:after{background:linear-gradient(165deg,#73848a,#202e40 90%);clip-path:polygon(0 70%,8% 68%,8% 28%,14% 28%,14% 67%,25% 67%,25% 8%,31% 8%,31% 67%,45% 67%,45% 19%,52% 19%,52% 68%,68% 68%,68% 14%,75% 14%,75% 67%,88% 67%,100% 52%,100% 100%,0 100%)}
+.eth-chapter-scene[data-chapter="3"]{--scene-a:#7aa6a6;--scene-b:#506b78;--scene-c:#1e3344}
+.eth-chapter-scene[data-chapter="3"]:before{background:radial-gradient(ellipse at 68% 23%,rgba(255,232,174,.98) 0 6%,rgba(250,203,132,.32) 19%,transparent 42%),linear-gradient(180deg,rgba(220,244,239,.2),transparent 52%,rgba(9,28,43,.5))}
+.eth-chapter-scene[data-chapter="3"]:after{background:linear-gradient(165deg,#a4b4aa,#304958 90%);clip-path:polygon(0 70%,8% 70%,15% 33%,21% 70%,32% 70%,40% 4%,48% 70%,58% 70%,67% 18%,74% 70%,87% 70%,94% 40%,100% 65%,100% 100%,0 100%)}
+.eth-scene-haze{position:absolute;z-index:1;inset:35% 0 0;background:linear-gradient(180deg,transparent,rgba(10,20,29,.32));pointer-events:none}
+.eth-scene-copy{position:relative;z-index:2;max-width:68%;padding:clamp(22px,3.2vw,40px);color:#fff3df;text-shadow:0 3px 14px rgba(13,17,22,.5)}
+.eth-scene-kicker{font-size:10px;font-weight:1000;letter-spacing:.24em;color:#ffe0b1}
+.eth-scene-title{margin:10px 0 9px;font-size:clamp(27px,3.5vw,47px);font-weight:1000;line-height:1.05;letter-spacing:.015em}
+.eth-scene-enemy{font-size:12px;font-weight:800;color:#f8d6ae}
+.eth-scene-mark{position:absolute;z-index:2;right:7%;bottom:14%;font-size:clamp(68px,9vw,112px);opacity:.82;filter:drop-shadow(0 12px 18px rgba(9,16,22,.5));animation:ethSceneFloat 5.5s ease-in-out infinite}
+@keyframes ethSceneFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
+.eth-main-info-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(220px,.82fr);gap:12px;align-items:stretch}
+.eth-main-level-card,.eth-main-hero-card{min-width:0;padding:17px;border:1px solid rgba(233,181,117,.24);border-radius:14px 22px 14px 22px;background:linear-gradient(145deg,rgba(37,61,70,.76),rgba(19,38,49,.82))}
+.eth-main-level-top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+.eth-game-level{margin-top:7px;color:#ffe0a9;font-size:clamp(54px,6vw,79px);font-weight:1000;line-height:.95;text-shadow:0 5px 24px rgba(240,167,99,.18)}
+.eth-game-level small{margin-left:7px;color:#829ba3;font-size:16px;font-weight:800;text-shadow:none}
+.eth-main-level-seal{display:flex;flex-direction:column;align-items:center;gap:3px;color:#e1b77d}
+.eth-main-level-seal span{display:grid;place-items:center;width:38px;height:38px;border:1px solid rgba(238,186,125,.5);border-radius:50%;background:rgba(8,20,28,.55);font-size:20px}
+.eth-main-level-seal small{font-size:8px;letter-spacing:.15em}
+.eth-main-progress-track{height:9px;margin:15px 0 12px;overflow:hidden;border:1px solid rgba(4,13,20,.8);border-radius:99px;background:#091923;box-shadow:inset 0 2px 4px rgba(0,0,0,.35)}
+.eth-main-progress-fill{height:100%;border-radius:inherit;background:linear-gradient(90deg,#c87554,#e9a45f 52%,#f3d094);box-shadow:0 0 14px rgba(236,166,98,.46);transition:width .65s cubic-bezier(.2,.7,.2,1)}
+.eth-main-level-card p{min-height:38px;color:#aab9bc;font-size:12px;line-height:1.55}
+.eth-main-hero-heading{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.eth-main-cycle{padding:4px 8px;border:1px solid #c68d59;border-radius:999px;color:#f1c58d;font-size:9px;font-weight:1000}
+.eth-main-hero-name{margin:9px 0 2px;color:#fff0dc;font-size:clamp(19px,2vw,26px);font-weight:1000;overflow-wrap:anywhere}
+.eth-main-hero-meta{color:#9eb0b6;font-size:11px}
+.eth-main-hero-meta b{color:#f1c184}
+.eth-main-hero-stats{display:flex;flex-direction:column;gap:6px;margin:13px 0;color:#a7b6b9;font-size:10px}
+.eth-main-hero-stats b{color:#f6dfbd}
+.eth-game-action{
+  display:flex;align-items:center;justify-content:center;gap:14px;width:100%;margin:10px 0 0;padding:14px 18px;
+  border:2px solid #100f0d;border-radius:11px 24px 11px 24px;background:linear-gradient(120deg,#f4c47f,#d98b60 62%,#a95f50);
+  color:#231b18;font-size:clamp(14px,1.3vw,18px);font-weight:1000;letter-spacing:.075em;box-shadow:0 5px 0 rgba(3,9,12,.75),0 12px 24px rgba(0,0,0,.18);
+  transition:transform .22s,filter .22s,box-shadow .22s,background .3s;
+}
+.eth-game-action:hover{transform:translateY(-2px);filter:brightness(1.06);box-shadow:0 7px 0 rgba(3,9,12,.75),0 16px 28px rgba(0,0,0,.22)}
+.eth-game-action:active{transform:translateY(3px) scale(.985);filter:brightness(.88);box-shadow:0 2px 0 rgba(3,9,12,.75)}
+.eth-game-side{display:flex;flex-direction:column;gap:12px;min-width:0}
+.eth-game-card{padding:17px;border:1px solid rgba(232,179,115,.28);border-radius:15px 25px 15px 25px;background:linear-gradient(145deg,rgba(24,47,58,.95),rgba(13,29,39,.95));color:#eee6d9;box-shadow:0 13px 30px rgba(0,0,0,.22),inset 0 1px rgba(255,255,255,.05)}
+.eth-side-card-heading{display:flex;align-items:center;justify-content:space-between;margin-bottom:13px;color:#d9a66e}
+.eth-game-side-button{display:flex;align-items:center;gap:10px;width:100%;margin:0 0 8px;padding:11px 12px;text-align:left;border:1.5px solid #090f13;border-radius:9px 17px 9px 17px;background:linear-gradient(120deg,rgba(48,71,78,.96),rgba(23,43,52,.98));color:#e9e3d8;font-size:11px;font-weight:900;box-shadow:0 3px 0 rgba(3,8,11,.62);transition:transform .2s,border-color .2s,background .25s,color .2s}
+.eth-game-side-button>span{color:#e5b276;font-size:15px}
+.eth-game-side-button i{margin-left:auto;color:#d8a56b;font-style:normal;opacity:.65}
+.eth-game-side-button:hover:not(:disabled){transform:translateX(3px);border-color:#c78f5e;background:linear-gradient(120deg,#526469,#253d48);color:#fff2db}
+.eth-game-side-button:active:not(:disabled){transform:translateY(2px) scale(.99);filter:brightness(.88)}
+.eth-side-profile-person{display:flex;align-items:center;gap:11px}
+.eth-side-profile-person .eth-game-avatar{border:2px solid #0b1115;box-shadow:0 0 0 2px rgba(226,171,108,.5)}
+.eth-side-profile-title{color:#f6e5ce;font-size:14px;font-weight:1000}
+.eth-side-profile-caption{margin-top:3px;color:#90a5ab;font-size:10px}
+.eth-side-gold{display:flex;justify-content:space-between;align-items:center;margin-top:14px;padding-top:12px;border-top:1px solid rgba(230,181,122,.2);color:#9eb0b4;font-size:9px;font-weight:900;letter-spacing:.14em}
+.eth-side-gold b{color:#f4cd91;font-size:14px;letter-spacing:0}
+.eth-side-gold b span{color:#dca567}
+.eth-game-placeholder{display:flex;flex-direction:column;align-items:flex-start;justify-content:center;width:100%;max-width:none;min-height:100%;margin:0;padding:clamp(30px,8vw,100px);text-align:left;border:0;border-radius:0;background:radial-gradient(ellipse at 75% 38%,rgba(205,140,89,.16),transparent 33%),linear-gradient(135deg,rgba(16,37,49,.94),rgba(24,35,44,.96));color:#f2e7d7;box-shadow:none}
+.eth-map-placeholder-mark{display:grid;place-items:center;width:74px;height:74px;margin-bottom:22px;border:1px solid rgba(240,188,128,.48);border-radius:50%;color:#ecc18c;font-size:39px;background:rgba(7,20,29,.44);box-shadow:0 0 35px rgba(223,164,102,.12)}
+.eth-game-placeholder h2{margin:12px 0;color:#f6dfbd;font-size:clamp(28px,4vw,48px)}
+.eth-game-placeholder p{max-width:540px;color:#aab9bc;font-size:14px;line-height:1.75}
+.eth-game-placeholder .eth-game-action{max-width:250px;margin-top:25px}
+.eth-game-settings{display:block;position:absolute;inset:0;z-index:2;overflow:auto;padding:clamp(15px,3vw,40px);background:radial-gradient(ellipse at 85% 8%,rgba(210,139,86,.14),transparent 36%),linear-gradient(120deg,rgba(10,25,35,.96),rgba(25,38,47,.96));backdrop-filter:blur(10px)}
+.eth-game-settings-inner{width:min(940px,100%);margin:0;padding:clamp(18px,3vw,34px);border:1px solid rgba(238,185,125,.34);border-radius:18px 30px 18px 30px;background:linear-gradient(145deg,rgba(25,48,58,.97),rgba(13,29,39,.98));color:#f0e6d8;box-shadow:0 22px 65px rgba(0,0,0,.32)}
+.eth-settings-heading{display:flex;align-items:flex-start;justify-content:space-between;gap:15px;padding-bottom:20px;border-bottom:1px solid rgba(237,184,122,.2)}
+.eth-settings-heading h2{margin:6px 0;color:#f6dfbd;font-size:clamp(28px,3vw,38px)}
+.eth-settings-heading p{color:#9eb0b5;font-size:12px}
+.eth-settings-close{display:grid;place-items:center;width:40px;height:40px;border:1.5px solid #080e12;border-radius:10px 16px 10px 16px;background:#28414b;color:#f4d5ab;font-size:18px;transition:transform .2s,background .2s}
+.eth-settings-close:hover{transform:rotate(5deg);background:#3c5961}
+.eth-settings-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:18px}
+.eth-game-setting-row{display:grid;grid-template-columns:42px minmax(0,1fr);gap:13px;align-items:start;min-width:0;padding:17px;border:1px solid rgba(230,180,123,.2);border-radius:13px 21px 13px 21px;background:rgba(39,61,68,.42)}
+.eth-game-setting-row[hidden]{display:none!important}
+.eth-setting-icon{display:grid;place-items:center;width:40px;height:40px;border:1px solid rgba(232,185,128,.42);border-radius:12px;color:#efc48c;background:rgba(7,19,27,.42);font-size:19px}
+.eth-setting-content{min-width:0}
+.eth-setting-content h3{margin:1px 0 6px;color:#f2dfc5;font-size:15px}
+.eth-setting-content p{color:#9eafb5;font-size:11px;line-height:1.55}
+.eth-settings-avatar-row{display:flex;align-items:center;gap:12px;margin-top:12px}
+.eth-settings-avatar-row>.eth-game-avatar{width:72px;height:72px;min-width:72px;border:2px solid #090f13;box-shadow:0 0 0 2px rgba(229,172,108,.5)}
+.eth-settings-avatar-controls{flex:1;min-width:0}
+.eth-settings-avatar-controls small{display:block;margin-top:5px;color:#98aeb3;font-size:10px}
+.eth-settings-actions{display:flex;gap:7px;flex-wrap:wrap;margin-top:10px}
+.eth-settings-actions .eth-game-side-button{width:auto;margin:0;padding:8px 10px}
+.eth-settings-promo-row{display:flex;gap:8px;margin-top:12px}
+.eth-settings-promo-row .eth-game-side-button{width:auto;min-width:74px;margin:0;justify-content:center}
+.eth-game-input{width:100%;min-width:0;border:1.5px solid #0b1114;border-radius:9px;background:#0d1d27;color:#f4e9d9;padding:10px 12px}
+.eth-game-input::placeholder{color:#71878e}
+.eth-settings-status{margin-top:8px;color:#aeb9b9;font-size:10px}
+.eth-settings-sound-button{width:auto;margin-top:12px}
+.eth-game-setting-row .eth-game-side-button:disabled{opacity:.5;cursor:not-allowed;filter:saturate(.5)}
+.eth-game-inventory.screen{
+  position:fixed!important;inset:0;z-index:1000;width:100%;height:100%;min-height:100%;padding:clamp(9px,1.6vw,22px)!important;
+  display:none;align-items:stretch;justify-content:flex-start;overflow:auto;overscroll-behavior:contain;
+  background:linear-gradient(130deg,rgba(8,22,31,.93),rgba(14,29,39,.96))!important;backdrop-filter:blur(16px);
+  transform:translate3d(-103%,0,0);transition:transform .66s cubic-bezier(.2,.78,.2,1);pointer-events:none;
+}
+.eth-game-inventory.screen.active{display:flex!important;transform:translate3d(0,0,0);pointer-events:auto;box-shadow:20px 0 70px rgba(0,0,0,.4)}
+.eth-game-inventory>.eth-inventory-frame{
+  display:flex;flex-direction:column;gap:17px;margin:0!important;width:min(1480px,100%)!important;min-height:calc(100svh - 2*clamp(9px,1.6vw,22px));
+  max-height:none!important;padding:clamp(16px,2.5vw,32px)!important;border:1px solid rgba(238,185,125,.38)!important;border-radius:18px 30px 18px 30px!important;
+  background:linear-gradient(145deg,rgba(24,46,57,.98),rgba(11,25,35,.985))!important;color:#eee5d8!important;box-shadow:0 22px 70px rgba(0,0,0,.4),inset 0 1px rgba(255,255,255,.05)
+}
+.eth-inventory-header{display:flex;justify-content:space-between;align-items:center;gap:14px;padding-bottom:14px;border-bottom:1px solid rgba(237,183,121,.24)}
+.eth-inventory-title{margin-top:5px;color:#f4d8ad!important;font-size:clamp(26px,3vw,39px);font-weight:1000;letter-spacing:.02em}
+.eth-inventory-header .eth-game-side-button{width:auto;margin:0}
+.eth-inventory-bonuses{display:flex;flex-wrap:wrap;gap:8px;padding:11px 13px;border:1px solid rgba(234,182,122,.24);border-radius:12px 20px 12px 20px;background:rgba(34,57,66,.62)}
+.eth-inventory-bonus{padding:7px 10px;border:1px solid rgba(228,180,122,.32);border-radius:8px 13px 8px 13px;background:rgba(7,21,30,.55);color:#e9d5b6;font-size:11px;font-weight:900}
+.eth-inventory-layout{display:grid;grid-template-columns:minmax(245px,310px) minmax(0,1fr);gap:16px;align-items:start;min-height:0}
+.eth-inventory-hero,.eth-inventory-items{min-width:0;padding:16px;border:1px solid rgba(230,178,119,.25);border-radius:14px 23px 14px 23px;background:linear-gradient(145deg,rgba(35,59,69,.82),rgba(16,34,45,.9));box-shadow:inset 0 1px rgba(255,255,255,.05)}
+.eth-inventory-hero{text-align:center;position:sticky;top:0}
+.eth-inventory-hero-model{height:clamp(195px,27vh,270px);display:grid;place-items:center;margin:7px auto 14px;border:1px solid rgba(232,187,132,.24);border-radius:13px 21px 13px 21px;background:radial-gradient(ellipse at 50% 75%,rgba(218,143,91,.27),transparent 64%),linear-gradient(180deg,#1c3947,#112631);overflow:hidden}
+.eth-inventory-hero-model svg{height:100%;width:100%;max-width:220px;max-height:245px;filter:drop-shadow(0 12px 14px rgba(0,0,0,.55))}
+.eth-inventory-hero-caption{color:#d5aa78;font-size:10px;font-weight:900;letter-spacing:.14em;text-transform:uppercase}
+#eth-inventory-hero-name{color:#f3e5d0!important}
+.eth-inventory-hero p{color:#91a5ab!important}
+.eth-inventory-items h3{color:#f0dfc6!important}
+.eth-inventory-items .equipment-slot{position:relative;border:1px solid rgba(237,185,126,.35)!important;border-radius:10px 17px 10px 17px!important;background:linear-gradient(145deg,rgba(42,67,76,.96),rgba(18,37,47,.98))!important;color:#e9e1d4!important;min-height:70px;transition:transform .22s,border-color .22s,box-shadow .22s}
+.eth-inventory-items .equipment-slot.filled{border-color:#dca96d!important;background:linear-gradient(145deg,rgba(101,78,58,.92),rgba(39,49,51,.98))!important;box-shadow:inset 0 1px rgba(255,255,255,.08),0 4px 12px rgba(0,0,0,.2)}
+.eth-inventory-items .equipment-slot:hover{transform:translateY(-2px);border-color:#f0c489!important}
+#eth-inventory-equipment #equipment-slots{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin:12px 0 0}
+.eth-inventory-items #inventory-list{grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;overflow:visible;align-items:start}
+.eth-inventory-items #inventory-list>div.eth-item-card{position:relative;min-width:0;overflow:hidden;padding:12px!important;border:1px solid rgba(231,181,124,.29)!important;border-radius:12px 20px 12px 20px!important;background:linear-gradient(150deg,rgba(39,63,73,.98),rgba(16,34,45,.99))!important;color:#f1e5d4!important;box-shadow:0 8px 19px rgba(0,0,0,.2);transition:transform .25s,border-color .25s,box-shadow .25s}
+.eth-inventory-items #inventory-list>div.eth-item-card:before{content:"";position:absolute;inset:0 0 auto;height:2px;background:linear-gradient(90deg,transparent,#e7b878,transparent);opacity:.55}
+.eth-inventory-items #inventory-list>div.eth-item-card:hover,.eth-inventory-items #inventory-list>div.eth-item-card:focus-within{z-index:2;transform:translateY(-3px);border-color:rgba(255,207,145,.78)!important;box-shadow:0 15px 30px rgba(0,0,0,.34),0 0 0 1px rgba(242,185,116,.12)}
+.eth-inventory-items #inventory-list>div.eth-item-card .text-white{color:#fff0dc!important}
+.eth-inventory-items #inventory-list>div.eth-item-card .text-slate-300,.eth-inventory-items #inventory-list>div.eth-item-card .text-slate-400{color:#aebcc0!important}
+.eth-inventory-items #inventory-list>div.eth-item-card .bg-slate-950\/60{background:rgba(5,15,22,.62)!important}
+.eth-item-miniature{height:142px!important;margin:-12px -12px 12px!important;display:grid;place-items:center;position:relative;overflow:hidden;border-bottom:1px solid rgba(225,177,119,.27)!important;background:radial-gradient(circle at 50% 35%,rgba(244,197,132,.3),rgba(46,74,81,.6) 56%,rgba(11,26,37,.96))!important;font-size:62px;text-shadow:0 7px 16px rgba(0,0,0,.5)}
+.eth-item-miniature:after{content:"";position:absolute;inset:0;background:linear-gradient(145deg,rgba(255,255,255,.12),transparent 45%,rgba(2,10,15,.25));pointer-events:none}
+.eth-item-miniature svg{position:relative;z-index:1;width:min(165px,92%);height:130px;overflow:visible;filter:drop-shadow(0 9px 9px rgba(0,0,0,.6));animation:ethItemFloat 5.2s ease-in-out infinite}
+.eth-item-miniature[data-rarity="holy"]{background:radial-gradient(circle at 50% 36%,rgba(255,236,163,.55),rgba(128,104,65,.52) 62%,#172631)!important}
+.eth-item-miniature[data-rarity="darkness"]{background:radial-gradient(circle at 50% 36%,rgba(219,116,123,.44),rgba(82,48,62,.55) 62%,#172631)!important}
+.eth-item-miniature[data-rarity="legendary"]{background:radial-gradient(circle at 50% 36%,rgba(255,190,111,.5),rgba(117,76,58,.55) 62%,#172631)!important}
+.eth-item-miniature[data-rarity="epic"]{background:radial-gradient(circle at 50% 36%,rgba(170,147,221,.46),rgba(69,59,93,.55) 62%,#172631)!important}
+.eth-inventory-items .eth-item-inspector{display:none!important}
+.eth-inventory-items #inventory-list>div.eth-item-card .relative.z-10>div:nth-child(3),
+.eth-inventory-items #inventory-list>div.eth-item-card .relative.z-10>p,
+.eth-inventory-items #inventory-list>div.eth-item-card .relative.z-10>button{
+  max-height:0;opacity:0;overflow:hidden;margin-top:0!important;padding-top:0!important;padding-bottom:0!important;border-width:0!important;pointer-events:none;
+  transition:max-height .3s ease,opacity .22s ease,margin .3s ease,padding .3s ease;
+}
+.eth-inventory-items #inventory-list>div.eth-item-card:hover .relative.z-10>div:nth-child(3),
+.eth-inventory-items #inventory-list>div.eth-item-card:hover .relative.z-10>p,
+.eth-inventory-items #inventory-list>div.eth-item-card:hover .relative.z-10>button,
+.eth-inventory-items #inventory-list>div.eth-item-card:focus-within .relative.z-10>div:nth-child(3),
+.eth-inventory-items #inventory-list>div.eth-item-card:focus-within .relative.z-10>p,
+.eth-inventory-items #inventory-list>div.eth-item-card:focus-within .relative.z-10>button{
+  max-height:130px;opacity:1;margin-top:8px!important;padding:8px!important;border-width:1px!important;pointer-events:auto;
+}
+.eth-inventory-items .eth-btn{border:1.5px solid #080e12!important;border-radius:8px 14px 8px 14px!important;background:linear-gradient(120deg,#eec185,#c47b59)!important;color:#211915!important;font-weight:1000;box-shadow:0 3px 0 rgba(0,0,0,.65)}
+.eth-inventory-items .eth-btn:hover{filter:brightness(1.08);transform:translateY(-1px)}
+#screen-inventory .eth-game-side-button{width:auto;margin:0;border-color:#080e12;background:linear-gradient(120deg,#314f5a,#1a3442);color:#eee3d2}
+#screen-inventory .eth-game-side-button:hover{border-color:#d7a36d}
+.eth-slot-drop{outline:2px dashed #f0c17e!important;outline-offset:3px;transform:translateY(-2px)}
+#screen-inventory .text-slate-400{color:#9eafb5!important}
+@media(max-width:1180px){
+  .eth-game-main{grid-template-columns:minmax(195px,220px) minmax(0,1fr)}
+  .eth-game-side{grid-column:1/-1;display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}
+  .eth-game-side .eth-game-card{min-width:0}
+  .eth-inventory-items #inventory-list{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media(max-width:780px){
+  #screen-map.eth-game-shell{height:100svh;min-height:580px}
+  .eth-game-topbar{flex-wrap:wrap;gap:9px;padding:9px 13px}
+  .eth-game-brand{font-size:23px}
+  .eth-game-tabs{order:3;width:100%;justify-content:flex-start}
+  .eth-game-tab{flex:1;min-width:0;padding:8px 8px;font-size:10px}
+  .eth-game-profile{margin-left:auto;max-width:190px}
+  .eth-game-profile .eth-game-avatar{width:44px;height:44px;min-width:44px}
+  .eth-game-view{padding:13px 12px 26px}
+  .eth-game-main{grid-template-columns:minmax(0,1fr);gap:12px}
+  .eth-game-main-stage{order:1}
+  .eth-game-chapter-rail{order:2;padding:12px}
+  .eth-chapter-rail-heading{padding:2px 4px 5px}
+  .eth-chapter-rail-heading p{max-width:none}
+  .eth-game-chapter{min-height:64px}
+  .eth-game-side{order:3;grid-column:auto;grid-template-columns:repeat(2,minmax(0,1fr))}
+  .eth-scene-copy{max-width:76%;padding:22px}
+  .eth-main-info-grid{grid-template-columns:1fr}
+  .eth-settings-grid{grid-template-columns:1fr}
+  .eth-game-settings{padding:12px}
+  .eth-game-settings-inner{padding:17px}
+  .eth-inventory-layout{grid-template-columns:1fr}
+  .eth-inventory-hero{position:relative}
+  .eth-inventory-hero-model{height:205px}
+  .eth-inventory-items #inventory-list{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .eth-game-inventory>.eth-inventory-frame{min-height:calc(100svh - 20px);padding:14px!important}
+}
+@media(max-width:520px){
+  .eth-game-view{padding:10px 9px 22px}
+  .eth-game-main-stage{padding:12px}
+  .eth-game-chapter-rail{gap:8px}
+  .eth-game-chapter{grid-template-columns:32px minmax(0,1fr) 9px;padding:9px;min-height:60px}
+  .eth-chapter-index{width:30px;height:30px;font-size:11px}
+  .eth-chapter-copy b{font-size:9px}
+  .eth-chapter-copy small{font-size:9px}
+  .eth-game-side{grid-template-columns:1fr}
+  .eth-scene-copy{max-width:82%;padding:18px}
+  .eth-scene-title{font-size:26px}
+  .eth-scene-mark{right:4%;bottom:12%;font-size:60px}
+  .eth-main-info-grid{gap:9px}
+  .eth-game-profile{max-width:170px;padding-right:9px}
+  .eth-game-profile b{max-width:95px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .eth-inventory-header{align-items:flex-start}
+  .eth-inventory-title{font-size:23px}
+  .eth-inventory-bonuses{gap:5px;padding:8px}
+  .eth-inventory-bonus{font-size:9px;padding:6px}
+  .eth-inventory-items #inventory-list{grid-template-columns:1fr}
+  .eth-settings-avatar-row{align-items:flex-start}
+  .eth-settings-actions{flex-direction:column}
+  .eth-settings-actions .eth-game-side-button{width:100%}
+}
+@media(hover:none){
+  .eth-inventory-items #inventory-list>div.eth-item-card .relative.z-10>div:nth-child(3),
+  .eth-inventory-items #inventory-list>div.eth-item-card .relative.z-10>p,
+  .eth-inventory-items #inventory-list>div.eth-item-card .relative.z-10>button{
+    max-height:140px;opacity:1;margin-top:8px!important;padding:8px!important;border-width:1px!important;pointer-events:auto;
+  }
+}
+@media(prefers-reduced-motion:reduce){
+  #screen-map.eth-game-shell,.eth-game-view,.eth-game-tab,.eth-game-chapter,.eth-game-profile,.eth-game-action,.eth-game-inventory.screen,.eth-item-miniature svg{transition:none!important;animation:none!important}
+}
+</style>
 </head>
 
 <body>
 
     <script>
         // Переключатель технических работ: true — показать экран, false — обычный вход в игру.
-        const ETH_MAINTENANCE_MODE = false;
+        const ETH_MAINTENANCE_MODE = true;
         if (ETH_MAINTENANCE_MODE) {
             document.body.insertAdjacentHTML('afterbegin', "<div id=\"eth-maintenance-overlay\" role=\"dialog\" aria-modal=\"true\" aria-labelledby=\"eth-maintenance-title\">\n        <div class=\"eth-maintenance-card\">\n            <div class=\"eth-maintenance-icon\" aria-hidden=\"true\">🛠️</div>\n            <h1 id=\"eth-maintenance-title\">Технические работы</h1>\n            <p>Этерия временно недоступна.</p>\n            <p class=\"eth-maintenance-subtitle\">Мы проводим технические работы. Пожалуйста, загляните позже.</p>\n        </div>\n    </div>\n    <style>\n        html, body { min-height: 100%; }\n        #eth-maintenance-overlay {\n            position: fixed;\n            inset: 0;\n            z-index: 2147483647;\n            display: flex;\n            align-items: center;\n            justify-content: center;\n            padding: 24px;\n            background: radial-gradient(ellipse at 50% 35%, #172554 0%, #080d20 55%, #020617 100%);\n            color: #f8fafc;\n            text-align: center;\n            pointer-events: auto;\n            user-select: none;\n        }\n        #eth-maintenance-overlay .eth-maintenance-card {\n            width: min(100%, 620px);\n            padding: clamp(28px, 6vw, 52px);\n            border: 1px solid rgba(251, 191, 36, .35);\n            border-radius: 24px;\n            background: rgba(15, 23, 42, .82);\n            box-shadow: 0 24px 80px rgba(0, 0, 0, .5);\n        }\n        #eth-maintenance-overlay .eth-maintenance-icon {\n            margin-bottom: 18px;\n            font-size: 52px;\n        }\n        #eth-maintenance-overlay h1 {\n            margin: 0 0 18px;\n            color: #fbbf24;\n            font-size: clamp(28px, 6vw, 44px);\n            line-height: 1.15;\n        }\n        #eth-maintenance-overlay p {\n            margin: 8px 0;\n            font-size: clamp(17px, 3vw, 21px);\n        }\n        #eth-maintenance-overlay .eth-maintenance-subtitle {\n            color: #cbd5e1;\n            font-size: 15px;\n        }\n    </style>");
             document.querySelectorAll('body > *:not(#eth-maintenance-overlay)').forEach(function (element) {
@@ -646,9 +960,9 @@ checkEtheriaConnection();
       <header class="eth-game-topbar">
         <div class="eth-game-brand">ЭТЕРИЯ</div>
         <nav class="eth-game-tabs" aria-label="Разделы игры">
-          <button class="eth-game-tab active" id="eth-tab-main" onpointerenter="if(matchMedia('(hover:hover)').matches)ethGameTab('main')" onclick="ethGameTab('main')">MAIN</button>
-          <button class="eth-game-tab" id="eth-tab-map" onpointerenter="if(matchMedia('(hover:hover)').matches)ethGameTab('map')" onclick="ethGameTab('map')">MAP</button>
-          <button class="eth-game-tab" id="eth-tab-settings" onpointerenter="if(matchMedia('(hover:hover)').matches)ethGameTab('settings')" onclick="ethGameTab('settings')">SETTINGS</button>
+          <button class="eth-game-tab active" id="eth-tab-main" onclick="ethGameTab('main')">MAIN</button>
+          <button class="eth-game-tab" id="eth-tab-map" onclick="ethGameTab('map')">MAP</button>
+          <button class="eth-game-tab" id="eth-tab-settings" onclick="ethGameTab('settings')">SETTINGS</button>
         </nav>
         <button class="eth-game-profile" type="button" onclick="showScreen('inventory')" aria-label="Открыть инвентарь">
           <span class="eth-game-avatar" id="eth-game-avatar"><span>👤</span></span>
@@ -656,83 +970,140 @@ checkEtheriaConnection();
         </button>
       </header>
 
-      <section id="eth-game-main-view" class="eth-game-main">
-        <div class="eth-game-card">
-          <div id="eth-chapter-scene" class="eth-chapter-scene" data-chapter="1">
-            <div class="eth-scene-copy"><div class="eth-scene-kicker" id="eth-scene-kicker">АКТ I · ПУТЬ НАЧИНАЕТСЯ</div><div class="eth-scene-title" id="eth-scene-title">Пепельная тропа</div><div class="eth-scene-enemy" id="eth-scene-enemy">Главный противник: Король Орков</div></div>
-            <div class="eth-scene-mark" id="eth-scene-mark">⚔️</div>
-          </div>
-          <div class="eth-game-eyebrow">Путь героя · кампания</div>
-          <div class="flex items-end justify-between gap-4 flex-wrap mt-2">
-            <div><div class="text-sm font-black tracking-widest">ТЕКУЩИЙ УРОВЕНЬ</div><div class="eth-game-level"><span id="current-level-display">1</span><small class="text-2xl"> / 50</small></div></div>
-            <div class="text-right"><div class="text-sm font-black">ГЕРОЙ</div><div id="map-hero-name" class="text-2xl font-black">Имя героя</div><div class="text-sm">Ур. героя <b id="map-hero-level">1</b> · <span id="map-ngp-label" class="hidden">NG+1</span></div></div>
-          </div>
-          <div class="mt-4 rounded-full h-3 overflow-hidden border border-[#54351f] bg-[#b98b65]"><div id="eth-level-progress" class="h-full rounded-full" style="width:2%;background:linear-gradient(90deg,#f4d28b,#c66d46)"></div></div>
-          <p id="level-description" class="mt-4 text-base leading-relaxed text-[#69462f]">Три главы ждут своего героя. Выбери путь и продолжи путешествие.</p>
-          <div class="eth-game-chapters">
-            <button class="eth-game-chapter selected" data-chapter="1" onpointerenter="if(matchMedia('(hover:hover)').matches)ethSelectChapter(1)" onclick="ethSelectChapter(1)"><b>ГЛАВА I · ПЕПЕЛЬНАЯ ТРОПА</b><span>Уровни 1–10 · Орки и пепельные стражи</span></button>
-            <button class="eth-game-chapter" data-chapter="2" onpointerenter="if(matchMedia('(hover:hover)').matches)ethSelectChapter(2)" onclick="ethSelectChapter(2)"><b>ГЛАВА II · КАМЕННАЯ ПАМЯТЬ</b><span>Уровни 11–25 · Дракон и Тёмный Маг</span></button>
-            <button class="eth-game-chapter" data-chapter="3" onpointerenter="if(matchMedia('(hover:hover)').matches)ethSelectChapter(3)" onclick="ethSelectChapter(3)"><b>ГЛАВА III · НЕБЕСНАЯ ЦИТАДЕЛЬ</b><span>Уровни 26–50 · Стражи цитадели и Безымянный</span></button>
-          </div>
-          <button class="eth-game-action" onclick="startCombat()">НАЧАТЬ СРАЖЕНИЕ</button>
-          <div class="mt-4 flex flex-wrap gap-3 text-sm font-bold text-[#714b32]">
-            <span>Опыт: <b id="map-hero-xp">0</b>/<b id="map-hero-next-xp">100</b></span>
-            <span>Очки характеристик: <b id="stat-points-badge">0</b></span>
-          </div>
-        </div>
-        <aside class="eth-game-side">
-          <div class="eth-game-card">
-            <div class="eth-game-eyebrow mb-3">Быстрый доступ</div>
-            <button class="eth-game-side-button mb-3" onclick="showScreen('upgrade')">✦ Прокачка героя</button>
-            <button class="eth-game-side-button mb-3" onclick="showScreen('inventory')">🎒 Инвентарь и экипировка</button>
-            <button class="eth-game-side-button mb-3" onclick="showScreen('mine')">⛏ Шахта Этерии</button>
-            <button class="eth-game-side-button" onclick="ethOpenAccount()">◉ Аккаунт и облако</button>
-          </div>
-          <div class="eth-game-card">
-            <div class="eth-game-eyebrow">Профиль героя</div>
-            <div class="flex items-center gap-3 mt-3">
-              <div id="map-hero-icon" class="eth-game-avatar" style="width:62px;height:62px">👤</div>
-              <div><div id="eth-game-hero-title" class="font-black text-lg">Путник</div><div class="text-xs">Хроники Этерии</div></div>
+      <div id="eth-game-view-stage" class="eth-game-view-stage">
+        <section id="eth-game-main-view" class="eth-game-view eth-game-main eth-view-active" aria-hidden="false">
+          <aside class="eth-game-chapter-rail" aria-label="Главы кампании">
+            <div class="eth-chapter-rail-heading">
+              <span class="eth-game-eyebrow">КАМПАНИЯ</span>
+              <h2>ТРИ ГЛАВЫ</h2>
+              <p>Три части одного пути. Каждая меняет мир, врагов и атмосферу.</p>
             </div>
-            <div class="mt-3 text-sm">Золото: <b id="eth-map-gold-display">0</b> 🪙</div>
-          </div>
-        </aside>
-      </section>
+            <button class="eth-game-chapter selected" data-chapter="1" onclick="ethSelectChapter(1)" type="button">
+              <span class="eth-chapter-index">I</span>
+              <span class="eth-chapter-copy"><b>ПЕПЕЛЬНАЯ ТРОПА</b><small>Уровни 1–10 · Орки и пепельные стражи</small></span>
+              <span class="eth-chapter-chevron">›</span>
+            </button>
+            <button class="eth-game-chapter" data-chapter="2" onclick="ethSelectChapter(2)" type="button">
+              <span class="eth-chapter-index">II</span>
+              <span class="eth-chapter-copy"><b>КАМЕННАЯ ПАМЯТЬ</b><small>Уровни 11–25 · Дракон и Тёмный Маг</small></span>
+              <span class="eth-chapter-chevron">›</span>
+            </button>
+            <button class="eth-game-chapter" data-chapter="3" onclick="ethSelectChapter(3)" type="button">
+              <span class="eth-chapter-index">III</span>
+              <span class="eth-chapter-copy"><b>НЕБЕСНАЯ ЦИТАДЕЛЬ</b><small>Уровни 26–50 · Стражи цитадели и Безымянный</small></span>
+              <span class="eth-chapter-chevron">›</span>
+            </button>
+            <div class="eth-chapter-rail-note"><span>✦</span> Выбор главы показывает её окружение. Кампания продолжается с текущего уровня.</div>
+          </aside>
 
-      <section id="eth-game-map-view" class="eth-game-placeholder" hidden>
-        <div class="text-6xl mb-4">🗺️</div><div class="eth-game-eyebrow">Следующая область обновления</div>
-        <h2 class="text-3xl font-black my-3">Карта Этерии</h2>
-        <p class="text-base">Эта область пока готовится. Переход доступен, содержимое карты появится в следующем этапе разработки.</p>
-        <button class="eth-game-action" style="max-width:280px" onclick="ethGameTab('main')">Вернуться в MAIN</button>
-      </section>
+          <main class="eth-game-main-stage">
+            <div class="eth-main-stage-topline">
+              <div><span class="eth-game-eyebrow">ХРОНИКИ ЭТЕРИИ</span><div class="eth-main-stage-subtitle">ПУТЬ ГЕРОЯ <span>／</span> ОСНОВНАЯ КАМПАНИЯ</div></div>
+              <div class="eth-main-current-chapter" id="eth-main-current-chapter">ГЛАВА I</div>
+            </div>
+            <div id="eth-chapter-scene" class="eth-chapter-scene" data-chapter="1">
+              <div class="eth-scene-copy">
+                <div class="eth-scene-kicker" id="eth-scene-kicker">АКТ I · ПУТЬ НАЧИНАЕТСЯ</div>
+                <div class="eth-scene-title" id="eth-scene-title">Пепельная тропа</div>
+                <div class="eth-scene-enemy" id="eth-scene-enemy">Главный противник: Король Орков</div>
+              </div>
+              <div class="eth-scene-mark" id="eth-scene-mark" aria-hidden="true">⚔️</div>
+              <div class="eth-scene-haze" aria-hidden="true"></div>
+            </div>
 
-      <section id="eth-game-settings-view" class="eth-game-settings" aria-hidden="true">
-        <div class="eth-game-settings-inner">
-          <div class="flex justify-between items-center gap-3 mb-3"><div><div class="eth-game-eyebrow">Профиль и предпочтения</div><h2 class="text-3xl font-black">Настройки</h2></div><button class="eth-game-side-button" style="width:auto" onclick="ethGameTab('main')">Закрыть ✕</button></div>
-          <div class="eth-game-setting-row">
-            <h3 class="text-xl font-black mb-2">Аватар игрока</h3>
-            <div class="flex items-center gap-4 flex-wrap">
-              <div id="eth-settings-avatar-preview" class="eth-game-avatar" style="width:86px;height:86px"><span>👤</span></div>
-              <div class="flex-1 min-w-[190px]"><input id="eth-avatar-file" class="eth-game-input" type="file" accept="image/png,image/jpeg,image/webp"><p class="text-xs mt-2">PNG, JPG или WebP · до 2 МБ. Картинка будет видна другим игрокам.</p><div class="flex gap-2 mt-2"><button class="eth-game-side-button" onclick="ethUploadAvatar()">Сохранить аватар</button><button class="eth-game-side-button" onclick="ethRemoveAvatar()">Удалить</button></div><p id="eth-avatar-status" class="text-sm mt-2" aria-live="polite"></p></div>
+            <div class="eth-main-info-grid">
+              <section class="eth-main-level-card">
+                <div class="eth-main-level-top">
+                  <div><span class="eth-game-eyebrow">ТЕКУЩИЙ УРОВЕНЬ</span><div class="eth-game-level"><span id="current-level-display">1</span><small>/ 50</small></div></div>
+                  <div class="eth-main-level-seal"><span>✦</span><small>ПРОГРЕСС</small></div>
+                </div>
+                <div class="eth-main-progress-track"><div id="eth-level-progress" class="eth-main-progress-fill" style="width:2%"></div></div>
+                <p id="level-description">Три главы ждут своего героя. Выбери путь и продолжи путешествие.</p>
+              </section>
+              <section class="eth-main-hero-card">
+                <div class="eth-main-hero-heading"><span class="eth-game-eyebrow">ТВОЙ ГЕРОЙ</span><span id="map-ngp-label" class="eth-main-cycle hidden">NG+1</span></div>
+                <div id="map-hero-name" class="eth-main-hero-name">Имя героя</div>
+                <div class="eth-main-hero-meta">Уровень героя <b id="map-hero-level">1</b></div>
+                <div class="eth-main-hero-stats">
+                  <span>Опыт <b id="map-hero-xp">0</b>/<b id="map-hero-next-xp">100</b></span>
+                  <span>Очки характеристик <b id="stat-points-badge">0</b></span>
+                </div>
+                <button class="eth-game-action" onclick="startCombat()" type="button">НАЧАТЬ СРАЖЕНИЕ <span>↗</span></button>
+              </section>
+            </div>
+          </main>
+
+          <aside class="eth-game-side">
+            <div class="eth-game-card eth-side-actions">
+              <div class="eth-side-card-heading"><span class="eth-game-eyebrow">БЫСТРЫЙ ДОСТУП</span><span>✧</span></div>
+              <button class="eth-game-side-button" onclick="showScreen('upgrade')" type="button"><span>✦</span> Прокачка героя <i>↗</i></button>
+              <button class="eth-game-side-button" onclick="showScreen('inventory')" type="button"><span>⚒</span> Инвентарь <i>↗</i></button>
+              <button class="eth-game-side-button" onclick="showScreen('mine')" type="button"><span>⛏</span> Шахта Этерии <i>↗</i></button>
+              <button class="eth-game-side-button" onclick="ethOpenAccount()" type="button"><span>◉</span> Аккаунт и облако <i>↗</i></button>
+            </div>
+            <div class="eth-game-card eth-side-profile">
+              <div class="eth-side-card-heading"><span class="eth-game-eyebrow">ПРОФИЛЬ ГЕРОЯ</span><span>◈</span></div>
+              <div class="eth-side-profile-person">
+                <div id="map-hero-icon" class="eth-game-avatar" style="width:66px;height:66px">👤</div>
+                <div><div id="eth-game-hero-title" class="eth-side-profile-title">Путник</div><div class="eth-side-profile-caption">Хроники Этерии</div></div>
+              </div>
+              <div class="eth-side-gold">ЗОЛОТО <b><span id="eth-map-gold-display">0</span> <span>◈</span></b></div>
+            </div>
+          </aside>
+        </section>
+
+        <section id="eth-game-map-view" class="eth-game-view eth-game-placeholder" aria-hidden="true" hidden>
+          <div class="eth-map-placeholder-mark">⌖</div>
+          <div class="eth-game-eyebrow">СЛЕДУЮЩИЙ ЭТАП ОБНОВЛЕНИЯ</div>
+          <h2>Карта Этерии</h2>
+          <p>Этот раздел уже на месте, но пока скрывает ещё не открытую часть мира. Содержимое карты появится в следующем этапе.</p>
+          <button class="eth-game-action" style="max-width:280px" onclick="ethGameTab('main')" type="button">ВЕРНУТЬСЯ В MAIN</button>
+        </section>
+
+        <section id="eth-game-settings-view" class="eth-game-view eth-game-settings" aria-hidden="true" hidden>
+          <div class="eth-game-settings-inner">
+            <div class="eth-settings-heading"><div><div class="eth-game-eyebrow">ПАРАМЕТРЫ И ПРОФИЛЬ</div><h2>Настройки</h2><p>Настрой Этерию под себя.</p></div><button class="eth-settings-close" onclick="ethGameTab('main')" type="button" aria-label="Закрыть настройки">✕</button></div>
+            <div class="eth-settings-grid">
+              <div class="eth-game-setting-row eth-game-account-only" hidden>
+                <div class="eth-setting-icon">◉</div>
+                <div class="eth-setting-content">
+                  <h3>Аватар игрока</h3>
+                  <p>Загрузи собственное изображение для профиля.</p>
+                  <div class="eth-settings-avatar-row">
+                    <div id="eth-settings-avatar-preview" class="eth-game-avatar"><span>👤</span></div>
+                    <div class="eth-settings-avatar-controls"><input id="eth-avatar-file" class="eth-game-input" type="file" accept="image/png,image/jpeg,image/webp"><small>PNG, JPG или WebP · до 2 МБ</small><div class="eth-settings-actions"><button class="eth-game-side-button" onclick="ethUploadAvatar()" type="button">Сохранить аватар</button><button class="eth-game-side-button" onclick="ethRemoveAvatar()" type="button">Удалить</button></div><p id="eth-avatar-status" class="eth-settings-status" aria-live="polite"></p></div>
+                  </div>
+                </div>
+              </div>
+              <div class="eth-game-setting-row eth-game-account-only" hidden>
+                <div class="eth-setting-icon">✦</div>
+                <div class="eth-setting-content">
+                  <h3>Промокод</h3>
+                  <p>Здесь можно будет активировать промокоды будущих событий Этерии.</p>
+                  <div class="eth-settings-promo-row"><input id="eth-promo-input" class="eth-game-input" maxlength="40" placeholder="Промокоды скоро появятся" disabled><button class="eth-game-side-button" disabled type="button">СКОРО</button></div>
+                  <p id="eth-promo-status" class="eth-settings-status">Система активации подключится после запуска промокодов.</p>
+                </div>
+              </div>
+              <div class="eth-game-setting-row">
+                <div class="eth-setting-icon">♫</div>
+                <div class="eth-setting-content">
+                  <h3>Звуки</h3>
+                  <p>Отключает атмосферный звук Этерии. Настройка сохраняется на этом устройстве.</p>
+                  <button id="eth-game-mute-button" class="eth-game-side-button eth-settings-sound-button" onclick="ethGameToggleSound()" type="button">Выключить все звуки</button>
+                </div>
+              </div>
+              <div class="eth-game-setting-row">
+                <div class="eth-setting-icon">⌘</div>
+                <div class="eth-setting-content">
+                  <h3>Аккаунт</h3>
+                  <p id="eth-game-account-state">Проверяем состояние аккаунта…</p>
+                  <button class="eth-game-side-button" onclick="ethOpenAccount()" type="button">ПРОФИЛЬ И БЕЗОПАСНОСТЬ</button>
+                </div>
+              </div>
             </div>
           </div>
-          <div class="eth-game-setting-row">
-            <h3 class="text-xl font-black mb-2">Промокод</h3>
-            <input id="eth-promo-input" class="eth-game-input" maxlength="40" placeholder="Промокоды скоро появятся" disabled>
-            <button class="eth-game-side-button mt-2" disabled>АКТИВАЦИЯ СКОРО</button>
-            <p id="eth-promo-status" class="text-sm mt-2">Поле подготовлено. Система активации будет подключена, когда появятся первые промокоды.</p>
-          </div>
-          <div class="eth-game-setting-row">
-            <h3 class="text-xl font-black mb-2">Звуки</h3>
-            <p class="text-sm mb-3">Общий переключатель атмосферного звука и будущих игровых эффектов.</p>
-            <button id="eth-game-mute-button" class="eth-game-side-button" onclick="ethGameToggleSound()">Выключить звук</button>
-          </div>
-          <div class="eth-game-setting-row">
-            <h3 class="text-xl font-black mb-2">Аккаунт</h3><p id="eth-game-account-state" class="text-sm mb-3">Проверяем состояние аккаунта…</p>
-            <button class="eth-game-side-button" onclick="ethOpenAccount()">Профиль и безопасность аккаунта</button>
-          </div>
-        </div>
-      </section>
+        </section>
+      </div>
     </div>
 
     <!-- Подлокация: Шахта -->
@@ -4837,34 +5208,46 @@ body.dodge-open{overflow:hidden}
 
   window.ethGameTab=function(tab){
     if(!['main','map','settings'].includes(tab))tab='main';
+    const previous=ethCurrentGameTab;
     ethCurrentGameTab=tab;
-    const main=document.getElementById('eth-game-main-view');
-    const map=document.getElementById('eth-game-map-view');
-    const settings=document.getElementById('eth-game-settings-view');
-    const views={main,map};
+    const views={main:document.getElementById('eth-game-main-view'),map:document.getElementById('eth-game-map-view'),settings:document.getElementById('eth-game-settings-view')};
+    const target=views[tab];
     Object.entries(views).forEach(([key,view])=>{
       if(!view)return;
       clearTimeout(view._ethHideTimer);
       if(key===tab){
+        const alreadyVisible=!view.hidden&&view.classList.contains('eth-view-active');
         view.hidden=false;
+        view.setAttribute('aria-hidden','false');
         view.classList.remove('eth-view-leaving');
-        view.classList.add('eth-view-entering');
-        requestAnimationFrame(()=>{view.classList.remove('eth-view-entering');view.classList.add('eth-view-active')});
+        if(!alreadyVisible){
+          view.classList.add('eth-view-entering');
+          requestAnimationFrame(()=>{
+            if(ethCurrentGameTab!==key)return;
+            view.classList.remove('eth-view-entering');
+            view.classList.add('eth-view-active');
+          });
+        }
       }else if(!view.hidden){
+        view.setAttribute('aria-hidden','true');
         view.classList.remove('eth-view-active','eth-view-entering');
         view.classList.add('eth-view-leaving');
         view._ethHideTimer=setTimeout(()=>{
-          if(ethCurrentGameTab!==key)view.hidden=true;
-          view.classList.remove('eth-view-leaving');
-        },430);
+          if(ethCurrentGameTab!==key){
+            view.hidden=true;
+            view.classList.remove('eth-view-leaving');
+          }
+        },540);
+      }else{
+        view.setAttribute('aria-hidden','true');
       }
     });
-    if(settings){settings.classList.toggle('open',tab==='settings');settings.setAttribute('aria-hidden',String(tab!=='settings'));}
     ['main','map','settings'].forEach(k=>{
-      const b=document.getElementById('eth-tab-'+k);
-      if(b)b.classList.toggle('active',k===tab);
+      const button=document.getElementById('eth-tab-'+k);
+      if(button)button.classList.toggle('active',k===tab);
     });
     if(tab==='settings')ethRefreshGameSettings();
+    if(previous!==tab&&target)target.scrollTop=0;
   };
 
   const ethChapterInfo={
@@ -4879,6 +5262,8 @@ body.dodge-open{overflow:hidden}
     document.querySelectorAll('.eth-game-chapter').forEach(el=>el.classList.toggle('selected',Number(el.dataset.chapter)===n));
     const scene=document.getElementById('eth-chapter-scene');
     if(scene)scene.dataset.chapter=String(n);
+    const shell=document.getElementById('screen-map');if(shell)shell.dataset.chapter=String(n);
+    const chapterLabel=document.getElementById('eth-main-current-chapter');if(chapterLabel)chapterLabel.textContent='ГЛАВА '+['I','II','III'][n-1];
     const title=document.getElementById('eth-scene-title');if(title)title.textContent=info.title;
     const kicker=document.getElementById('eth-scene-kicker');if(kicker)kicker.textContent=info.kicker;
     const enemy=document.getElementById('eth-scene-enemy');if(enemy)enemy.textContent=info.enemy;
@@ -4890,9 +5275,10 @@ body.dodge-open{overflow:hidden}
   function ethRefreshGameSettings(){
     const snap=ethProfileSnapshot();
     const account=document.getElementById('eth-game-account-state');
-    if(account)account.textContent=snap.signedIn?'Вход выполнен: '+snap.username:'Не выполнен вход. Для облачного профиля открой окно аккаунта.';
+    if(account)account.textContent=snap.signedIn?'Вход выполнен: '+snap.username:'Вход не выполнен. Открой аккаунт, чтобы подключить облачный профиль.';
+    document.querySelectorAll('.eth-game-account-only').forEach(row=>{row.hidden=!snap.signedIn;});
     const label=document.getElementById('eth-game-mute-button');
-    if(label)label.textContent=snap.ambientEnabled?'Выключить звук':'Включить звук';
+    if(label){label.textContent=snap.ambientEnabled?'Выключить все звуки':'Включить все звуки';label.setAttribute('aria-pressed',String(!snap.ambientEnabled));}
     ethSetAvatarUI(snap.avatarUrl||'');
   }
 
@@ -5077,6 +5463,7 @@ body.dodge-open{overflow:hidden}
     }
     const slots=document.getElementById('equipment-slots');
     if(slots)[...slots.children].forEach((slot,index)=>{
+      if(slot.dataset.ethDropBound==='true')return;
       const slotKey=['weapon','armor','amulet','ring'][index];
       slot.addEventListener('dragover',event=>{event.preventDefault();slot.classList.add('eth-slot-drop')});
       slot.addEventListener('dragleave',()=>slot.classList.remove('eth-slot-drop'));
@@ -5086,6 +5473,7 @@ body.dodge-open{overflow:hidden}
         const item=items[itemIndex];
         if(item&&item.slot===slotKey)window.equipArtifact(itemIndex);
       });
+      slot.dataset.ethDropBound='true';
     });
     ethRefreshInventoryHero();
     return result;
