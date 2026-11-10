@@ -347,6 +347,7 @@
 /* Etheria 2026 in-game sunset shell */
 
 /* Refined chapter presentation and inventory atelier */
+.eth-game-main,.eth-game-placeholder{transition:opacity .38s ease,transform .43s cubic-bezier(.2,.8,.2,1),filter .38s ease}.eth-game-main.eth-view-entering,.eth-game-placeholder.eth-view-entering{opacity:0;transform:translateX(24px) scale(.985);filter:blur(3px)}.eth-game-main.eth-view-leaving,.eth-game-placeholder.eth-view-leaving{opacity:0;transform:translateX(-22px) scale(.985);filter:blur(3px);pointer-events:none}.eth-game-main[hidden],.eth-game-placeholder[hidden]{display:none!important}.eth-game-tabs{position:relative}.eth-game-tab:not(.active){filter:saturate(.78);opacity:.82}.eth-game-tab.active{transform:translateY(-2px) scale(1.045);box-shadow:0 7px 0 #38231866,0 12px 25px #5b382344}.eth-game-tab:focus-visible{outline:3px solid #fff4d2;outline-offset:3px}.eth-game-inventory.screen{overscroll-behavior:contain}.eth-inventory-items #empty-inventory.flex{display:flex}.eth-game-shell #map-hero-icon.map-hero-model{background:linear-gradient(145deg,#ffe8bd,#dc9e70);border-color:#593a24}.eth-game-profile .eth-game-avatar{width:52px;height:52px;min-width:52px}
 .eth-chapter-scene{--scene-a:#e5a06e;--scene-b:#75494b;--scene-c:#3d3038;position:relative;overflow:hidden;min-height:190px;margin:-4px -4px 24px;border:2px solid #352216;border-radius:21px 34px 21px 34px;background:linear-gradient(180deg,var(--scene-a),var(--scene-b) 68%,var(--scene-c));box-shadow:inset 0 1px #fff9,0 11px 24px #4b2c2533}
 .eth-chapter-scene:before{content:"";position:absolute;inset:0;background:radial-gradient(ellipse at 70% 35%,rgba(255,240,188,.95) 0 7%,rgba(255,211,144,.4) 17%,transparent 38%),linear-gradient(180deg,#fff2d51a,transparent 50%,#241a243d)}
 .eth-chapter-scene:after{content:"";position:absolute;left:-5%;right:-5%;bottom:-2px;height:48%;background:linear-gradient(160deg,#754d49,#392f38);clip-path:polygon(0 70%,13% 48%,24% 62%,36% 30%,50% 58%,63% 22%,77% 55%,90% 34%,100% 57%,100% 100%,0 100%);opacity:.75}
@@ -4812,8 +4813,24 @@ body.dodge-open{overflow:hidden}
     const main=document.getElementById('eth-game-main-view');
     const map=document.getElementById('eth-game-map-view');
     const settings=document.getElementById('eth-game-settings-view');
-    if(main)main.hidden=tab!=='main';
-    if(map)map.hidden=tab!=='map';
+    const views={main,map};
+    Object.entries(views).forEach(([key,view])=>{
+      if(!view)return;
+      clearTimeout(view._ethHideTimer);
+      if(key===tab){
+        view.hidden=false;
+        view.classList.remove('eth-view-leaving');
+        view.classList.add('eth-view-entering');
+        requestAnimationFrame(()=>{view.classList.remove('eth-view-entering');view.classList.add('eth-view-active')});
+      }else if(!view.hidden){
+        view.classList.remove('eth-view-active','eth-view-entering');
+        view.classList.add('eth-view-leaving');
+        view._ethHideTimer=setTimeout(()=>{
+          if(ethCurrentGameTab!==key)view.hidden=true;
+          view.classList.remove('eth-view-leaving');
+        },430);
+      }
+    });
     if(settings){settings.classList.toggle('open',tab==='settings');settings.setAttribute('aria-hidden',String(tab!=='settings'));}
     ['main','map','settings'].forEach(k=>{
       const b=document.getElementById('eth-tab-'+k);
