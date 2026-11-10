@@ -171,6 +171,171 @@
             border-color: #3b82f6;
             background: rgba(59, 130, 246, 0.1);
         }
+
+        /* Etheria sunset main menu */
+        .eth-menu-screen {
+            isolation: isolate;
+            overflow: hidden;
+            min-height: 100svh;
+            color: #382317;
+            background:
+                linear-gradient(180deg, #f8e6c3 0%, #f6cb9b 24%, #edaa7b 49%, #d98268 72%, #805b59 100%);
+        }
+        .eth-sunset-scenery { position: absolute; inset: 0; z-index: -1; overflow: hidden; pointer-events: none; }
+        .eth-sunset-scenery::before {
+            content: ""; position: absolute; inset: 0;
+            background:
+                radial-gradient(ellipse at 50% 57%, rgba(255,244,190,.92) 0%, rgba(255,214,151,.58) 17%, transparent 44%),
+                linear-gradient(180deg, rgba(255,248,222,.20), transparent 44%, rgba(66,41,49,.12));
+        }
+        .eth-sunset-sun {
+            position: absolute; left: 50%; top: 42%; width: clamp(150px, 22vw, 290px);
+            aspect-ratio: 1; transform: translate(-50%,-50%); border-radius: 50%;
+            background: linear-gradient(145deg, #fff5c8 0%, #ffd58d 52%, #f4a06d 100%);
+            box-shadow: 0 0 55px rgba(255,221,160,.55), 0 0 150px rgba(255,190,120,.32);
+            opacity: .88;
+        }
+        .eth-sunset-hills {
+            position: absolute; left: -8%; right: -8%; bottom: 7%; height: 42%;
+            background: linear-gradient(165deg, #b97565, #865b5b 75%);
+            clip-path: polygon(0 62%, 10% 48%, 20% 57%, 32% 28%, 43% 48%, 54% 22%, 67% 54%, 78% 35%, 90% 55%, 100% 38%, 100% 100%, 0 100%);
+            opacity: .85;
+        }
+        .eth-sunset-foreground {
+            position: absolute; left: -8%; right: -8%; bottom: -2%; height: 30%;
+            background: linear-gradient(160deg, #674b4c 0%, #463a42 75%);
+            clip-path: polygon(0 50%, 12% 36%, 24% 54%, 39% 28%, 50% 47%, 65% 22%, 78% 50%, 90% 31%, 100% 45%, 100% 100%, 0 100%);
+            opacity: .92;
+        }
+        .eth-menu-content {
+            position: relative; z-index: 2; display: flex; flex-direction: column;
+            width: min(1120px, 100%); min-height: 100svh; padding: clamp(22px, 4vw, 54px);
+        }
+        .eth-menu-header { text-align: center; padding-top: clamp(10px, 3vh, 34px); }
+        .eth-menu-title {
+            display: inline-block; margin: 0; font-size: clamp(3.2rem, 9vw, 7rem);
+            line-height: 1.08; letter-spacing: .12em; font-weight: 900;
+            color: #fff0c7;
+            background: linear-gradient(100deg, #fff4cf 5%, #ffe0a5 36%, #f6a66d 68%, #fff0c7 100%);
+            -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+            filter: drop-shadow(2px 4px 0 rgba(45,25,17,.62)) drop-shadow(0 9px 22px rgba(78,40,28,.22));
+            transform-origin: 50% 65%;
+            animation: ethLogoSway 6.8s ease-in-out infinite;
+        }
+        @keyframes ethLogoSway {
+            0%, 100% { transform: rotate(-.35deg) translateY(0); }
+            50% { transform: rotate(.45deg) translateY(-3px); }
+        }
+        .eth-menu-subtitle {
+            margin: 10px 0 0; color: rgba(75,43,29,.78); font-size: clamp(10px, 1.25vw, 13px);
+            font-weight: 800; letter-spacing: .28em; text-shadow: 0 1px rgba(255,245,219,.35);
+        }
+        .eth-menu-layout { position: relative; flex: 1; min-height: 410px; display: flex; align-items: center; justify-content: flex-end; }
+        .eth-menu-nav {
+            display: flex; flex-direction: column; gap: clamp(13px, 2.2vh, 22px);
+            width: clamp(250px, 31vw, 365px); margin-right: clamp(2%, 9vw, 118px);
+            transition: transform .72s cubic-bezier(.2,.78,.2,1), opacity .55s ease;
+        }
+        .eth-menu-button {
+            min-height: 66px; padding: 15px 26px; border: 2.5px solid #24180f; border-radius: 19px 42px 19px 42px;
+            background: linear-gradient(125deg, #fff0c7 0%, #f6d29c 43%, #e99d70 100%);
+            color: #2f1c12; font-size: clamp(20px, 2.2vw, 27px); font-weight: 900;
+            letter-spacing: .025em; text-align: center;
+            box-shadow: 0 7px 0 rgba(39,24,16,.70), 0 15px 30px rgba(70,39,25,.18), inset 0 1px rgba(255,255,255,.8);
+            transition: transform .2s ease, filter .2s ease, box-shadow .2s ease, background .35s ease;
+            cursor: pointer;
+        }
+        .eth-menu-button-primary { min-height: 82px; font-size: clamp(24px, 2.8vw, 33px); border-radius: 22px 48px 22px 48px; }
+        .eth-menu-button:hover {
+            transform: translateY(-2px) scale(1.035);
+            filter: saturate(1.08) brightness(1.035);
+            box-shadow: 0 9px 0 rgba(39,24,16,.70), 0 19px 34px rgba(70,39,25,.22), inset 0 1px rgba(255,255,255,.8);
+        }
+        .eth-menu-button:active {
+            transform: translateY(3px) scale(.975);
+            filter: brightness(.91);
+            box-shadow: 0 3px 0 rgba(39,24,16,.75), 0 7px 14px rgba(70,39,25,.16);
+        }
+        .eth-menu-button:focus-visible, .eth-menu-audio:focus-visible { outline: 3px solid #fff3c8; outline-offset: 4px; }
+        .eth-menu-panel {
+            position: absolute; left: 1%; top: 50%; z-index: 4;
+            width: min(455px, 49%); max-height: min(76vh, 700px); overflow: auto;
+            opacity: 0; pointer-events: none; transform: translate(-24%, 19%) scale(.93);
+            transform-origin: left bottom;
+            transition: transform .76s cubic-bezier(.18,.78,.24,1), opacity .56s ease;
+            scrollbar-width: thin;
+        }
+        .eth-menu-layout.panel-open .eth-menu-panel { opacity: 1; pointer-events: auto; transform: translate(0,-50%) scale(1); }
+        .eth-menu-layout.panel-open .eth-menu-nav { transform: translateX(-24px); }
+        .eth-menu-panel-content { width: 100%; }
+        .eth-menu-panel .eth-v4-modal-inner {
+            width: 100%; max-height: min(76vh,700px); padding: clamp(16px,2vw,24px);
+            border: 2px solid #281b12; border-radius: 24px 34px 24px 34px;
+            background: linear-gradient(145deg, rgba(255,246,224,.97), rgba(242,211,171,.96));
+            color: #432a1a; box-shadow: 0 22px 60px rgba(48,27,19,.32), inset 0 1px rgba(255,255,255,.9);
+        }
+        .eth-menu-panel .eth-v4-modal-inner h2, .eth-menu-panel .eth-v4-modal-inner h3 { color: #61391f; }
+        .eth-menu-panel .eth-v4-panel {
+            background: rgba(255,251,240,.72); border: 1px solid rgba(65,39,23,.32);
+            color: #49301f; box-shadow: inset 0 1px rgba(255,255,255,.85);
+        }
+        .eth-menu-panel .eth-v4-muted { color: #765942; }
+        .eth-menu-panel .eth-v4-input, .eth-menu-panel .eth-v4-select {
+            color: #3c281a; background: rgba(255,255,250,.94); border: 1.8px solid #352317;
+            border-radius: 12px; padding: 11px 12px;
+        }
+        .eth-menu-panel .eth-v4-input:focus, .eth-menu-panel .eth-v4-select:focus {
+            border-color: #bd7145; box-shadow: 0 0 0 3px rgba(219,139,89,.19);
+        }
+        .eth-menu-panel .eth-v4-btn {
+            border: 2px solid #2c1c12; border-radius: 12px;
+            background: linear-gradient(125deg,#f7d7a7,#e9a171); color: #352115;
+            box-shadow: 0 3px 0 rgba(42,26,16,.28);
+        }
+        .eth-menu-panel .eth-v4-btn.green { background: linear-gradient(125deg,#f6d8a5,#dcaa75); }
+        .eth-menu-panel .eth-v4-btn.purple { background: linear-gradient(125deg,#f5d1a0,#d58c71); }
+        .eth-menu-panel .eth-v4-btn.gold { background: linear-gradient(125deg,#ffe4a7,#e9a05f); }
+        .eth-menu-panel .eth-v4-table { color: #432a1a; }
+        .eth-menu-panel .eth-v4-table td, .eth-menu-panel .eth-v4-table th { border-bottom-color: rgba(65,39,23,.22); }
+        .eth-menu-panel .eth-v4-table th { color: #75452b; }
+        .eth-menu-settings { padding: clamp(18px,2.4vw,26px); border: 2px solid #2c1c12; border-radius: 24px 34px 24px 34px; background: linear-gradient(145deg,rgba(255,246,224,.97),rgba(242,211,171,.96)); box-shadow: 0 22px 60px rgba(48,27,19,.32); }
+        .eth-menu-settings h2 { margin: 0 0 6px; color: #61391f; font-size: clamp(23px,3vw,30px); font-weight: 900; }
+        .eth-menu-settings p { color: #765942; line-height: 1.55; font-size: 14px; }
+        .eth-menu-settings-toggle { width: 100%; margin-top: 18px; padding: 13px 16px; border: 2px solid #2c1c12; border-radius: 13px; background: linear-gradient(120deg,#ffe5b4,#e9a171); color: #352115; font-weight: 900; }
+        .eth-menu-footer { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding-top: 12px; }
+        .eth-menu-audio { padding: 9px 14px; border: 1.8px solid rgba(42,26,16,.8); border-radius: 999px; background: rgba(255,239,202,.68); color: #40291b; font-size: 12px; font-weight: 800; backdrop-filter: blur(8px); transition: background .2s, transform .2s; }
+        .eth-menu-audio:hover { transform: translateY(-1px); background: rgba(255,246,224,.88); }
+        .eth-menu-footer-note { color: rgba(63,39,27,.72); font-size: 11px; letter-spacing: .06em; }
+        @media (max-width: 700px) {
+            .eth-menu-content { padding: 18px 16px 16px; }
+            .eth-menu-header { padding-top: 4vh; }
+            .eth-menu-title { letter-spacing: .08em; }
+            .eth-menu-subtitle { letter-spacing: .15em; }
+            .eth-menu-layout { min-height: 490px; align-items: center; justify-content: center; }
+            .eth-menu-nav { width: min(350px,92%); margin: 0; gap: 14px; }
+            .eth-menu-button { min-height: 58px; }
+            .eth-menu-button-primary { min-height: 72px; }
+            .eth-menu-panel { top: auto; bottom: 0; left: 2%; width: 96%; max-height: 58%; transform: translate(-18%,35%) scale(.94); }
+            .eth-menu-layout.panel-open .eth-menu-panel { transform: translate(0,0) scale(1); }
+            .eth-menu-layout.panel-open .eth-menu-nav { transform: translate(-12px,-116px) scale(.94); }
+            .eth-menu-panel .eth-v4-modal-inner { max-height: 58vh; }
+        }
+        @media (max-width: 390px) {
+            .eth-menu-footer-note { display: none; }
+            .eth-menu-button { padding: 12px 18px; }
+        }
+        @media (max-height: 650px) and (min-width: 701px) {
+            .eth-menu-content { padding-top: 12px; padding-bottom: 12px; }
+            .eth-menu-header { padding-top: 0; }
+            .eth-menu-title { font-size: clamp(3rem,7vw,5rem); }
+            .eth-menu-layout { min-height: 300px; }
+            .eth-menu-panel { max-height: 68vh; }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            .eth-menu-title { animation: none; }
+            .eth-menu-button, .eth-menu-nav, .eth-menu-panel { transition-duration: .01ms; }
+        }
+
     </style>
 </head>
 
@@ -228,18 +393,37 @@ checkEtheriaAuth();
 checkEtheriaConnection();
 </script>
 
-    <!-- Главное Меню -->
-    <div id="screen-menu" class="screen active flex-col items-center justify-center relative">
-        <div class="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1518709268805-4e9042af9f23?q=80&w=1920')] opacity-10 bg-cover bg-center"></div>
-        <div class="z-10 text-center space-y-8 p-10 glass rounded-3xl w-11/12 max-w-2xl">
-            <h1 class="text-6xl md:text-8xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-amber-300 via-orange-500 to-red-600 title-font drop-shadow-lg levitate mb-4">
-                ЭТЕРИЯ
-            </h1>
-            <p class="text-xl text-slate-300 max-w-md mx-auto font-light tracking-wide">50 уровней. 10 боссов. Эволюция героев и шахты Этерии.</p>
-            <button onclick="startGame()" class="btn px-10 py-5 bg-gradient-to-r from-blue-600 to-violet-600 hover:from-blue-500 hover:to-violet-500 rounded-2xl text-2xl font-bold shadow-blue-900/50 text-white w-full max-w-sm mx-auto block mt-8 border border-blue-400/30">
-                Начать Путь
-            </button>
+    <!-- Главное меню: закатная тема -->
+    <div id="screen-menu" class="screen active flex-col items-center justify-center relative eth-menu-screen">
+        <div class="eth-sunset-scenery" aria-hidden="true">
+            <div class="eth-sunset-sun"></div>
+            <div class="eth-sunset-hills"></div>
+            <div class="eth-sunset-foreground"></div>
         </div>
+        <main class="eth-menu-content">
+            <header class="eth-menu-header">
+                <h1 class="eth-menu-title title-font">ЭТЕРИЯ</h1>
+                <p class="eth-menu-subtitle">МИР ПРИКЛЮЧЕНИЙ И ТИХИХ ЗАКАТОВ</p>
+            </header>
+
+            <div id="eth-menu-layout" class="eth-menu-layout">
+                <aside id="eth-menu-panel" class="eth-menu-panel" aria-hidden="true">
+                    <div id="eth-menu-panel-content" class="eth-menu-panel-content"></div>
+                </aside>
+
+                <nav id="eth-menu-nav" class="eth-menu-nav" aria-label="Главное меню">
+                    <button type="button" class="eth-menu-button eth-menu-button-primary" onclick="startGame()">Играть</button>
+                    <button type="button" class="eth-menu-button" onclick="ethMenuOpenPanel('settings')">Настройки</button>
+                    <button type="button" class="eth-menu-button" onclick="ethMenuOpenPanel('leaders')">Лидеры</button>
+                </nav>
+            </div>
+
+            <footer class="eth-menu-footer">
+                <button id="eth-menu-audio-toggle" type="button" class="eth-menu-audio" aria-pressed="true" onclick="ethMenuToggleAudio()">♫ Атмосфера: включена</button>
+                <span class="eth-menu-footer-note">Спокойная музыка заката</span>
+            </footer>
+        </main>
+        <div id="eth-menu-tools" class="hidden" aria-hidden="true"></div>
     </div>
 
     <!-- Выбор Героя -->
@@ -4131,6 +4315,213 @@ body.dodge-open{overflow:hidden}
 
   // =====================================================================
   // END ETHERIA SUPABASE INTEGRATION
+
+
+  // Main-menu panels reuse the existing Supabase account and leaderboard markup.
+  let ethMenuMovedModal = null;
+  let ethMenuAudioEnabled = true;
+  let ethMenuAudioContext = null;
+  let ethMenuAudioMaster = null;
+
+  function ethMenuRestoreMovedModal() {
+    if (!ethMenuMovedModal) return;
+    const moved = ethMenuMovedModal;
+    ethMenuMovedModal = null;
+    moved.modal.appendChild(moved.inner);
+    moved.inner.classList.remove('eth-menu-embedded');
+  }
+
+  function ethMenuMoveModalIntoPanel(modalId) {
+    const modal = byId(modalId);
+    const inner = modal?.querySelector('.eth-v4-modal-inner');
+    const slot = byId('eth-menu-panel-content');
+    if (!modal || !inner || !slot) return false;
+    ethMenuRestoreMovedModal();
+    modal.classList.remove('open');
+    inner.classList.add('eth-menu-embedded');
+    const closeButton = inner.querySelector('button[onclick*="' + modalId + '"]');
+    if (closeButton) {
+      closeButton.onclick = function () {
+        if (byId('screen-menu')?.classList.contains('active') && ethMenuMovedModal?.id === modalId) {
+          window.ethMenuClosePanel();
+        } else {
+          modal.classList.remove('open');
+        }
+      };
+    }
+    slot.replaceChildren(inner);
+    ethMenuMovedModal = { id: modalId, modal, inner };
+    return true;
+  }
+
+  function ethMenuUpdateAudioButtons() {
+    const label = ethMenuAudioEnabled ? '♫ Атмосфера: включена' : '♫ Атмосфера: выключена';
+    const mainButton = byId('eth-menu-audio-toggle');
+    if (mainButton) {
+      mainButton.textContent = label;
+      mainButton.setAttribute('aria-pressed', String(ethMenuAudioEnabled));
+    }
+    const panelButton = byId('eth-menu-audio-panel-toggle');
+    if (panelButton) panelButton.textContent = ethMenuAudioEnabled ? 'Выключить атмосферный звук' : 'Включить атмосферный звук';
+  }
+
+  function ethMenuSetAudioLevel(level) {
+    if (!ethMenuAudioContext || !ethMenuAudioMaster) return;
+    const now = ethMenuAudioContext.currentTime;
+    ethMenuAudioMaster.gain.cancelScheduledValues(now);
+    ethMenuAudioMaster.gain.setTargetAtTime(Math.max(0, Math.min(.22, level)), now, .85);
+  }
+
+  function ethMenuStartAudio() {
+    if (!ethMenuAudioEnabled) return;
+    try {
+      const AudioCtor = window.AudioContext || window.webkitAudioContext;
+      if (!AudioCtor) return;
+      if (!ethMenuAudioContext) {
+        const ctx = new AudioCtor();
+        const master = ctx.createGain();
+        master.gain.value = 0;
+        master.connect(ctx.destination);
+
+        const noiseBuffer = ctx.createBuffer(1, ctx.sampleRate * 3, ctx.sampleRate);
+        const noiseData = noiseBuffer.getChannelData(0);
+        for (let i = 0; i < noiseData.length; i++) noiseData[i] = (Math.random() * 2 - 1) * .5;
+        const noise = ctx.createBufferSource();
+        noise.buffer = noiseBuffer;
+        noise.loop = true;
+        const windFilter = ctx.createBiquadFilter();
+        windFilter.type = 'lowpass';
+        windFilter.frequency.value = 430;
+        windFilter.Q.value = .35;
+        const windGain = ctx.createGain();
+        windGain.gain.value = .12;
+        noise.connect(windFilter);
+        windFilter.connect(windGain);
+        windGain.connect(master);
+        noise.start();
+
+        [174.61, 220].forEach((frequency, index) => {
+          const oscillator = ctx.createOscillator();
+          const toneGain = ctx.createGain();
+          oscillator.type = 'sine';
+          oscillator.frequency.value = frequency;
+          toneGain.gain.value = index === 0 ? .018 : .010;
+          oscillator.connect(toneGain);
+          toneGain.connect(master);
+          oscillator.start();
+        });
+
+        ethMenuAudioContext = ctx;
+        ethMenuAudioMaster = master;
+      }
+      if (ethMenuAudioContext.state === 'suspended') ethMenuAudioContext.resume().catch(() => {});
+      ethMenuSetAudioLevel(.22);
+    } catch (error) {
+      console.warn('Etheria ambient audio is unavailable:', error);
+    }
+  }
+
+  window.ethMenuToggleAudio = function () {
+    ethMenuAudioEnabled = !ethMenuAudioEnabled;
+    ethMenuUpdateAudioButtons();
+    if (ethMenuAudioEnabled) ethMenuStartAudio();
+    else ethMenuSetAudioLevel(0);
+  };
+
+  window.ethMenuOpenPanel = function (kind) {
+    if (byId('screen-menu')?.classList.contains('active')) ethMenuStartAudio();
+    const layout = byId('eth-menu-layout');
+    const panel = byId('eth-menu-panel');
+    const slot = byId('eth-menu-panel-content');
+    if (!layout || !panel || !slot) return;
+
+    ethMenuRestoreMovedModal();
+    if (kind === 'auth') {
+      ethV4.authIntent = true;
+      ethMenuMoveModalIntoPanel('eth-account-modal');
+      ethRefreshAccountUI();
+    } else if (kind === 'leaders') {
+      ethV4.authIntent = false;
+      ethMenuMoveModalIntoPanel('eth-leaderboard-modal');
+      if (window.ethRenderLeaderboard) window.ethRenderLeaderboard();
+    } else {
+      ethV4.authIntent = false;
+      slot.innerHTML =
+        '<section class="eth-menu-settings">' +
+          '<div class="text-xs uppercase tracking-widest mb-2" style="color:#96603c;font-weight:900">Атмосфера Этерии</div>' +
+          '<h2>Настройки</h2>' +
+          '<p>Здесь можно включать и выключать спокойный звук ветра и мягкий фоновый тон. Звук запускается после первого нажатия, потому что браузеры блокируют автоматическое воспроизведение.</p>' +
+          '<button id="eth-menu-audio-panel-toggle" type="button" class="eth-menu-settings-toggle" onclick="ethMenuToggleAudio()">Выключить атмосферный звук</button>' +
+          '<p class="mt-4">Плавные анимации и тёплая цветовая тема применяются ко всему главному меню. Игровые настройки прогресса остаются внутри самой игры.</p>' +
+        '</section>';
+      ethMenuUpdateAudioButtons();
+    }
+
+    panel.setAttribute('aria-hidden', 'false');
+    layout.classList.add('panel-open');
+  };
+
+  window.ethMenuClosePanel = function () {
+    const layout = byId('eth-menu-layout');
+    const panel = byId('eth-menu-panel');
+    if (!layout || !panel) return;
+    layout.classList.remove('panel-open');
+    panel.setAttribute('aria-hidden', 'true');
+    const moved = ethMenuMovedModal;
+    if (moved) {
+      window.setTimeout(() => {
+        if (!layout.classList.contains('panel-open') && ethMenuMovedModal === moved) {
+          ethMenuRestoreMovedModal();
+          const slot = byId('eth-menu-panel-content');
+          if (slot) slot.replaceChildren();
+        }
+      }, 780);
+    } else {
+      const slot = byId('eth-menu-panel-content');
+      if (slot) slot.replaceChildren();
+    }
+  };
+
+  // A click on Play opens the sliding account panel when needed, then continues through the original game flow.
+  const ethStartGameBeforeSunsetMenu = window.startGame;
+  window.startGame = function () {
+    ethMenuStartAudio();
+    if (!ethV4.account || !ethCloudUser) {
+      window.ethMenuOpenPanel('auth');
+      return;
+    }
+    if (byId('eth-menu-layout')?.classList.contains('panel-open')) window.ethMenuClosePanel();
+    ethMenuSetAudioLevel(0);
+    return ethStartGameBeforeSunsetMenu.apply(this, arguments);
+  };
+
+  const ethOpenAccountBeforeSunsetMenu = window.ethOpenAccount;
+  window.ethOpenAccount = function () {
+    if (byId('screen-menu')?.classList.contains('active')) {
+      window.ethMenuOpenPanel('auth');
+      return;
+    }
+    return ethOpenAccountBeforeSunsetMenu?.apply(this, arguments);
+  };
+
+  const ethOpenLeaderboardBeforeSunsetMenu = window.ethOpenLeaderboard;
+  window.ethOpenLeaderboard = function () {
+    if (byId('screen-menu')?.classList.contains('active')) {
+      window.ethMenuOpenPanel('leaders');
+      return;
+    }
+    return ethOpenLeaderboardBeforeSunsetMenu?.apply(this, arguments);
+  };
+
+  const ethShowScreenBeforeSunsetAudio = window.showScreen;
+  window.showScreen = function (id) {
+    const result = ethShowScreenBeforeSunsetAudio.apply(this, arguments);
+    if (id === 'menu') ethMenuStartAudio();
+    else ethMenuSetAudioLevel(0);
+    return result;
+  };
+
+  ethMenuUpdateAudioButtons();
 
 })();
 </script>
