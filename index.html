@@ -799,6 +799,20 @@ body.eth-inventory-open #screen-map.eth-game-shell{transform:translate3d(15vw,0,
   #screen-map.eth-game-shell,.eth-game-view,.eth-game-tab,.eth-game-chapter,.eth-game-profile,.eth-game-action,.eth-game-inventory.screen,.eth-item-miniature svg{transition:none!important;animation:none!important}
 }
 </style>
+
+<style id="eth-interaction-polish-v2">
+@keyframes ethBrandSway{0%,100%{transform:rotate(-.45deg)}50%{transform:rotate(.55deg)}}
+.eth-game-brand{transform-origin:24% 55%;animation:ethBrandSway 7.2s ease-in-out infinite}
+.eth-game-tab:hover{transform:translateY(-2px) scale(1.025)}
+.eth-game-tab:active{transform:translateY(1px) scale(.975);filter:brightness(.88)}
+.eth-game-chapter:active{transform:translateX(1px) scale(.985);filter:brightness(.9)}
+.eth-game-profile:active{transform:scale(.985);filter:brightness(.9)}
+.eth-game-side-button:active:not(:disabled){transform:translateY(2px) scale(.975);filter:brightness(.88)}
+.eth-game-action:hover{transform:translateY(-2px) scale(1.018)}
+.eth-game-action:active{transform:translateY(3px) scale(.975);filter:brightness(.86)}
+.eth-inventory-items .eth-btn:active{transform:scale(.975);filter:brightness(.86)}
+@media(prefers-reduced-motion:reduce){.eth-game-brand{animation:none!important}}
+</style>
 </head>
 
 <body>
