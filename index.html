@@ -5399,24 +5399,41 @@ body.dodge-open{overflow:hidden}
   window.ethHandleBattleStartError=ethReportBattleStartError;
   window.ethStartMainBattle=function(){
     const feedback=document.getElementById('eth-start-battle-feedback');
-    if(feedback)feedback.textContent='';
+    if(feedback)feedback.textContent='Запуск боя…';
     try{
       if(!state?.hero){
         const heroScreen=document.getElementById('screen-hero-select');
         if(heroScreen){document.querySelectorAll('.screen').forEach(node=>node.classList.remove('active'));heroScreen.classList.add('active');}
+        if(feedback)feedback.textContent='Сначала выбери героя.';
         return false;
       }
       if(typeof window.ethStartSoloCombatDirect!=='function'){
-        throw new Error('Обработчик боя не загрузился. Проверь, не прервалась ли загрузка игровых скриптов.');
+        throw new Error('Обработчик боя не загрузился. Загрузка игрового скрипта прервалась.');
       }
       const started=window.ethStartSoloCombatDirect();
-      if(!started)throw new Error('Бой не был запущен. Проверь режим совместной игры и состояние героя.');
+      if(!started)throw new Error('Обработчик вернул отказ от запуска.');
+      const combat=document.getElementById('screen-combat');
+      if(!state.combat?.isActive||!combat?.classList.contains('active')){
+        throw new Error('После запуска боевой экран не активировался.');
+      }
+      if(feedback)feedback.textContent='';
       return true;
     }catch(error){
       ethReportBattleStartError(error);
       return false;
     }
   };
+  // Bind the MAIN battle button explicitly. Do not rely on an inline onclick
+  // handler being evaluated by the page or by a browser extension/CSP setting.
+  const ethMainBattleButton=document.querySelector('#eth-game-main-view .eth-game-action');
+  if(ethMainBattleButton&&!ethMainBattleButton.dataset.ethBattleBound){
+    ethMainBattleButton.dataset.ethBattleBound='true';
+    ethMainBattleButton.removeAttribute('onclick');
+    ethMainBattleButton.addEventListener('click',event=>{
+      event.preventDefault();
+      window.ethStartMainBattle();
+    });
+  }
   const ethCloseStoryBeforeBattleGuard=window.closeStoryScene;
   if(typeof ethCloseStoryBeforeBattleGuard==='function')window.closeStoryScene=function(...args){
     try{return ethCloseStoryBeforeBattleGuard.apply(this,args)}
