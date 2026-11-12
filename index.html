@@ -3438,7 +3438,6 @@ body.dodge-open{overflow:hidden}
     if(partyNet.role==='host'&&partyNet.roomId){if(!partyNet.started)startCoopAdventure();return true;}
     if(partyNet.role==='guest'&&partyNet.roomId){setCoopStatus('Только ведущий начинает следующий бой.');return false;}
     const level=Math.max(1,Number(state.level)||1);
-    const shouldShowBattleStory=!skipStory&&!!STORY[level]&&!storySeen.has(level);
     setEnemyPool(level);
     const stats=getFinalStats();
     const screen=byId('screen-combat');
@@ -3486,13 +3485,6 @@ body.dodge-open{overflow:hidden}
     try{tuneSoloEnemy()}catch(error){console.warn('[Etheria] Enemy styling skipped:',error)}
     try{renderSoloModels()}catch(error){console.warn('[Etheria] Model styling skipped:',error)}
     try{renderSoloBattleMenu()}catch(error){console.warn('[Etheria] Battle menu styling skipped:',error)}
-    // Prepare the battle before showing the introductory story. Closing the story
-    // must only reveal the already-running battle, not start it through old wrappers.
-    if(shouldShowBattleStory){
-      showStoryScene(level,null);
-      const continueButton=byId('modal-story')?.querySelector('button[onclick="closeStoryScene()"]');
-      if(continueButton)continueButton.textContent='Начать бой';
-    }
     return true;
   };
   const previousWindowStartCombatForStages=window.startCombat;
