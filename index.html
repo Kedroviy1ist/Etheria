@@ -957,6 +957,13 @@ body.eth-inventory-open #screen-map.eth-game-shell{transform:translate3d(15vw,0,
 .eth-world-map-canvas:before{content:"";position:absolute;z-index:-1;inset:0;background:radial-gradient(ellipse at 10% 15%,rgba(220,164,106,.12),transparent 23%),radial-gradient(ellipse at 93% 35%,rgba(215,150,91,.14),transparent 25%),linear-gradient(180deg,transparent 45%,rgba(6,12,13,.58));pointer-events:none}
 .eth-world-map-branches{position:absolute;z-index:1;inset:0;width:100%;height:100%;filter:drop-shadow(0 11px 9px rgba(0,0,0,.45));pointer-events:none}
 .eth-world-map-sign{position:absolute;z-index:3;display:flex;align-items:center;justify-content:center;gap:10px;min-height:88px;padding:12px 16px;border:3px solid #20140e;border-radius:11px 19px 9px 17px;background:linear-gradient(135deg,#c18a55,#795036 52%,#4c3428);box-shadow:0 9px 0 #24160f,0 18px 24px rgba(0,0,0,.32),inset 0 2px rgba(255,231,184,.35);color:#ffebca;text-shadow:0 2px 3px #2a170e}
+.eth-world-map-sign{cursor:pointer;font:inherit;transition:transform .2s cubic-bezier(.2,.8,.2,1),filter .2s,border-color .2s}
+.eth-world-map-train:hover{transform:translateY(-4px) scale(1.045) rotate(-2deg);filter:brightness(1.15);border-color:#f0c58f}
+.eth-world-map-shop:hover{transform:translateY(-4px) scale(1.045) rotate(1deg);filter:brightness(1.15);border-color:#f0c58f}
+.eth-world-map-sign:active{filter:brightness(.92)}
+.eth-world-map-sign:focus-visible{outline:3px solid #ffe1a9;outline-offset:5px}
+.eth-world-map-toast{position:absolute;z-index:8;left:50%;bottom:46px;transform:translateX(-50%);max-width:calc(100% - 32px);padding:12px 18px;border:1px solid rgba(232,186,129,.55);border-radius:12px 18px;background:rgba(15,21,21,.94);box-shadow:0 14px 32px #0009;color:#f6d8ae;text-align:center;font-size:11px;font-weight:900;letter-spacing:.06em;animation:ethMapToastIn .24s ease-out}
+@keyframes ethMapToastIn{from{opacity:0;transform:translate(-50%,8px)}to{opacity:1;transform:translate(-50%,0)}}
 .eth-world-map-sign:after{content:"";position:absolute;inset:5px;border:1px solid rgba(255,218,163,.32);border-radius:7px 13px 6px 11px;pointer-events:none}
 .eth-world-map-train{left:3%;top:9%;width:27%;transform:rotate(-2deg)}
 .eth-world-map-shop{left:37%;top:8%;width:23%;min-height:75px;transform:rotate(1deg)}
@@ -1251,14 +1258,14 @@ checkEtheriaConnection();
               <path d="M505 410 C610 350 690 252 850 165" fill="none" stroke="#a5744d" stroke-width="19" stroke-linecap="round"/>
               <path d="M490 550 Q470 505 491 470 M518 486 Q540 450 522 416 M488 356 Q461 332 477 305" fill="none" stroke="#d29b63" stroke-width="5" stroke-linecap="round" opacity=".45"/>
             </svg>
-            <div class="eth-world-map-sign eth-world-map-train">
+            <button class="eth-world-map-sign eth-world-map-train" type="button" onclick="ethWorldMapLocked(this,'TRAIN')" aria-label="TRAIN — откроется позже">
               <span class="eth-world-map-sign-icon">🚂</span>
-              <div><b>TRAIN</b><small>Железная дорога</small></div>
-            </div>
-            <div class="eth-world-map-sign eth-world-map-shop">
+              <span><b>TRAIN</b><small>Железная дорога</small></span>
+            </button>
+            <button class="eth-world-map-sign eth-world-map-shop" type="button" onclick="ethWorldMapLocked(this,'SHOP')" aria-label="SHOP — откроется позже">
               <span class="eth-world-map-sign-icon">⚒</span>
-              <div><b>SHOP</b><small>Лавка путешественника</small></div>
-            </div>
+              <span><b>SHOP</b><small>Лавка путешественника</small></span>
+            </button>
             <button class="eth-world-map-mine" type="button" onclick="ethEnterMineFromMap(this)" aria-label="Войти в шахту Этерии">
               <span class="eth-world-map-mine-icon">⛏</span>
               <b>ШАХТА</b><small>ЭТЕРИИ</small>
@@ -6114,6 +6121,52 @@ body.dodge-open{overflow:hidden}
     }
     if (id === 'map') ethRestoreMineView();
     return ethShowScreenBeforeMine.apply(this, arguments);
+  };
+
+  let ethMapLockedBusy = false;
+  window.ethWorldMapLocked = function(trigger, locationName) {
+    if (ethMapLockedBusy) return;
+    ethMapLockedBusy = true;
+    const layer = document.createElement('div');
+    layer.className = 'eth-mine-transition-layer';
+    const circle = document.createElement('div');
+    circle.className = 'eth-mine-transition-circle';
+    layer.appendChild(circle);
+    const sourceIcon = trigger && trigger.querySelector('.eth-world-map-sign-icon');
+    let icon = null;
+    if (sourceIcon) {
+      const rect = sourceIcon.getBoundingClientRect();
+      icon = document.createElement('div');
+      icon.className = 'eth-mine-transition-icon';
+      icon.textContent = sourceIcon.textContent || '✦';
+      icon.style.left = rect.left + 'px';
+      icon.style.top = rect.top + 'px';
+      layer.appendChild(icon);
+      requestAnimationFrame(() => {
+        icon.style.left = Math.round(window.innerWidth / 2 - 21) + 'px';
+        icon.style.top = Math.round(window.innerHeight / 2 - 21) + 'px';
+        icon.classList.add('centered');
+      });
+    }
+    document.body.appendChild(layer);
+    requestAnimationFrame(() => requestAnimationFrame(() => circle.classList.add('expanded')));
+    setTimeout(() => {
+      if (icon) icon.classList.add('fade');
+      circle.classList.add('shrinking');
+    }, 540);
+    setTimeout(() => {
+      layer.remove();
+      const map = document.getElementById('eth-game-map-view');
+      if (map) {
+        map.querySelector('.eth-world-map-toast')?.remove();
+        const toast = document.createElement('div');
+        toast.className = 'eth-world-map-toast';
+        toast.textContent = locationName + ' · Место скоро откроется';
+        map.appendChild(toast);
+        setTimeout(() => toast.remove(), 2600);
+      }
+      ethMapLockedBusy = false;
+    }, 1080);
   };
 
   window.ethEnterMineFromMap = function(trigger) {
