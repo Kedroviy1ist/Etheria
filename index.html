@@ -947,6 +947,38 @@ body.eth-inventory-open #screen-map.eth-game-shell{transform:translate3d(15vw,0,
 @media(max-width:720px){.eth-mine-cave{padding:9px}.eth-mine-header{padding:10px}.eth-mine-header-actions{width:100%;display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}.eth-mine-balance,.eth-mine-tool-level{min-width:0}.eth-mine-back{min-height:42px}.eth-mine-layout{grid-template-columns:1fr}.eth-mine-sidebar{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}.eth-mine-inventory-card{grid-column:1/-1}.eth-mine-scene{aspect-ratio:1.18}.eth-mine-torch{top:170px}.eth-mine-chamber{padding:13px}.eth-mine-spot{width:43px;height:43px}}
 @media(max-width:430px){.eth-mine-brand-icon{width:42px;height:42px;font-size:26px}.eth-mine-brand h1{font-size:22px}.eth-mine-sidebar{grid-template-columns:1fr}.eth-mine-inventory-card{grid-column:auto}.eth-mine-balance{padding:7px 9px}.eth-mine-scene{aspect-ratio:1.08}.eth-mine-spot{width:39px;height:39px}.eth-mine-torch-right{display:block;right:10px;top:245px;opacity:.65}}
 @media(prefers-reduced-motion:reduce){.eth-mine-torch:before,.eth-mine-target-ring,.eth-mine-cavity-glow{animation:none!important}.eth-mine-transition-circle,.eth-mine-transition-icon{transition-duration:.01ms!important}}
+.eth-world-map-view{display:flex;flex-direction:column;gap:12px;width:100%;height:100%;min-height:0;padding:clamp(16px,2vw,28px);color:#f2e5d0}
+.eth-world-map-header{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap}
+.eth-world-map-header h2{margin:4px 0;color:#f5d4a6;font-family:Georgia,serif;font-size:clamp(24px,3vw,36px);font-weight:900}
+.eth-world-map-header p{margin:0;color:#b4a18b;font-size:12px}
+.eth-world-map-back{padding:10px 14px;border:1px solid rgba(231,184,128,.35);border-radius:10px 16px;background:linear-gradient(130deg,#2e3535,#1a2629);color:#f4d8b2;font-size:10px;font-weight:1000;letter-spacing:.12em}
+.eth-world-map-back:hover{transform:translateY(-2px);border-color:#e0b37c}
+.eth-world-map-canvas{position:relative;isolation:isolate;flex:1;min-height:450px;width:min(1320px,100%);margin:0 auto;overflow:hidden;border:1px solid rgba(226,177,119,.2);border-radius:24px 40px 24px 40px;background:radial-gradient(ellipse at 50% 83%,rgba(183,121,70,.26),transparent 38%),radial-gradient(ellipse at 80% 18%,rgba(229,157,87,.16),transparent 28%),linear-gradient(145deg,#192b2e 0%,#263535 48%,#1b282a 100%);box-shadow:inset 0 0 80px rgba(0,0,0,.48),0 18px 48px rgba(0,0,0,.24)}
+.eth-world-map-canvas:before{content:"";position:absolute;z-index:-1;inset:0;background:radial-gradient(ellipse at 10% 15%,rgba(220,164,106,.12),transparent 23%),radial-gradient(ellipse at 93% 35%,rgba(215,150,91,.14),transparent 25%),linear-gradient(180deg,transparent 45%,rgba(6,12,13,.58));pointer-events:none}
+.eth-world-map-branches{position:absolute;z-index:1;inset:0;width:100%;height:100%;filter:drop-shadow(0 11px 9px rgba(0,0,0,.45));pointer-events:none}
+.eth-world-map-sign{position:absolute;z-index:3;display:flex;align-items:center;justify-content:center;gap:10px;min-height:88px;padding:12px 16px;border:3px solid #20140e;border-radius:11px 19px 9px 17px;background:linear-gradient(135deg,#c18a55,#795036 52%,#4c3428);box-shadow:0 9px 0 #24160f,0 18px 24px rgba(0,0,0,.32),inset 0 2px rgba(255,231,184,.35);color:#ffebca;text-shadow:0 2px 3px #2a170e}
+.eth-world-map-sign:after{content:"";position:absolute;inset:5px;border:1px solid rgba(255,218,163,.32);border-radius:7px 13px 6px 11px;pointer-events:none}
+.eth-world-map-train{left:3%;top:9%;width:27%;transform:rotate(-2deg)}
+.eth-world-map-shop{left:37%;top:8%;width:23%;min-height:75px;transform:rotate(1deg)}
+.eth-world-map-sign-icon{font-size:29px;filter:drop-shadow(0 3px 2px #24160f)}
+.eth-world-map-sign b{display:block;font-family:Georgia,serif;font-size:clamp(15px,2vw,23px);font-weight:1000;letter-spacing:.15em}
+.eth-world-map-sign small{display:block;margin-top:3px;color:#f3d3a6;font-size:9px;font-weight:800;letter-spacing:.08em}
+.eth-world-map-mine{position:absolute;z-index:4;right:2.5%;top:2.5%;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:3px;width:25%;min-width:185px;height:235px;padding:16px 12px 17px;overflow:hidden;border:3px solid #100d0b;border-radius:48% 48% 18px 18px / 30% 30% 12px 12px;background:radial-gradient(ellipse at 50% 42%,#926044 0 9%,#523727 37%,#211a16 73%);color:#f8d8a6;box-shadow:0 13px 0 #17100c,0 23px 32px rgba(0,0,0,.4),inset 0 0 28px #080706;cursor:pointer;transition:transform .2s cubic-bezier(.2,.8,.2,1),filter .2s,border-color .2s}
+.eth-world-map-mine:before{content:"";position:absolute;z-index:0;inset:7px 8px 34px;border:2px solid rgba(206,153,98,.4);border-radius:47% 47% 13px 13px / 28% 28% 10px 10px;background:radial-gradient(ellipse at 50% 60%,#020202 0 29%,#100c09 55%,transparent 72%);box-shadow:inset 0 0 28px #000}
+.eth-world-map-mine:after{content:"";position:absolute;z-index:1;left:8%;right:8%;top:0;height:36%;background:linear-gradient(145deg,#9c7859,#4c392c);clip-path:polygon(0 85%,12% 18%,25% 58%,40% 0,51% 42%,66% 0,79% 55%,100% 20%,100% 100%);opacity:.85}
+.eth-world-map-mine:hover{transform:translateY(-4px) scale(1.045);filter:brightness(1.16);border-color:#e0b17b;box-shadow:0 17px 0 #17100c,0 29px 40px rgba(0,0,0,.46),0 0 28px rgba(230,163,94,.2),inset 0 0 28px #080706}
+.eth-world-map-mine:active{transform:translateY(1px) scale(.99)}
+.eth-world-map-mine:focus-visible{outline:3px solid #ffe1a9;outline-offset:5px}
+.eth-world-map-mine-icon{position:relative;z-index:2;margin-top:auto;color:#ffe3ae;font-size:43px;text-shadow:0 0 18px #f5a653,0 4px 7px #000}
+.eth-world-map-mine>b,.eth-world-map-mine>small{position:relative;z-index:2;font-weight:1000;letter-spacing:.2em;text-shadow:0 2px 4px #000}
+.eth-world-map-mine>b{font-size:12px}
+.eth-world-map-mine>small{color:#c4a27c;font-size:8px}
+.eth-world-map-mine-door{position:absolute;z-index:1;left:50%;top:46%;width:47%;height:36%;transform:translateX(-50%);border:4px solid #100c09;border-bottom:0;border-radius:50% 50% 0 0;background:radial-gradient(ellipse at 50% 70%,#030303,#100a07 70%);box-shadow:inset 0 0 20px #000,0 0 18px rgba(0,0,0,.7)}
+.eth-world-map-ground{position:absolute;left:0;right:0;bottom:0;height:25%;background:linear-gradient(180deg,rgba(11,17,16,0),rgba(7,11,11,.76));clip-path:polygon(0 48%,12% 30%,22% 56%,36% 24%,49% 46%,63% 22%,77% 53%,88% 30%,100% 49%,100% 100%,0 100%);pointer-events:none}
+.eth-world-map-caption{position:absolute;z-index:2;left:50%;bottom:17px;transform:translateX(-50%);color:rgba(211,187,152,.56);font-size:8px;font-weight:900;letter-spacing:.22em;white-space:nowrap}
+#screen-map .eth-world-map-mine:hover{transform:translateY(-4px) scale(1.045)}
+@media(max-width:760px){.eth-world-map-canvas{min-height:520px}.eth-world-map-train{left:2%;top:8%;width:32%;min-height:72px;padding:8px}.eth-world-map-shop{left:38%;top:8%;width:27%;min-height:68px;padding:8px}.eth-world-map-sign-icon{font-size:23px}.eth-world-map-sign small{font-size:7px}.eth-world-map-mine{right:2%;top:20%;width:31%;min-width:0;height:210px}.eth-world-map-caption{font-size:7px;letter-spacing:.1em}}
+@media(max-width:480px){.eth-world-map-view{padding:12px}.eth-world-map-header h2{font-size:23px}.eth-world-map-canvas{min-height:480px}.eth-world-map-train{left:2%;top:8%;width:38%;gap:5px;transform:rotate(-2deg)}.eth-world-map-shop{left:43%;top:7%;width:31%;gap:5px}.eth-world-map-sign{min-height:65px;padding:7px}.eth-world-map-sign b{font-size:14px}.eth-world-map-sign-icon{font-size:20px}.eth-world-map-mine{right:4%;top:34%;width:52%;height:205px}.eth-world-map-caption{bottom:12px}}
 </style>
 </head>
 
@@ -1202,12 +1234,39 @@ checkEtheriaConnection();
           </aside>
         </section>
 
-        <section id="eth-game-map-view" class="eth-game-view eth-game-placeholder" aria-hidden="true" hidden>
-          <div class="eth-map-placeholder-mark">⌖</div>
-          <div class="eth-game-eyebrow">СЛЕДУЮЩИЙ ЭТАП ОБНОВЛЕНИЯ</div>
-          <h2>Карта Этерии</h2>
-          <p>Этот раздел уже на месте, но пока скрывает ещё не открытую часть мира. Содержимое карты появится в следующем этапе.</p>
-          <button class="eth-game-action" style="max-width:280px" onclick="ethGameTab('main')" type="button">ВЕРНУТЬСЯ В MAIN</button>
+        <section id="eth-game-map-view" class="eth-game-view eth-world-map-view" aria-hidden="true" hidden>
+          <div class="eth-world-map-header">
+            <div><span class="eth-game-eyebrow">МИР ЭТЕРИИ</span><h2>Куда ведёт твой путь?</h2><p>Выбери место на карте. Другие маршруты откроются позже.</p></div>
+            <button class="eth-world-map-back" onclick="ethGameTab('main')" type="button">← MAIN</button>
+          </div>
+          <div class="eth-world-map-canvas">
+            <svg class="eth-world-map-branches" viewBox="0 0 1000 620" preserveAspectRatio="none" aria-hidden="true">
+              <path d="M505 640 C504 530 509 438 505 350 C500 270 500 218 500 155" fill="none" stroke="#21150f" stroke-width="42" stroke-linecap="round"/>
+              <path d="M505 410 C410 345 315 235 170 166" fill="none" stroke="#21150f" stroke-width="36" stroke-linecap="round"/>
+              <path d="M505 360 C505 285 505 218 505 158" fill="none" stroke="#21150f" stroke-width="34" stroke-linecap="round"/>
+              <path d="M505 410 C610 350 690 252 850 165" fill="none" stroke="#21150f" stroke-width="36" stroke-linecap="round"/>
+              <path d="M505 640 C504 530 509 438 505 350 C500 270 500 218 500 155" fill="none" stroke="#9b6844" stroke-width="23" stroke-linecap="round"/>
+              <path d="M505 410 C410 345 315 235 170 166" fill="none" stroke="#a5744d" stroke-width="19" stroke-linecap="round"/>
+              <path d="M505 360 C505 285 505 218 505 158" fill="none" stroke="#b07a4c" stroke-width="17" stroke-linecap="round"/>
+              <path d="M505 410 C610 350 690 252 850 165" fill="none" stroke="#a5744d" stroke-width="19" stroke-linecap="round"/>
+              <path d="M490 550 Q470 505 491 470 M518 486 Q540 450 522 416 M488 356 Q461 332 477 305" fill="none" stroke="#d29b63" stroke-width="5" stroke-linecap="round" opacity=".45"/>
+            </svg>
+            <div class="eth-world-map-sign eth-world-map-train">
+              <span class="eth-world-map-sign-icon">🚂</span>
+              <div><b>TRAIN</b><small>Железная дорога</small></div>
+            </div>
+            <div class="eth-world-map-sign eth-world-map-shop">
+              <span class="eth-world-map-sign-icon">⚒</span>
+              <div><b>SHOP</b><small>Лавка путешественника</small></div>
+            </div>
+            <button class="eth-world-map-mine" type="button" onclick="ethEnterMineFromMap(this)" aria-label="Войти в шахту Этерии">
+              <span class="eth-world-map-mine-icon">⛏</span>
+              <b>ШАХТА</b><small>ЭТЕРИИ</small>
+              <i class="eth-world-map-mine-door"></i>
+            </button>
+            <div class="eth-world-map-ground" aria-hidden="true"></div>
+            <div class="eth-world-map-caption">СЕВЕРНЫЕ ПРЕДЕЛЫ · КАРТА ОТКРЫТЫХ МЕСТ</div>
+          </div>
         </section>
 
         <section id="eth-game-settings-view" class="eth-game-view eth-game-settings" aria-hidden="true" hidden>
