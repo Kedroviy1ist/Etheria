@@ -3314,7 +3314,7 @@ body.dodge-open{overflow:hidden}
    <header class="soul-dodge-head"><div><div class="text-[10px] uppercase tracking-[.3em] text-red-300 font-black">Фаза врага · уклонение</div><h2 id="dodge-enemy-title" class="text-2xl md:text-3xl font-black text-white">Атака монстра</h2><p id="dodge-pattern-hint" class="text-xs md:text-sm text-slate-400 mt-1">Уклоняйся от атак в зоне.</p></div><div class="text-right shrink-0"><div class="text-[10px] uppercase tracking-widest text-slate-400">Попадания</div><div id="dodge-hit-count" class="text-2xl font-black text-rose-300">0</div></div></header>
    <div class="dodge-monster-row"><div id="dodge-monster-model"></div><div class="dodge-instructions"><b>Двигай сердце и избегай красных атак.</b><span>WASD / стрелки · мышь / касание · экранные кнопки</span><div class="dodge-time-track"><i id="dodge-time-fill"></i></div><span id="dodge-time-text">8.0 сек.</span></div></div>
    <canvas id="soul-dodge-canvas" width="760" height="390" tabindex="0" aria-label="Арена уклонения. Управляй сердцем и избегай снарядов"></canvas>
-   <div class="dodge-controls"><span class="text-xs text-slate-500 hidden sm:block">Держи клавиши, чтобы двигаться</span><div class="dodge-pad"><button type="button" data-dir="up" aria-label="Вверх">▲</button><div><button type="button" data-dir="left" aria-label="Влево">◀</button><button type="button" data-dir="down" aria-label="Вниз">▼</button><button type="button" data-dir="right" aria-label="Вправо">▶</button></div></div><span class="text-xs text-slate-400">Не обязательно атаковать — просто выживи до конца!</span></div>
+   <div class="dodge-controls"><span class="text-xs text-slate-500 hidden sm:block">Держи клавиши, чтобы двигаться</span><div class="dodge-pad"><button type="button" data-dir="up" aria-label="Вверх">▲</button><div><button type="button" data-dir="left" aria-label="Влево">◀</button><button type="button" data-dir="down" aria-label="Вниз">▼</button><button type="button" data-dir="right" aria-label="Вправо">▶</button></div></div><span class="text-xs text-slate-400">Не атакуй. Продержись как можно дольше без попаданий.</span><button id="dodge-training-exit" type="button" onclick="ethStopTrainingDodge()" hidden>Завершить попытку</button></div>
   </section>
  </div>`;
  if(!byId('soul-dodge-overlay'))document.body.insertAdjacentHTML('beforeend',dodgeMarkup);
@@ -3387,16 +3387,59 @@ body.dodge-open{overflow:hidden}
  }
  function dodgeCollision(d,b){const p=d.player;if(b.kind==='beam'||b.kind==='spearBeam'||b.kind==='shock'){if(b.delay>0)return false;if(b.kind==='spearBeam')return Math.abs(p.x-b.x)<b.w/2+8;return p.x>b.x-8&&p.x<b.x+b.w+8&&p.y>b.y-b.h/2-8&&p.y<b.y+b.h/2+8}const r=(b.r||10)+p.r-2;return Math.hypot(p.x-b.x,p.y-b.y)<r}
  function moveDodgePlayer(d,dt){const k=d.keys;let dx=(k.right?1:0)-(k.left?1:0),dy=(k.down?1:0)-(k.up?1:0);if(dx||dy){const n=Math.hypot(dx,dy)||1;d.player.x+=dx/n*255*dt;d.player.y+=dy/n*255*dt}d.player.x=Math.max(22,Math.min(DODGE_W-22,d.player.x));d.player.y=Math.max(22,Math.min(DODGE_H-22,d.player.y))}
- function updateDodgeBullets(d,dt,elapsed){d.bullets.forEach(b=>{b.age+=dt*1000;b.life-=dt*1000;if(b.delay>0)b.delay=Math.max(0,b.delay-dt*1000);if(b.gravity){b.vy+=b.gravity*dt;if(b.y>DODGE_H-25&&b.bounces<1){b.y=DODGE_H-25;b.vy=-Math.abs(b.vy)*.65;b.vx*=.8;b.bounces++}}if(b.homing&&b.age>450){const v=aimVelocity(b.x,b.y,d.player.x,d.player.y,Math.hypot(b.vx,b.vy));b.vx+=(v.vx-b.vx)*b.homing*dt;b.vy+=(v.vy-b.vy)*b.homing*dt}b.x+=(b.vx||0)*dt;b.y+=(b.vy||0)*dt;if(b.wave)b.y+=Math.sin(b.age*.009)*b.wave*dt*30;b.rotation=(b.rotation||0)+dt*2});d.bullets=d.bullets.filter(b=>b.life>0&&b.x>-90&&b.x<DODGE_W+90&&b.y>-100&&b.y<DODGE_H+100);if(elapsed<d.duration)spawnDodgeWave(d,elapsed);if(performance.now()>d.invulnerableUntil){for(const b of d.bullets){if(dodgeCollision(d,b)){d.hits += 1;d.invulnerableUntil=performance.now()+720;byId('dodge-hit-count').textContent=d.hits;break}}}}
- function finishDodgeArena(){if(!dodge.active)return;dodge.active=false;if(dodge.raf)cancelAnimationFrame(dodge.raf);const cb=dodge.onComplete;const result={hits:dodge.hits,elapsed:dodge.duration,pattern:dodge.pattern};byId('soul-dodge-overlay').classList.remove('open');document.body.classList.remove('dodge-open');dodge.onComplete=null;if(cb)cb(result)}
- function dodgeFrame(now){if(!dodge.active)return;const dt=Math.min(.04,Math.max(0,(now-dodge.last)/1000));dodge.last=now;const elapsed=now-dodge.started;moveDodgePlayer(dodge,dt);updateDodgeBullets(dodge,dt,elapsed);drawDodgeArena(dodge,now);byId('dodge-time-fill').style.width=`${Math.max(0,100-elapsed/dodge.duration*100)}%`;byId('dodge-time-text').textContent=`${Math.max(0,(dodge.duration-elapsed)/1000).toFixed(1)} сек.`;if(elapsed>=dodge.duration){finishDodgeArena();return}dodge.raf=requestAnimationFrame(dodgeFrame)}
+ function updateDodgeBullets(d,dt,elapsed){d.bullets.forEach(b=>{b.age+=dt*1000;b.life-=dt*1000;if(b.delay>0)b.delay=Math.max(0,b.delay-dt*1000);if(b.gravity){b.vy+=b.gravity*dt;if(b.y>DODGE_H-25&&b.bounces<1){b.y=DODGE_H-25;b.vy=-Math.abs(b.vy)*.65;b.vx*=.8;b.bounces++}}if(b.homing&&b.age>450){const v=aimVelocity(b.x,b.y,d.player.x,d.player.y,Math.hypot(b.vx,b.vy));b.vx+=(v.vx-b.vx)*b.homing*dt;b.vy+=(v.vy-b.vy)*b.homing*dt}b.x+=(b.vx||0)*dt;b.y+=(b.vy||0)*dt;if(b.wave)b.y+=Math.sin(b.age*.009)*b.wave*dt*30;b.rotation=(b.rotation||0)+dt*2});d.bullets=d.bullets.filter(b=>b.life>0&&b.x>-90&&b.x<DODGE_W+90&&b.y>-100&&b.y<DODGE_H+100);if(elapsed<d.duration)spawnDodgeWave(d,elapsed);if(performance.now()>d.invulnerableUntil){for(const b of d.bullets){if(dodgeCollision(d,b)){d.hits+=1;byId('dodge-hit-count').textContent=d.hits;if(d.mode==='training'){finishDodgeArena();return}d.invulnerableUntil=performance.now()+720;break}}}}
+ function finishDodgeArena(){if(!dodge.active)return;const elapsed=Math.max(0,performance.now()-dodge.started);dodge.active=false;if(dodge.raf)cancelAnimationFrame(dodge.raf);const cb=dodge.onComplete;const result={hits:dodge.hits,elapsed,pattern:dodge.pattern};byId('soul-dodge-overlay').classList.remove('open');document.body.classList.remove('dodge-open');dodge.onComplete=null;if(cb)cb(result)}
+ function dodgeFrame(now){if(!dodge.active)return;const dt=Math.min(.04,Math.max(0,(now-dodge.last)/1000));dodge.last=now;const elapsed=now-dodge.started;if(dodge.mode==='training'){const stages=[['fan','Первая серия: веерные снаряды.'],['rain','Вторая серия: костяной дождь.'],['sweep','Третья серия: атаки по горизонтали.'],['spiral','Четвёртая серия: спираль.'],['cross','Пятая серия: перекрёстные лучи.'],['void','Финальная серия: смешанные атаки.']];const stage=stages[Math.min(stages.length-1,Math.floor(elapsed/15000))];if(dodge.pattern!==stage[0]){dodge.pattern=stage[0];dodge.nextWave=elapsed;byId('dodge-pattern-hint').textContent=stage[1]}}moveDodgePlayer(dodge,dt);updateDodgeBullets(dodge,dt,elapsed);if(!dodge.active)return;drawDodgeArena(dodge,now);if(dodge.mode==='training'){byId('dodge-time-fill').style.width='100%';byId('dodge-time-text').textContent=`Продержался: ${(elapsed/1000).toFixed(1)} сек.`}else{byId('dodge-time-fill').style.width=`${Math.max(0,100-elapsed/dodge.duration*100)}%`;byId('dodge-time-text').textContent=`${Math.max(0,(dodge.duration-elapsed)/1000).toFixed(1)} сек.`}if(dodge.mode!=='training'&&elapsed>=dodge.duration){finishDodgeArena();return}dodge.raf=requestAnimationFrame(dodgeFrame)}
  function setDodgeKey(dir,on){if(dodge.active)dodge.keys[dir]=on}
  window.addEventListener('keydown',e=>{if(!dodge.active)return;const key=e.key.toLowerCase();const dirs={arrowup:'up',w:'up',arrowdown:'down',s:'down',arrowleft:'left',a:'left',arrowright:'right',d:'right'};if(dirs[key]){e.preventDefault();setDodgeKey(dirs[key],true)}});
  window.addEventListener('keyup',e=>{const key=e.key.toLowerCase();const dirs={arrowup:'up',w:'up',arrowdown:'down',s:'down',arrowleft:'left',a:'left',arrowright:'right',d:'right'};if(dirs[key])setDodgeKey(dirs[key],false)});
  byId('soul-dodge-overlay').querySelectorAll('[data-dir]').forEach(btn=>{const dir=btn.dataset.dir;btn.addEventListener('pointerdown',e=>{e.preventDefault();btn.setPointerCapture?.(e.pointerId);setDodgeKey(dir,true)});['pointerup','pointercancel','lostpointercapture'].forEach(ev=>btn.addEventListener(ev,()=>setDodgeKey(dir,false)))});
  const dodgeCanvas=byId('soul-dodge-canvas');dodgeCanvas.addEventListener('pointerdown',e=>{if(!dodge.active)return;dodge.pointer=true;dodgeCanvas.setPointerCapture?.(e.pointerId);updateDodgePointer(e)});dodgeCanvas.addEventListener('pointermove',e=>{if(dodge.active&&dodge.pointer)updateDodgePointer(e)});['pointerup','pointercancel','lostpointercapture'].forEach(ev=>dodgeCanvas.addEventListener(ev,()=>{dodge.pointer=false}));
  function updateDodgePointer(e){const r=dodgeCanvas.getBoundingClientRect();dodge.player.x=Math.max(22,Math.min(DODGE_W-22,(e.clientX-r.left)/r.width*DODGE_W));dodge.player.y=Math.max(22,Math.min(DODGE_H-22,(e.clientY-r.top)/r.height*DODGE_H))}
- function startDodgeArena(opts){if(dodge.active)finishDodgeArena();const enemy=opts.enemy||{};const modelId=getMonsterId(enemy,opts.level);const info=MONSTER_INFO[modelId]||MONSTER_INFO.goblin;dodge={active:true,raf:0,last:performance.now(),started:performance.now(),duration:opts.duration||8200,player:{x:380,y:320,r:9},bullets:[],keys:{},pointer:false,pattern:info.pattern,nextWave:0,hits:0,invulnerableUntil:0,onComplete:opts.onComplete,sessionKey:opts.sessionKey||null,lastCompletedKey:dodge.lastCompletedKey||null,enemy,canvas:dodgeCanvas,ctx:dodgeCanvas.getContext('2d'),mode:opts.mode||'solo'};byId('dodge-enemy-title').textContent=enemy.name||'Противник';byId('dodge-pattern-hint').textContent=info.hint;byId('dodge-monster-model').innerHTML=monsterSVG(enemy);byId('dodge-hit-count').textContent='0';byId('dodge-time-fill').style.width='100%';byId('dodge-time-text').textContent=(dodge.duration/1000).toFixed(1)+' сек.';byId('soul-dodge-overlay').classList.add('open');document.body.classList.add('dodge-open');dodgeCanvas.focus({preventScroll:true});dodge.raf=requestAnimationFrame(dodgeFrame)}
+ function startDodgeArena(opts){if(dodge.active)finishDodgeArena();const enemy=opts.enemy||{};const modelId=getMonsterId(enemy,opts.level);const info=MONSTER_INFO[modelId]||MONSTER_INFO.goblin;dodge={active:true,raf:0,last:performance.now(),started:performance.now(),duration:opts.duration||8200,player:{x:380,y:320,r:9},bullets:[],keys:{},pointer:false,pattern:opts.pattern||info.pattern,nextWave:0,hits:0,invulnerableUntil:0,onComplete:opts.onComplete,sessionKey:opts.sessionKey||null,lastCompletedKey:dodge.lastCompletedKey||null,enemy,canvas:dodgeCanvas,ctx:dodgeCanvas.getContext('2d'),mode:opts.mode||'solo'};byId('dodge-enemy-title').textContent=enemy.name||'Противник';byId('dodge-pattern-hint').textContent=dodge.mode==='training'?'Уклоняйся от атак. Каждые 15 секунд рисунок атак становится сложнее.':info.hint;byId('dodge-monster-model').innerHTML=monsterSVG(enemy);byId('dodge-hit-count').textContent='0';byId('dodge-time-fill').style.width='100%';byId('dodge-time-text').textContent=dodge.mode==='training'?'Продержался: 0.0 сек.':(dodge.duration/1000).toFixed(1)+' сек.';const trainingExit=byId('dodge-training-exit');if(trainingExit)trainingExit.hidden=dodge.mode!=='training';byId('soul-dodge-overlay').classList.add('open');document.body.classList.add('dodge-open');dodgeCanvas.focus({preventScroll:true});dodge.raf=requestAnimationFrame(dodgeFrame)}
+
+
+ function ethFinishTrainingSession(result){
+  const seconds=Math.max(0,Number(result?.elapsed)||0)/1000;
+  const shownSeconds=Math.floor(seconds*10)/10;
+  const xpMultiplier=window.ethShopRewardMultiplier?window.ethShopRewardMultiplier('xp'):1;
+  const xpGained=Math.max(0,Math.floor(seconds*2*xpMultiplier));
+  state.xp=Math.max(0,Number(state.xp)||0)+xpGained;
+  let levelsGained=0;
+  while(state.xp>=(Number(state.nextXp)||100)){
+   state.xp-=Number(state.nextXp)||100;
+   state.heroLvl=Math.max(1,Number(state.heroLvl)||1)+1;
+   state.statPoints=(Number(state.statPoints)||0)+6;
+   state.nextXp=Math.floor((Number(state.nextXp)||100)*1.5);
+   levelsGained++;
+  }
+  if(typeof updateMapScreen==='function')updateMapScreen();
+  const timeNode=byId('eth-training-result-time');
+  const xpNode=byId('eth-training-result-xp');
+  const note=byId('eth-training-result-note');
+  if(timeNode)timeNode.textContent=shownSeconds.toFixed(1)+' сек.';
+  if(xpNode)xpNode.textContent='+'+xpGained+' опыта';
+  if(note)note.textContent=levelsGained?'Уровней героя получено: '+levelsGained+'. Очки характеристик начислены.':'Попадание завершило попытку. Попробуй продержаться дольше.';
+  byId('eth-training-result')?.classList.add('open');
+  if(typeof window.ethCloudSaveCurrentAccount==='function'){
+   Promise.resolve(window.ethCloudSaveCurrentAccount()).then(saved=>{
+    const saveNote=byId('eth-training-result-save');
+    if(saveNote)saveNote.textContent=saved===false?'Облачное сохранение не подтвердилось. Проверь подключение.':'Опыт сохранён в профиле.';
+   }).catch(error=>{
+    const saveNote=byId('eth-training-result-save');
+    if(saveNote)saveNote.textContent='Не удалось подтвердить облачное сохранение.';
+    console.warn('Training reward save failed:',error);
+   });
+  }
+ }
+ window.ethStartTrainingDodge=function(){
+  if(!state.hero){window.showScreen('hero-select');return}
+  byId('eth-training-result')?.classList.remove('open');
+  startDodgeArena({enemy:{name:'Тренировочный скелет',icon:'💀',modelId:'skeleton'},level:1,duration:86400000,pattern:'fan',mode:'training',onComplete:ethFinishTrainingSession});
+ };
+ window.ethStopTrainingDodge=function(){if(dodge.active&&dodge.mode==='training')finishDodgeArena()};
+ window.ethTrainingAgain=function(){byId('eth-training-result')?.classList.remove('open');window.ethStartTrainingDodge()};
+ window.ethTrainingDismiss=function(){byId('eth-training-result')?.classList.remove('open')};
 
  // Одиночная игра: три команды, а магия содержит только доступные классовые умения.
  let soloMenuMode='root';
