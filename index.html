@@ -6500,9 +6500,7 @@ body.dodge-open{overflow:hidden}
   }
   function ethShopBuildStock(cycle){
     const rng=ethShopRng((cycle*2654435761+0x51a7c3)>>>0);
-    const owned=new Set(state.shopTitles||[]);
-    const titlePool=ETH_SHOP_TITLE_STOCK.filter(item=>!owned.has(item.name));
-    const selectedTitles=ethShopShuffle(titlePool.length?titlePool:ETH_SHOP_TITLE_STOCK,rng).slice(0,2);
+    const selectedTitles=ethShopShuffle(ETH_SHOP_TITLE_STOCK,rng).slice(0,2);
     const selectedCases=ethShopShuffle(ETH_SHOP_CASES,rng).slice(0,2);
     const rarityRates=[['common',40],['uncommon',25],['rare',16],['epic',10],['legendary',6],['holy',2.5],['darkness',.5]];
     const stock=[];
@@ -6713,8 +6711,9 @@ body.dodge-open{overflow:hidden}
     const mins=Math.floor(remaining/60000);
     const secs=Math.floor((remaining%60000)/1000);
     node.textContent=String(mins).padStart(2,'0')+':'+String(secs).padStart(2,'0');
+    const previousCycle=Number(state.shopStockCycle)||0;
     ethShopEnsureState();
-    if(Math.floor(Date.now()/300000)!==Number(state.shopStockCycle)){
+    if(previousCycle!==Number(state.shopStockCycle)){
       ethShopStock=ethShopBuildStock(state.shopStockCycle);
       ethShopTab(ethShopActiveTab);
       ethShopFeedback('Витрина обновилась. Новые товары уже на местах.');
