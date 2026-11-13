@@ -824,6 +824,130 @@ body.eth-inventory-open #screen-map.eth-game-shell{transform:translate3d(15vw,0,
 }
 @media(max-width:520px){.eth-game-chapter .eth-chapter-index{width:30px!important;height:30px!important;min-width:30px!important;flex-basis:30px!important;font-size:12px!important}}
 </style>
+<style id="eth-mine-overhaul">
+.eth-mine-launch-button:hover:not(:disabled){transform:translateX(3px) scale(1.035)!important;box-shadow:0 10px 22px rgba(0,0,0,.24)}
+#screen-map.eth-mine-mode .eth-game-topbar{display:none!important}
+#screen-map.eth-mine-mode #eth-game-view-stage{position:relative;flex:1;min-height:0;height:100%;overflow:hidden}
+#screen-mine.eth-mine-screen{position:absolute;inset:0;z-index:30;width:100%;height:100%;min-height:0;padding:0!important;display:flex;overflow:hidden;background:#100c0a;color:#f2dfbd;opacity:0;visibility:hidden;transform:none;filter:none;pointer-events:none;transition:opacity .24s ease}
+#screen-mine.eth-mine-screen.active.eth-view-active{display:flex;opacity:1;visibility:visible;pointer-events:auto}
+#screen-mine.eth-mine-screen[hidden]{display:none!important}
+.eth-mine-cave{position:relative;isolation:isolate;display:flex;flex-direction:column;gap:clamp(12px,2vh,22px);width:100%;min-height:100%;padding:clamp(12px,2vw,26px);overflow:auto;overscroll-behavior:contain;background:radial-gradient(ellipse at 50% 42%,rgba(149,83,42,.2),transparent 38%),radial-gradient(ellipse at 12% 10%,rgba(255,156,67,.11),transparent 24%),linear-gradient(180deg,#18100d 0%,#21140f 34%,#110d0c 100%)}
+.eth-mine-cave:before{content:"";position:absolute;z-index:-2;inset:0;pointer-events:none;opacity:.58;background:radial-gradient(ellipse at 0% 28%,#3c2920 0 5%,transparent 28%),radial-gradient(ellipse at 100% 25%,#443027 0 7%,transparent 29%),linear-gradient(180deg,transparent 0 67%,rgba(5,4,4,.78) 100%);clip-path:polygon(0 0,100% 0,100% 100%,0 100%)}
+.eth-mine-cave:after{content:"";position:absolute;z-index:-1;left:-5%;right:-5%;bottom:-3%;height:25%;pointer-events:none;background:linear-gradient(180deg,rgba(69,48,35,.2),#090807 90%);clip-path:polygon(0 54%,9% 30%,18% 52%,27% 26%,37% 57%,47% 23%,57% 52%,68% 30%,77% 59%,88% 25%,100% 50%,100% 100%,0 100%)}
+.eth-mine-rock-wall{position:absolute;z-index:-1;top:-5%;width:24%;height:70%;pointer-events:none;opacity:.25;background:linear-gradient(150deg,#9b7658,#31231d 42%,#090807 85%);filter:drop-shadow(0 16px 22px #050403);clip-path:polygon(0 0,100% 0,76% 12%,96% 24%,70% 37%,94% 53%,73% 69%,100% 100%,0 100%)}
+.eth-mine-wall-left{left:-8%;transform:rotate(5deg)}
+.eth-mine-wall-right{right:-8%;transform:scaleX(-1) rotate(5deg)}
+.eth-mine-torch{position:absolute;z-index:1;top:clamp(98px,14vh,150px);width:18px;height:88px;border:3px solid #1c100b;border-radius:8px;background:linear-gradient(90deg,#4a2a18,#a16a39 48%,#422617);box-shadow:0 8px 18px #0008}
+.eth-mine-torch:before{content:"";position:absolute;left:50%;top:-37px;width:28px;height:42px;transform:translateX(-50%);border-radius:55% 45% 55% 45%;background:radial-gradient(ellipse at 50% 70%,#fff5bd 0 12%,#ffd36a 28%,#f17b27 62%,transparent 74%);filter:drop-shadow(0 0 16px #ff9b3b);animation:ethMineFlame .95s ease-in-out infinite alternate}
+.eth-mine-torch:after{content:"";position:absolute;left:50%;top:-19px;width:8px;height:19px;transform:translateX(-50%);border-radius:50%;background:#fff2ac;filter:blur(3px);opacity:.85}
+.eth-mine-torch span{position:absolute;left:50%;top:-12px;width:4px;height:16px;transform:translateX(-50%);background:#ffcf72;box-shadow:0 0 34px 18px rgba(238,126,43,.22);opacity:.5}
+.eth-mine-torch-left{left:clamp(18px,5vw,76px)}
+.eth-mine-torch-right{right:clamp(18px,5vw,76px);top:clamp(165px,22vh,240px);transform:scale(.82)}
+@keyframes ethMineFlame{from{transform:translateX(-50%) rotate(-5deg) scale(.94)}to{transform:translateX(-50%) rotate(6deg) scale(1.1)}}
+.eth-mine-header{position:relative;z-index:3;display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;width:min(1440px,100%);margin:0 auto;padding:12px 16px;border:1px solid rgba(206,147,92,.3);border-radius:15px 25px 15px 25px;background:linear-gradient(110deg,rgba(29,20,16,.94),rgba(48,31,22,.92));box-shadow:0 12px 32px #0007,inset 0 1px rgba(255,235,193,.06);backdrop-filter:blur(12px)}
+.eth-mine-brand{display:flex;align-items:center;gap:12px}
+.eth-mine-brand-icon{display:grid;place-items:center;width:52px;height:52px;border:1px solid #c18b54;border-radius:13px 19px 13px 19px;background:linear-gradient(145deg,#67452c,#281a13);color:#ffda9b;font-size:31px;text-shadow:0 0 15px #ffb65c88}
+.eth-mine-brand small,.eth-mine-balance small,.eth-mine-tool-level small{display:block;color:#b18a67;font-size:9px;font-weight:900;letter-spacing:.2em}
+.eth-mine-brand h1{margin:2px 0 0;color:#ffe0ad;font-family:Georgia,serif;font-size:clamp(22px,3vw,33px);font-weight:900;letter-spacing:.02em}
+.eth-mine-header-actions{display:flex;align-items:center;gap:9px;flex-wrap:wrap}
+.eth-mine-balance,.eth-mine-tool-level{display:flex;flex-direction:column;justify-content:center;min-width:94px;padding:8px 12px;border:1px solid rgba(206,147,92,.22);border-radius:10px 15px;background:rgba(10,8,7,.58)}
+.eth-mine-balance b{margin-top:2px;color:#ffdc9e;font-size:17px;font-variant-numeric:tabular-nums}
+.eth-mine-balance i{font-style:normal;color:#d7a45e}
+.eth-mine-dark-balance b{color:#b6d8df}
+.eth-mine-dark-balance i{color:#8ddce8}
+.eth-mine-tool-level{flex-direction:row;align-items:center;gap:9px}
+.eth-mine-tool-level>span{font-size:26px;color:#f2bd79}
+.eth-mine-tool-level b{display:block;margin-top:2px;color:#f7e2c6}
+.eth-mine-back{padding:11px 14px;border:1px solid #735136;border-radius:9px 15px;background:linear-gradient(130deg,#57402e,#30241e);color:#f4d7b1;font-size:10px;font-weight:1000;letter-spacing:.1em;transition:transform .18s,filter .18s}
+.eth-mine-back:hover{transform:translateY(-2px);filter:brightness(1.18)}
+.eth-mine-layout{position:relative;z-index:2;display:grid;grid-template-columns:minmax(0,1.65fr) minmax(270px,.75fr);gap:clamp(14px,2vw,24px);align-items:start;width:min(1440px,100%);margin:0 auto}
+.eth-mine-chamber{min-width:0;padding:clamp(17px,2.4vw,30px);border:1px solid rgba(191,132,80,.28);border-radius:18px 31px 18px 31px;background:linear-gradient(145deg,rgba(37,26,20,.92),rgba(17,14,12,.94));box-shadow:0 20px 56px #0008,inset 0 1px rgba(255,233,196,.06);text-align:center}
+.eth-mine-section-kicker,.eth-mine-card-kicker{color:#c28e5b;font-size:9px;font-weight:1000;letter-spacing:.24em}
+.eth-mine-chamber h2{margin:7px 0 5px;color:#ffe0ac;font-family:Georgia,serif;font-size:clamp(24px,3vw,37px);font-weight:900}
+.eth-mine-intro{max-width:650px;margin:0 auto 16px;color:#bba58f;font-size:13px;line-height:1.6}
+.eth-mine-scene{position:relative;isolation:isolate;width:min(720px,100%);aspect-ratio:1.48;margin:0 auto;border:1px solid rgba(200,145,91,.23);border-radius:48% 48% 18px 18px / 25% 25% 18px 18px;overflow:hidden;background:radial-gradient(ellipse at 50% 49%,rgba(174,105,51,.31),transparent 51%),radial-gradient(ellipse at 50% 100%,#090807 0 8%,transparent 62%),linear-gradient(180deg,#1b120e,#2c1c13 56%,#120d0a);box-shadow:inset 0 0 62px #050403,0 14px 34px #0008}
+.eth-mine-scene:before,.eth-mine-scene:after{content:"";position:absolute;z-index:0;inset:0;pointer-events:none}
+.eth-mine-scene:before{background:radial-gradient(ellipse at 18% 18%,rgba(255,170,82,.13),transparent 28%),radial-gradient(ellipse at 85% 22%,rgba(255,174,83,.1),transparent 26%),linear-gradient(90deg,rgba(0,0,0,.42),transparent 25% 75%,rgba(0,0,0,.42))}
+.eth-mine-scene:after{inset:auto 0 0;height:17%;background:linear-gradient(0deg,rgba(4,3,3,.72),transparent)}
+.eth-mine-vein-light{position:absolute;z-index:1;left:25%;top:17%;width:52%;height:70%;border-radius:50%;background:rgba(204,125,61,.16);filter:blur(35px);pointer-events:none}
+.eth-mine-vein-art{position:absolute;z-index:2;left:7%;top:4%;width:86%;height:92%;overflow:visible;filter:drop-shadow(0 16px 16px #0009)}
+.eth-mine-cracks{position:absolute;z-index:4;inset:4% 7% 4%;width:86%;height:92%;overflow:visible;pointer-events:none}
+.eth-mine-cracks path{fill:none;stroke:#110d0a;stroke-width:9;stroke-linecap:round;stroke-linejoin:round;filter:drop-shadow(0 0 2px #e5be87);animation:ethMineCrackIn .24s ease-out both}
+@keyframes ethMineCrackIn{from{opacity:0;stroke-dasharray:0 250}to{opacity:1;stroke-dasharray:250 0}}
+.eth-mine-spot-layer{position:absolute;z-index:5;inset:0}
+.eth-mine-spot{position:absolute;display:grid;place-items:center;width:clamp(42px,6vw,58px);height:clamp(42px,6vw,58px);padding:0;transform:translate(-50%,-50%);border:1px solid rgba(255,224,159,.7);border-radius:50%;background:rgba(33,20,13,.8);box-shadow:0 0 0 4px rgba(242,173,86,.08),0 0 23px rgba(245,166,78,.24);cursor:pointer;touch-action:manipulation;transition:opacity .18s,transform .18s}
+.eth-mine-spot:hover{transform:translate(-50%,-50%) scale(1.06);border-color:#fff0bb}
+.eth-mine-spot:focus-visible{outline:3px solid #ffe2a6;outline-offset:4px}
+.eth-mine-target-ring{position:absolute;inset:6px;border:3px solid #ffd38c;border-radius:50%;box-shadow:0 0 13px #ffb85a;animation:ethMineTargetPulse 1.2s cubic-bezier(.1,.6,.35,1) infinite}
+@keyframes ethMineTargetPulse{0%{transform:scale(2.25);opacity:.06}9%{opacity:1}76%{transform:scale(.93);opacity:.9}100%{transform:scale(.78);opacity:0}}
+.eth-mine-spot-core{position:relative;z-index:1;width:10px;height:10px;border:2px solid #fff2ca;border-radius:50%;background:#ffcf7a;box-shadow:0 0 13px #ffb451}
+.eth-mine-spot.hit{transform:translate(-50%,-50%) scale(1.45);opacity:0;pointer-events:none}
+.eth-mine-spot.miss{animation:ethMineMiss .18s ease-in-out}
+@keyframes ethMineMiss{25%{transform:translate(-54%,-50%)}75%{transform:translate(-46%,-50%)}}
+.eth-mine-cavity{position:absolute;z-index:7;left:50%;top:51%;width:clamp(78px,12vw,112px);height:clamp(78px,12vw,112px);transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;border:3px solid #dca56a;border-radius:50%;background:radial-gradient(circle at 40% 35%,#17100d 0 30%,#050404 69%);color:#f4cf8d;box-shadow:0 0 0 9px rgba(222,155,83,.1),0 0 42px 14px rgba(247,158,66,.38),inset 0 0 26px #000;animation:ethMineCavityReveal .55s cubic-bezier(.2,.8,.2,1) both}
+.eth-mine-cavity b{font-size:28px;text-shadow:0 0 16px #ffe4a4}
+.eth-mine-cavity small{font-size:8px;font-weight:1000;letter-spacing:.13em}
+.eth-mine-cavity:hover{filter:brightness(1.25);box-shadow:0 0 0 12px rgba(222,155,83,.12),0 0 54px 20px rgba(247,158,66,.5)}
+.eth-mine-cavity-glow{position:absolute;inset:-13px;border:1px dashed rgba(255,208,130,.42);border-radius:50%;animation:ethMineCavitySpin 12s linear infinite}
+@keyframes ethMineCavityReveal{from{opacity:0;transform:translate(-50%,-50%) scale(.25)}to{opacity:1;transform:translate(-50%,-50%) scale(1)}}
+@keyframes ethMineCavitySpin{to{transform:rotate(360deg)}}
+.eth-mine-scene-vignette{position:absolute;z-index:6;inset:0;pointer-events:none;box-shadow:inset 0 0 44px 14px rgba(0,0,0,.46)}
+.eth-mine-progress-row{max-width:680px;margin:17px auto 0;text-align:left}
+.eth-mine-progress-label{display:flex;justify-content:space-between;color:#b99b7b;font-size:9px;font-weight:1000;letter-spacing:.18em}
+.eth-mine-progress-label b{color:#ffdda4;font-size:12px;letter-spacing:.08em}
+.eth-mine-progress-track{height:7px;margin-top:8px;overflow:hidden;border:1px solid #5e402c;border-radius:99px;background:#090807}
+.eth-mine-progress-track span{display:block;width:0;height:100%;border-radius:inherit;background:linear-gradient(90deg,#a65b2d,#ffd28a);box-shadow:0 0 14px #ffae54;transition:width .28s ease}
+.eth-mine-step-dots{display:grid;grid-template-columns:repeat(5,1fr);gap:7px;margin-top:8px}
+.eth-mine-step-dots i{height:3px;border-radius:99px;background:#50392b;transition:background .2s,box-shadow .2s}
+.eth-mine-step-dots i.done{background:#f3bd76;box-shadow:0 0 12px #e9a65b}
+.eth-mine-message{min-height:22px;margin:14px 0 0;color:#e5c79e;font-size:12px;font-weight:750;letter-spacing:.02em}
+.eth-mine-next{margin:12px auto 0;padding:12px 18px;border:1px solid #d09a5c;border-radius:10px 17px;background:linear-gradient(120deg,#9a572d,#55331f);color:#fff0d0;font-size:10px;font-weight:1000;letter-spacing:.1em;box-shadow:0 7px 18px #0005;transition:transform .18s,filter .18s}
+.eth-mine-next:hover{transform:translateY(-2px);filter:brightness(1.15)}
+.eth-mine-sidebar{display:flex;flex-direction:column;gap:13px;min-width:0}
+.eth-mine-card{padding:17px;border:1px solid rgba(191,132,80,.28);border-radius:13px 23px;background:linear-gradient(145deg,rgba(41,29,21,.95),rgba(20,15,12,.96));box-shadow:0 14px 34px #0007,inset 0 1px rgba(255,233,196,.05)}
+.eth-mine-pickaxe-card{text-align:center}
+.eth-mine-pickaxe-art{display:grid;place-items:center;width:60px;height:60px;margin:9px auto 5px;border:1px solid #8d633f;border-radius:50%;background:radial-gradient(circle,#61472f,#261a13);color:#f1c17b;font-size:34px;box-shadow:0 0 26px #da954733}
+.eth-mine-card h3{margin:3px 0 11px;color:#ffe1b2;font-family:Georgia,serif;font-size:21px;font-weight:900}
+.eth-mine-level-line{display:flex;justify-content:space-between;gap:8px;color:#a78c70;font-size:9px;font-weight:1000;letter-spacing:.12em}
+.eth-mine-level-line b{color:#f8d8a8;font-size:10px;letter-spacing:0}
+.eth-mine-upgrade-dots{display:flex;justify-content:center;gap:7px;margin:10px 0 12px}
+.eth-mine-upgrade-dots i{width:22px;height:5px;border-radius:99px;background:#554031}
+.eth-mine-upgrade-dots i.done{background:#efbb74;box-shadow:0 0 10px #e7a352}
+.eth-mine-pickaxe-card p{margin:0 0 12px;color:#bba58f;font-size:11px;line-height:1.55}
+.eth-mine-upgrade{width:100%;padding:12px 10px;border:1px solid #bd8b55;border-radius:9px 15px;background:linear-gradient(120deg,#8b542e,#4d311f);color:#ffe5b9;font-size:10px;font-weight:1000;letter-spacing:.08em;box-shadow:0 5px 0 #21140d;transition:transform .16s,filter .16s}
+.eth-mine-upgrade:hover:not(:disabled){transform:translateY(-2px);filter:brightness(1.18)}
+.eth-mine-upgrade:active:not(:disabled){transform:translateY(2px);box-shadow:0 2px 0 #21140d}
+.eth-mine-upgrade:disabled{opacity:.5;cursor:not-allowed;filter:grayscale(.5)}
+.eth-mine-upgrade-status{display:block;min-height:15px;margin-top:9px;color:#aa957d;font-size:9px}
+.eth-mine-card-heading{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:11px;color:#edc38c;font-size:10px;font-weight:1000;letter-spacing:.15em}
+.eth-mine-card-heading small{color:#846c56;font-size:8px;letter-spacing:.08em}
+.eth-mine-drop-chances{display:flex;flex-direction:column;gap:8px}
+.eth-mine-drop-row{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:8px;padding:8px 9px;border:1px solid rgba(177,124,75,.16);border-radius:8px 12px;background:rgba(8,7,6,.4)}
+.eth-mine-drop-name{display:flex;align-items:center;gap:8px;color:#e8d1b3;font-size:11px;font-weight:850}
+.eth-mine-drop-name i{width:22px;text-align:center;font-size:16px;font-style:normal}
+.eth-mine-drop-chance{color:#f2c887;font-size:11px;font-weight:1000;font-variant-numeric:tabular-nums}
+.eth-mine-drop-row.dark-coin .eth-mine-drop-name,.eth-mine-drop-row.dark-coin .eth-mine-drop-chance{color:#a9e3ec}
+.eth-mine-mineral-list{display:flex;flex-direction:column;gap:7px}
+.eth-mine-mineral-row{display:flex;justify-content:space-between;align-items:center;gap:8px;color:#cdb89e;font-size:11px}
+.eth-mine-mineral-row b{color:#f0d09f;font-variant-numeric:tabular-nums}
+.eth-mine-mineral-row span{display:flex;align-items:center;gap:7px}
+.eth-mine-empty{color:#877563;font-size:10px;font-style:italic}
+.eth-mine-log-heading{margin-top:15px;padding-top:12px;border-top:1px solid rgba(191,132,80,.2);color:#a9825b;font-size:8px;font-weight:1000;letter-spacing:.16em}
+.eth-mine-loot-log{display:flex;flex-direction:column;gap:6px;max-height:150px;margin-top:8px;overflow:auto;color:#bca68d;font-size:10px}
+.eth-mine-log-entry{display:flex;justify-content:space-between;gap:8px;padding-bottom:5px;border-bottom:1px solid rgba(191,132,80,.13)}
+.eth-mine-log-entry b{color:#f4cf91;white-space:nowrap}
+.eth-mine-transition-layer{position:fixed;z-index:99999;inset:0;overflow:hidden;pointer-events:none}
+.eth-mine-transition-circle{position:absolute;left:50%;top:50%;width:100vmax;height:100vmax;border-radius:50%;background:#030303;transform:translate(-50%,-50%) scale(.001);transition:transform .5s cubic-bezier(.65,0,.25,1)}
+.eth-mine-transition-circle.expanded{transform:translate(-50%,-50%) scale(1.7)}
+.eth-mine-transition-circle.shrinking{transform:translate(-50%,-50%) scale(.001)}
+.eth-mine-transition-icon{position:fixed;z-index:2;display:grid;place-items:center;width:42px;height:42px;color:#ffe0a8;font-size:34px;text-shadow:0 0 20px #ffb65c,0 4px 7px #000;transition:left .38s cubic-bezier(.2,.8,.2,1),top .38s cubic-bezier(.2,.8,.2,1),transform .38s cubic-bezier(.2,.8,.2,1),opacity .22s}
+.eth-mine-transition-icon.centered{transform:scale(2.1) rotate(-17deg)}
+.eth-mine-transition-icon.fade{opacity:0}
+@media(max-width:980px){.eth-mine-layout{grid-template-columns:minmax(0,1fr) minmax(250px,.75fr)}.eth-mine-torch-right{display:none}}
+@media(max-width:720px){.eth-mine-cave{padding:9px}.eth-mine-header{padding:10px}.eth-mine-header-actions{width:100%;display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}.eth-mine-balance,.eth-mine-tool-level{min-width:0}.eth-mine-back{min-height:42px}.eth-mine-layout{grid-template-columns:1fr}.eth-mine-sidebar{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}.eth-mine-inventory-card{grid-column:1/-1}.eth-mine-scene{aspect-ratio:1.18}.eth-mine-torch{top:170px}.eth-mine-chamber{padding:13px}.eth-mine-spot{width:43px;height:43px}}
+@media(max-width:430px){.eth-mine-brand-icon{width:42px;height:42px;font-size:26px}.eth-mine-brand h1{font-size:22px}.eth-mine-sidebar{grid-template-columns:1fr}.eth-mine-inventory-card{grid-column:auto}.eth-mine-balance{padding:7px 9px}.eth-mine-scene{aspect-ratio:1.08}.eth-mine-spot{width:39px;height:39px}.eth-mine-torch-right{display:block;right:10px;top:245px;opacity:.65}}
+@media(prefers-reduced-motion:reduce){.eth-mine-torch:before,.eth-mine-target-ring,.eth-mine-cavity-glow{animation:none!important}.eth-mine-transition-circle,.eth-mine-transition-icon{transition-duration:.01ms!important}}
+</style>
 </head>
 
 <body>
@@ -1064,7 +1188,7 @@ checkEtheriaConnection();
               <div class="eth-side-card-heading"><span class="eth-game-eyebrow">БЫСТРЫЙ ДОСТУП</span><span>✧</span></div>
               <button class="eth-game-side-button" onclick="showScreen('upgrade')" type="button"><span>✦</span> Прокачка героя <i>↗</i></button>
               <button class="eth-game-side-button" onclick="showScreen('inventory')" type="button"><span>⚒</span> Инвентарь <i>↗</i></button>
-              <button class="eth-game-side-button" onclick="showScreen('mine')" type="button"><span>⛏</span> Шахта Этерии <i>↗</i></button>
+              <button class="eth-game-side-button eth-mine-launch-button" onclick="ethEnterMineFromMap(this)" type="button" aria-label="Открыть шахту Этерии"><span>⛏</span> Шахта Этерии <i>↗</i></button>
               <button class="eth-game-side-button" onclick="ethOpenAccount()" type="button"><span>◉</span> Аккаунт и облако <i>↗</i></button>
             </div>
             <div class="eth-game-card eth-side-profile">
@@ -1132,130 +1256,124 @@ checkEtheriaConnection();
       </div>
     </div>
 
-    <!-- Подлокация: Шахта -->
-    <div id="screen-mine" class="screen flex-col p-4 md:p-8 relative overflow-y-auto">
-        <div class="absolute inset-0 bg-gradient-to-b from-slate-950 via-stone-950 to-black pointer-events-none"></div>
-        <header class="glass p-5 rounded-2xl mb-6 z-10 flex flex-wrap justify-between items-center gap-3 shrink-0">
-            <div>
-                <div class="text-sm uppercase tracking-widest text-amber-500">Подлокация</div>
-                <h2 class="text-4xl title-font">⛏ Шахта Этерии</h2>
-            </div>
-            <div class="flex gap-2 flex-wrap items-center">
-                <div class="px-4 py-2 rounded-xl bg-amber-900/30 border border-amber-500/30 font-bold">🪙 <span id="gold-display">0</span> золота</div>
-                <div class="px-4 py-2 rounded-xl bg-slate-800/80 border border-slate-600/50">⛏️ Кирка <b id="pickaxe-level">1</b> ур.</div>
-                <button onclick="showScreen('map')" class="btn px-5 py-2 bg-slate-700 hover:bg-slate-600 rounded-xl">Назад</button>
-            </div>
+    <!-- Подлокация: обновлённая шахта -->
+    <div id="screen-mine" class="screen eth-game-view eth-mine-screen" hidden aria-hidden="true">
+      <div class="eth-mine-cave">
+        <div class="eth-mine-rock-wall eth-mine-wall-left" aria-hidden="true"></div>
+        <div class="eth-mine-rock-wall eth-mine-wall-right" aria-hidden="true"></div>
+        <div class="eth-mine-torch eth-mine-torch-left" aria-hidden="true"><span></span></div>
+        <div class="eth-mine-torch eth-mine-torch-right" aria-hidden="true"><span></span></div>
+
+        <header class="eth-mine-header">
+          <div class="eth-mine-brand">
+            <span class="eth-mine-brand-icon">⛏</span>
+            <div><small>ПОДЛОКАЦИЯ · ЭТЕРИЯ</small><h1>Шахта Этерии</h1></div>
+          </div>
+          <div class="eth-mine-header-actions">
+            <div class="eth-mine-balance"><small>ЗОЛОТО</small><b><span id="gold-display">0</span> <i>◈</i></b></div>
+            <div class="eth-mine-balance eth-mine-dark-balance"><small>DARK COIN</small><b><span id="eth-mine-dark-coins">0</span> <i>◆</i></b></div>
+            <div class="eth-mine-tool-level"><span>⛏</span><div><small>КИРКА</small><b><span id="pickaxe-level">1</span> / 6</b></div></div>
+            <button class="eth-mine-back" onclick="showScreen('map')" type="button">← ВЕРНУТЬСЯ</button>
+          </div>
         </header>
 
-        <div class="z-10 grid grid-cols-1 lg:grid-cols-3 gap-6 max-w-7xl w-full mx-auto mb-8">
-            <div class="lg:col-span-2 pixel-panel rounded-3xl p-8 flex flex-col items-center justify-center">
-                <div class="text-center mb-4">
-                    <div class="text-slate-400">Прочность жилы</div>
-                    <div id="rock-hp-text" class="text-2xl font-bold">5 / 5</div>
-                </div>
-                <div class="w-full max-w-xl bg-black/50 h-4 rounded-full overflow-hidden mb-8">
-                    <div id="rock-hp-bar" class="h-full bg-gradient-to-r from-amber-700 to-yellow-300 transition-all" style="width:100%"></div>
-                </div>
-                <div id="mine-rock" class="mining-rock text-9xl mb-8" onclick="mineRock()">🪨</div>
-                <p id="mine-message" class="text-slate-300 text-center min-h-8">Ударь по жиле киркой.</p>
-                <div class="flex gap-3 mt-5 flex-wrap justify-center">
-                    <button onclick="mineRock()" class="btn px-10 py-4 bg-gradient-to-r from-amber-600 to-orange-700 hover:from-amber-500 hover:to-orange-600 rounded-2xl font-bold text-xl">⛏️ Добывать</button>
-                    <button onclick="upgradePickaxe()" class="btn px-7 py-4 bg-indigo-600 hover:bg-indigo-500 rounded-2xl font-bold">Улучшить кирку — <span id="pickaxe-cost">100</span> 🪙</button>
-                </div>
-            </div>
-            <div class="pixel-panel rounded-3xl p-6 overflow-y-auto max-h-[500px]">
-                <h3 class="text-2xl title-font text-amber-300 mb-4">Добытые минералы</h3>
-                <div id="mineral-list" class="space-y-3"></div>
-                <h3 class="text-2xl title-font text-indigo-300 mt-7 mb-4">Журнал добычи</h3>
-                <div id="mine-loot-log" class="text-sm text-slate-300 space-y-2"></div>
-            </div>
-        </div>
+        <main class="eth-mine-layout">
+          <section class="eth-mine-chamber">
+            <div class="eth-mine-section-kicker">ГЛУБИННЫЙ УРОВЕНЬ · ЖИЛА № 01</div>
+            <h2>Найди слабые места</h2>
+            <p class="eth-mine-intro">Пять точных попаданий по меткам расколют жилу. Лови момент, когда кольцо сойдётся с отметкой.</p>
 
-        <!-- Раздел с сундуками -->
-        <div class="z-10 max-w-7xl w-full mx-auto pixel-panel rounded-3xl p-6 md:p-8 mb-8">
-            <div class="mb-6">
-                <h3 class="text-3xl title-font text-amber-400 flex items-center gap-3">🧰 Сокровищница Шахты</h3>
-                <p class="text-slate-300 text-sm mt-1">Покупайте сундуки за накопленное в шахтах и боях золото, чтобы получить древние артефакты!</p>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <!-- Деревянный сундук -->
-                <div class="bg-slate-900/70 border border-amber-900/40 hover:border-amber-500/60 rounded-2xl p-6 flex flex-col justify-between transition-all group">
-                    <div>
-                        <div class="text-6xl text-center mb-4 group-hover:scale-110 transition-transform">📦</div>
-                        <h4 class="text-2xl title-font text-center text-amber-200 mb-2">Деревянный Сундук</h4>
-                        <p class="text-xs text-slate-300 text-center mb-4">Простой сундук. Подойдет для начинающих искателей приключений.</p>
-                        <div class="bg-slate-950/60 rounded-xl p-3 text-xs space-y-1 text-slate-300 mb-6 border border-slate-800">
-                            <div class="flex justify-between"><span>Обычный (Common):</span> <span class="text-slate-400 font-bold">60%</span></div>
-                            <div class="flex justify-between"><span>Необычный (Uncommon):</span> <span class="text-green-400 font-bold">30%</span></div>
-                            <div class="flex justify-between"><span>Редкий (Rare):</span> <span class="text-blue-400 font-bold">10%</span></div>
-                        </div>
-                    </div>
-                    <button onclick="buyChest('wooden')" class="btn w-full py-3 bg-gradient-to-r from-amber-700 to-amber-600 hover:from-amber-600 hover:to-amber-500 rounded-xl font-bold text-white shadow-md flex justify-center items-center gap-2">
-                        <span>Купить за</span>
-                        <span class="text-amber-300 font-extrabold">150 🪙</span>
-                    </button>
-                </div>
-
-                <!-- Железный сундук -->
-                <div class="bg-slate-900/70 border border-slate-600/50 hover:border-indigo-500/60 rounded-2xl p-6 flex flex-col justify-between transition-all group">
-                    <div>
-                        <div class="text-6xl text-center mb-4 group-hover:scale-110 transition-transform">🧰</div>
-                        <h4 class="text-2xl title-font text-center text-indigo-300 mb-2">Железный Сундук</h4>
-                        <p class="text-xs text-slate-300 text-center mb-4">Надежный кованый сундук с повышением качества добычи.</p>
-                        <div class="bg-slate-950/60 rounded-xl p-3 text-xs space-y-1 text-slate-300 mb-6 border border-slate-800">
-                            <div class="flex justify-between"><span>Необычный (Uncommon):</span> <span class="text-green-400 font-bold">45%</span></div>
-                            <div class="flex justify-between"><span>Редкий (Rare):</span> <span class="text-blue-400 font-bold">35%</span></div>
-                            <div class="flex justify-between"><span>Эпический (Epic):</span> <span class="text-purple-400 font-bold">17%</span></div>
-                            <div class="flex justify-between"><span>Легендарный:</span> <span class="text-orange-400 font-bold">3%</span></div>
-                        </div>
-                    </div>
-                    <button onclick="buyChest('iron')" class="btn w-full py-3 bg-gradient-to-r from-indigo-700 to-indigo-600 hover:from-indigo-600 hover:to-indigo-500 rounded-xl font-bold text-white shadow-md flex justify-center items-center gap-2">
-                        <span>Купить за</span>
-                        <span class="text-amber-300 font-extrabold">500 🪙</span>
-                    </button>
-                </div>
-
-                <!-- Древний сундук -->
-                <div class="bg-slate-900/70 border border-amber-500/40 hover:border-yellow-400 rounded-2xl p-6 flex flex-col justify-between transition-all group shadow-[0_0_20px_rgba(245,158,11,0.15)] relative overflow-hidden">
-                    <div class="absolute -top-12 -right-12 w-28 h-28 bg-amber-500/10 rounded-full blur-xl"></div>
-                    <div>
-                        <div class="text-6xl text-center mb-4 group-hover:scale-110 transition-transform">👑</div>
-                        <h4 class="text-2xl title-font text-center text-amber-400 mb-2">Древний Сундук</h4>
-                        <p class="text-xs text-slate-300 text-center mb-4">Сокровища давно ушедших эпох. Шанс на Священные и Проклятые реликварии!</p>
-                        <div class="bg-slate-950/60 rounded-xl p-3 text-xs space-y-1 text-slate-300 mb-6 border border-slate-800">
-                            <div class="flex justify-between"><span>Редкий (Rare):</span> <span class="text-blue-400 font-bold">30%</span></div>
-                            <div class="flex justify-between"><span>Эпический (Epic):</span> <span class="text-purple-400 font-bold">45%</span></div>
-                            <div class="flex justify-between"><span>Легендарный:</span> <span class="text-orange-400 font-bold">15%</span></div>
-                            <div class="flex justify-between"><span>Священный / Тёмный:</span> <span class="text-yellow-300 font-bold">10%</span></div>
-                        </div>
-                    </div>
-                    <button onclick="buyChest('ancient')" class="btn w-full py-3 bg-gradient-to-r from-amber-600 via-yellow-600 to-amber-700 hover:from-amber-500 hover:to-yellow-500 rounded-xl font-bold text-white shadow-lg flex justify-center items-center gap-2">
-                        <span>Купить за</span>
-                        <span class="text-amber-200 font-extrabold">2000 🪙</span>
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Модальное окно открытия сундука -->
-    <div id="modal-chest" class="fixed inset-0 bg-slate-950/85 z-[70] hidden items-center justify-center backdrop-blur-md p-4">
-        <div class="glass p-8 rounded-[2rem] border border-amber-500/40 text-center max-w-md w-full shadow-2xl relative">
-            <div id="chest-modal-icon" class="text-8xl mb-4 levitate">📦</div>
-            <h2 id="chest-modal-title" class="text-3xl title-font mb-2 text-amber-300">Сундук Открыт!</h2>
-            <p class="text-slate-400 text-sm mb-6">Внутри лежал артефакт:</p>
-            
-            <div id="chest-modal-item" class="bg-slate-900/80 p-5 rounded-2xl mb-6 border border-slate-700/60 shadow-inner">
-                <div id="chest-item-rarity" class="text-xs font-extrabold tracking-widest text-slate-400 mb-1">COMMON</div>
-                <div id="chest-item-name" class="font-bold text-2xl text-amber-400 mb-2">Название</div>
-                <div id="chest-item-desc" class="text-sm text-slate-300">Описание</div>
+            <div class="eth-mine-scene" id="eth-mine-scene" data-cracks="0">
+              <div class="eth-mine-vein-light" aria-hidden="true"></div>
+              <svg class="eth-mine-vein-art" viewBox="0 0 620 420" role="img" aria-label="Каменная жила с медными и алмазными прожилками">
+                <defs>
+                  <linearGradient id="ethMineRockFill" x1="0" y1="0" x2="1" y2="1">
+                    <stop offset="0" stop-color="#8c7964"/>
+                    <stop offset=".42" stop-color="#51473e"/>
+                    <stop offset="1" stop-color="#211e1c"/>
+                  </linearGradient>
+                  <linearGradient id="ethMineOreGold" x1="0" y1="0" x2="1" y2="1">
+                    <stop offset="0" stop-color="#ffe5a0"/>
+                    <stop offset=".45" stop-color="#d78a42"/>
+                    <stop offset="1" stop-color="#78452c"/>
+                  </linearGradient>
+                  <linearGradient id="ethMineDiamond" x1="0" y1="0" x2="1" y2="1">
+                    <stop offset="0" stop-color="#f1ffff"/>
+                    <stop offset=".5" stop-color="#72c7d1"/>
+                    <stop offset="1" stop-color="#28627b"/>
+                  </linearGradient>
+                  <filter id="ethMineOreGlow"><feGaussianBlur stdDeviation="9"/></filter>
+                </defs>
+                <path d="M82 287 104 207 87 150 139 86 214 67 258 31 340 55 397 35 467 87 524 151 540 223 508 302 449 351 360 376 265 397 177 372 113 337Z" fill="#080706" opacity=".6" transform="translate(0 10)"/>
+                <path d="M88 282 105 205 87 151 140 85 215 68 259 34 340 57 398 37 466 89 522 152 539 223 507 300 448 349 359 375 265 395 178 370 113 336Z" fill="url(#ethMineRockFill)" stroke="#171412" stroke-width="16" stroke-linejoin="round"/>
+                <path d="m116 199 31-83 67-23 38 17-24 44-64 24-20 57Z" fill="#b2a18a" opacity=".36"/>
+                <path d="m294 76 47-19 55 22-8 48-42 20-43-28Z" fill="#b7aa96" opacity=".24"/>
+                <path d="m404 160 67-25 42 36-22 70-55 25-40-41Z" fill="#0f0d0c" opacity=".35"/>
+                <path d="m145 260 47-49 37 13 15 53-46 39-55-13Z" fill="#292522" opacity=".8"/>
+                <path d="m278 176 42-33 39 29-10 58-44 22-44-29Z" fill="url(#ethMineOreGold)" stroke="#6d452c" stroke-width="7"/>
+                <path d="m294 176 26-22 24 19-9 42-26 16-25-19Z" fill="#f6cf82" opacity=".8"/>
+                <path d="m390 232 37-70 34 16-2 59-39 42Z" fill="url(#ethMineDiamond)" stroke="#234c5a" stroke-width="7" stroke-linejoin="round"/>
+                <path d="m416 179 11 37 15-23-3 38-23 28-16-19Z" fill="#d8ffff" opacity=".62"/>
+                <path d="m203 119 29-27 18 11-13 43-37 16Z" fill="url(#ethMineOreGold)" opacity=".8"/>
+                <path d="m168 302 30-28 25 18-7 34-37 17Z" fill="url(#ethMineDiamond)" opacity=".74"/>
+                <path d="m340 310 28-41 20 10-4 44-35 22Z" fill="#c17a3f" opacity=".8"/>
+                <g fill="#d4c3a5" opacity=".25">
+                  <path d="m116 177 18-28 11 22-14 29Z"/><path d="m484 119 21 23-17 21-23-20Z"/>
+                  <path d="m245 345 32-18 18 22-30 20Z"/><path d="m364 91 23-18 19 18-26 17Z"/>
+                </g>
+                <g fill="#ffe2a1" opacity=".5" filter="url(#ethMineOreGlow)">
+                  <circle cx="318" cy="194" r="23"/><circle cx="430" cy="213" r="19"/>
+                </g>
+                <g fill="#f8dfae" opacity=".55">
+                  <circle cx="134" cy="243" r="4"/><circle cx="480" cy="294" r="5"/><circle cx="351" cy="92" r="3"/>
+                  <circle cx="253" cy="298" r="4"/><circle cx="183" cy="164" r="3"/>
+                </g>
+              </svg>
+              <svg id="eth-mine-cracks" class="eth-mine-cracks" viewBox="0 0 620 420" aria-hidden="true"></svg>
+              <div id="eth-mine-spot-layer" class="eth-mine-spot-layer" aria-label="Слабые места жилы"></div>
+              <button id="eth-mine-cavity" class="eth-mine-cavity" type="button" onclick="ethMineClaimLoot()" hidden aria-label="Забрать добычу из открывшейся полости">
+                <span class="eth-mine-cavity-glow"></span><b>◆</b><small>ЗАБРАТЬ</small>
+              </button>
+              <div class="eth-mine-scene-vignette" aria-hidden="true"></div>
             </div>
 
-            <button onclick="closeChestModal()" class="btn px-8 py-3.5 bg-gradient-to-r from-amber-600 to-yellow-600 hover:from-amber-500 hover:to-yellow-500 rounded-xl font-bold w-full text-xl text-white shadow-lg border border-amber-400/30">
-                Забрать артефакт
-            </button>
-        </div>
+            <div class="eth-mine-progress-row">
+              <div class="eth-mine-progress-label"><span>ТРЕЩИНЫ НА ЖИЛЕ</span><b id="eth-mine-hit-count">0 / 5</b></div>
+              <div class="eth-mine-progress-track"><span id="eth-mine-hit-progress"></span></div>
+              <div class="eth-mine-step-dots" aria-hidden="true">
+                <i></i><i></i><i></i><i></i><i></i>
+              </div>
+            </div>
+            <p id="mine-message" class="eth-mine-message" role="status" aria-live="polite">Попади по слабому месту, когда кольцо почти совпадёт с центром.</p>
+            <button id="eth-mine-next-vein" class="eth-mine-next" type="button" onclick="ethMineStartRun()" hidden>⛏ НАЙТИ СЛЕДУЮЩУЮ ЖИЛУ</button>
+          </section>
+
+          <aside class="eth-mine-sidebar">
+            <section class="eth-mine-card eth-mine-pickaxe-card">
+              <div class="eth-mine-card-kicker">ИНСТРУМЕНТ</div>
+              <div class="eth-mine-pickaxe-art">⛏</div>
+              <h3>Кирка искателя</h3>
+              <div class="eth-mine-level-line"><span>УРОВЕНЬ</span><b><span id="eth-mine-upgrade-count">0</span> / 5 улучшений</b></div>
+              <div id="eth-mine-upgrade-dots" class="eth-mine-upgrade-dots" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div>
+              <p>Каждое улучшение повышает вес меди, алмаза и DARK COIN на 50%.</p>
+              <button id="eth-mine-upgrade-button" class="eth-mine-upgrade" type="button" onclick="upgradePickaxe()">УЛУЧШИТЬ · <b id="pickaxe-cost">100</b> ◈</button>
+              <small id="eth-mine-upgrade-status" class="eth-mine-upgrade-status">Доступно 5 улучшений</small>
+            </section>
+
+            <section class="eth-mine-card">
+              <div class="eth-mine-card-heading"><span>ШАНС ДОБЫЧИ</span><small>ПО УРОВНЮ КИРКИ</small></div>
+              <div id="eth-mine-drop-chances" class="eth-mine-drop-chances"></div>
+            </section>
+
+            <section class="eth-mine-card eth-mine-inventory-card">
+              <div class="eth-mine-card-heading"><span>ТВОЯ ДОБЫЧА</span><small>НАКОПЛЕНО</small></div>
+              <div id="mineral-list" class="eth-mine-mineral-list"></div>
+              <div class="eth-mine-log-heading">ПОСЛЕДНИЕ НАХОДКИ</div>
+              <div id="mine-loot-log" class="eth-mine-loot-log"><span>Пока пусто — первая находка ждёт тебя.</span></div>
+            </section>
+          </aside>
+        </main>
+      </div>
     </div>
 
     <!-- Экран Прокачки -->
@@ -1726,6 +1844,7 @@ checkEtheriaConnection();
             gold: 0,
             pickaxeLevel: 1,
             minerals: {},
+            darkCoins: 0,
             mineRockHp: 5,
             mineRockMaxHp: 5,
             evolutionPending: false,
@@ -1745,6 +1864,7 @@ checkEtheriaConnection();
             state.gold = state.gold ?? 0;
             state.pickaxeLevel = state.pickaxeLevel ?? 1;
             state.minerals = state.minerals ?? {};
+            state.darkCoins = Math.max(0, Math.floor(Number(state.darkCoins) || 0));
             state.mineRockHp = state.mineRockHp ?? 5;
             state.mineRockMaxHp = state.mineRockMaxHp ?? 5;
             state.evolutionPending = state.evolutionPending ?? false;
@@ -1822,6 +1942,7 @@ checkEtheriaConnection();
             state.gold = 0;
             state.pickaxeLevel = 1;
             state.minerals = {};
+            state.darkCoins = 0;
             state.mineRockHp = 5;
             state.mineRockMaxHp = 5;
             state.evolved = false;
@@ -3870,14 +3991,14 @@ body.dodge-open{overflow:hidden}
     return ethFallbackHash(pass,salt);
   }
   function ethNormName(name){return String(name||'').trim().toLocaleLowerCase('ru-RU')}
-  function ethProfileFromState(){return {heroType:state.hero?.type||null,level:state.level||1,newGamePlus:Math.max(0,Number(state.newGamePlus)||0),totalXpEarned:Math.max(0,Number(state.totalXpEarned)||0),campaignRecorded:!!state._etheriaCampaignRecorded,xp:state.xp||0,nextXp:state.nextXp||100,heroLvl:state.heroLvl||1,statPoints:state.statPoints||0,baseHp:state.baseHp||0,baseMp:state.baseMp||0,baseAtk:state.baseAtk||0,baseDef:state.baseDef||0,inventory:JSON.parse(JSON.stringify(state.inventory||[])),learnedAbilities:JSON.parse(JSON.stringify(state.learnedAbilities||[])),gold:state.gold||0,pickaxeLevel:state.pickaxeLevel||1,minerals:JSON.parse(JSON.stringify(state.minerals||{})),mineRockHp:state.mineRockHp||5,mineRockMaxHp:state.mineRockMaxHp||5,evolved:!!state.evolved,evolutionPending:!!state.evolutionPending};}
+  function ethProfileFromState(){return {heroType:state.hero?.type||null,level:state.level||1,newGamePlus:Math.max(0,Number(state.newGamePlus)||0),totalXpEarned:Math.max(0,Number(state.totalXpEarned)||0),campaignRecorded:!!state._etheriaCampaignRecorded,xp:state.xp||0,nextXp:state.nextXp||100,heroLvl:state.heroLvl||1,statPoints:state.statPoints||0,baseHp:state.baseHp||0,baseMp:state.baseMp||0,baseAtk:state.baseAtk||0,baseDef:state.baseDef||0,inventory:JSON.parse(JSON.stringify(state.inventory||[])),learnedAbilities:JSON.parse(JSON.stringify(state.learnedAbilities||[])),gold:state.gold||0,pickaxeLevel:state.pickaxeLevel||1,minerals:JSON.parse(JSON.stringify(state.minerals||{})),darkCoins:Math.max(0,Number(state.darkCoins)||0),mineRockHp:state.mineRockHp||5,mineRockMaxHp:state.mineRockMaxHp||5,evolved:!!state.evolved,evolutionPending:!!state.evolutionPending};}
   function ethSaveCurrentAccount(){if(!ethV4.account)return;const record=ethV4.accounts[ethNormName(ethV4.account.username)];if(!record)return;record.profile=ethProfileFromState();record.stats=record.stats||{};record.stats.gold=record.profile.gold;record.stats.bestLevel=Math.max(record.stats.bestLevel||1,record.profile.level||1);record.lastPlayed=new Date().toISOString();ethV4.account=record;ethSaveAccounts();ethRefreshAccountUI()}
   function ethRestoreProfile(record){
     const p=record?.profile;if(!p?.heroType)return false;
     const template=HERO_TEMPLATES[p.heroType]||HERO_TEMPLATES.warrior;
     state.hero={...template,type:p.heroType};state.level=Math.max(1,Math.min(50,Number(p.level)||1));state.newGamePlus=Math.max(0,Number(p.newGamePlus)||0);state.totalXpEarned=Math.max(0,Number(p.totalXpEarned)||0,Number(record?.stats?.totalXp)||0);state._etheriaCampaignRecorded=!!p.campaignRecorded;state.xp=Number(p.xp)||0;state.nextXp=Number(p.nextXp)||100;state.heroLvl=Number(p.heroLvl)||1;state.statPoints=Number(p.statPoints)||0;
     state.baseHp=Number(p.baseHp)||template.baseHp;state.baseMp=Number(p.baseMp)||template.baseMp;state.baseAtk=Number(p.baseAtk)||template.baseAtk;state.baseDef=Number(p.baseDef)||template.baseDef;
-    state.inventory=Array.isArray(p.inventory)?p.inventory.map(prepareArtifact):[];state.learnedAbilities=Array.isArray(p.learnedAbilities)?p.learnedAbilities:[];state.gold=Number(p.gold)||0;state.pickaxeLevel=Number(p.pickaxeLevel)||1;state.minerals=p.minerals||{};state.mineRockHp=Number(p.mineRockHp)||5;state.mineRockMaxHp=Number(p.mineRockMaxHp)||5;state.evolved=!!p.evolved;state.evolutionPending=!!p.evolutionPending;
+    state.inventory=Array.isArray(p.inventory)?p.inventory.map(prepareArtifact):[];state.learnedAbilities=Array.isArray(p.learnedAbilities)?p.learnedAbilities:[];state.gold=Number(p.gold)||0;state.pickaxeLevel=Number(p.pickaxeLevel)||1;state.minerals=p.minerals||{};state.darkCoins=Math.max(0,Math.floor(Number(p.darkCoins)||0));state.mineRockHp=Number(p.mineRockHp)||5;state.mineRockMaxHp=Number(p.mineRockMaxHp)||5;state.evolved=!!p.evolved;state.evolutionPending=!!p.evolutionPending;
     state.combat={isActive:false,hp:0,mp:0,enemy:null,playerBuffs:[]};updateMapScreen();return true;
   }
   function ethTitlesFor(record){const a=Array.isArray(record?.titles)?record.titles:['Путник'];if(record?.role==='developer')return ['DEVELOPER'];return a.filter(t=>t!=='DEVELOPER')}
@@ -5609,6 +5730,390 @@ body.dodge-open{overflow:hidden}
     ethSetAvatarUI(ethAvatarPreviewUrl);
     if(status)status.textContent='Предпросмотр. Нажми «Сохранить аватар», чтобы загрузить его в облако.';
   });
+
+
+  // ===== SHAXTA / MINE OVERHAUL =====
+  const ETH_MINE_DROPS = [
+    { id: 'stone', name: 'Камень', icon: '🪨', gold: 5, weight: 60 },
+    { id: 'copper', name: 'Медь', icon: '🟠', gold: 50, weight: 30 },
+    { id: 'diamond', name: 'Алмаз', icon: '💎', gold: 500, weight: 9.99 },
+    { id: 'darkCoin', name: 'DARK COIN', icon: '◆', gold: 0, weight: 0.01, dark: true }
+  ];
+  const ETH_MINE_SPOTS = [
+    { left: 29, top: 38, crack: 'M 175 153 L 208 179 L 193 207 L 222 230 L 212 258' },
+    { left: 66, top: 29, crack: 'M 403 96 L 377 128 L 397 151 L 372 180 L 384 212' },
+    { left: 77, top: 57, crack: 'M 486 214 L 453 231 L 467 255 L 435 277 L 443 304' },
+    { left: 44, top: 71, crack: 'M 279 288 L 302 260 L 323 285 L 305 316 L 333 343' },
+    { left: 24, top: 60, crack: 'M 130 226 L 157 245 L 143 275 L 175 294 L 163 326' }
+  ];
+  let ethMineRun = { hits: 0, active: false, targetStartedAt: 0, targetNode: null };
+  let ethMineTransitionBusy = false;
+
+  function ethMineUpgradeCount() {
+    return Math.min(5, Math.max(0, Math.floor(Number(state.pickaxeLevel) || 1) - 1));
+  }
+  function ethMineChances() {
+    const boost = Math.pow(1.5, ethMineUpgradeCount());
+    const weights = ETH_MINE_DROPS.map((drop, index) => index === 0 ? drop.weight : drop.weight * boost);
+    const total = weights.reduce((sum, value) => sum + value, 0);
+    return ETH_MINE_DROPS.map((drop, index) => ({ ...drop, chance: weights[index] / total * 100 }));
+  }
+  function ethMineFormatChance(value) {
+    const digits = value < 0.1 ? 3 : 2;
+    return value.toFixed(digits).replace(/0+$/, '').replace(/\.$/, '') + '%';
+  }
+  function ethMineCost() {
+    return Math.floor(100 * Math.pow(1.5, Math.max(0, (Number(state.pickaxeLevel) || 1) - 1)));
+  }
+  function ethMinePersist() {
+    try {
+      if (typeof ethCloudSaveCurrentAccount === 'function') {
+        const pending = ethCloudSaveCurrentAccount();
+        if (pending && typeof pending.catch === 'function') pending.catch(error => console.warn('Mine save failed:', error));
+      }
+    } catch (error) {
+      console.warn('Mine save failed:', error);
+    }
+  }
+  function ethMineSetMessage(message) {
+    const node = document.getElementById('mine-message');
+    if (node) node.textContent = message;
+  }
+  function ethMineRender() {
+    if (typeof ensureExpansionState === 'function') ensureExpansionState();
+    const gold = document.getElementById('gold-display');
+    const darkCoins = document.getElementById('eth-mine-dark-coins');
+    const level = document.getElementById('pickaxe-level');
+    const cost = document.getElementById('pickaxe-cost');
+    if (gold) gold.textContent = String(Math.max(0, Number(state.gold) || 0));
+    if (darkCoins) darkCoins.textContent = String(Math.max(0, Number(state.darkCoins) || 0));
+    if (level) level.textContent = String(Math.min(6, Math.max(1, Number(state.pickaxeLevel) || 1)));
+    const upgrades = ethMineUpgradeCount();
+    const upgradeCount = document.getElementById('eth-mine-upgrade-count');
+    if (upgradeCount) upgradeCount.textContent = String(upgrades);
+    const upgradeStatus = document.getElementById('eth-mine-upgrade-status');
+    const upgradeButton = document.getElementById('eth-mine-upgrade-button');
+    const isMaxed = (Number(state.pickaxeLevel) || 1) >= 6;
+    const nextCost = ethMineCost();
+    if (cost) cost.textContent = isMaxed ? 'МАКС.' : String(nextCost);
+    if (upgradeButton) upgradeButton.disabled = isMaxed || Number(state.gold) < nextCost;
+    if (upgradeStatus) upgradeStatus.textContent = isMaxed ? 'Все 5 улучшений установлены' : 'Следующий уровень повышает вес редкой добычи';
+    const upgradeDots = document.getElementById('eth-mine-upgrade-dots');
+    if (upgradeDots) [...upgradeDots.children].forEach((dot, index) => dot.classList.toggle('done', index < upgrades));
+
+    const chances = ethMineChances();
+    const chanceHost = document.getElementById('eth-mine-drop-chances');
+    if (chanceHost) {
+      chanceHost.replaceChildren();
+      chances.forEach(drop => {
+        const row = document.createElement('div');
+        row.className = 'eth-mine-drop-row' + (drop.dark ? ' dark-coin' : '');
+        const name = document.createElement('span');
+        name.className = 'eth-mine-drop-name';
+        const icon = document.createElement('i');
+        icon.textContent = drop.icon;
+        const label = document.createElement('span');
+        label.textContent = drop.name;
+        name.append(icon, label);
+        const chance = document.createElement('b');
+        chance.className = 'eth-mine-drop-chance';
+        chance.textContent = ethMineFormatChance(drop.chance);
+        row.append(name, chance);
+        chanceHost.appendChild(row);
+      });
+    }
+
+    const list = document.getElementById('mineral-list');
+    if (list) {
+      list.replaceChildren();
+      const shown = ETH_MINE_DROPS.filter(drop => !drop.dark).map(drop => ({
+        id: drop.id, name: drop.name, icon: drop.icon, count: Math.max(0, Number(state.minerals[drop.id]) || 0)
+      }));
+      // Preserve visibility of any minerals from older saves without deleting those values.
+      if (Array.isArray(MINERALS)) {
+        MINERALS.forEach(drop => {
+          if (shown.some(item => item.id === drop.id)) return;
+          const count = Math.max(0, Number(state.minerals[drop.id]) || 0);
+          if (count > 0) shown.push({ id: drop.id, name: drop.name, icon: drop.icon, count });
+        });
+      }
+      shown.forEach(drop => {
+        const row = document.createElement('div');
+        row.className = 'eth-mine-mineral-row';
+        const label = document.createElement('span');
+        label.textContent = drop.icon + ' ' + drop.name;
+        const quantity = document.createElement('b');
+        quantity.textContent = '×' + drop.count;
+        row.append(label, quantity);
+        list.appendChild(row);
+      });
+      if (!shown.length) {
+        const empty = document.createElement('div');
+        empty.className = 'eth-mine-empty';
+        empty.textContent = 'Здесь появятся добытые минералы.';
+        list.appendChild(empty);
+      }
+    }
+
+    const log = document.getElementById('mine-loot-log');
+    if (log && !log.children.length) {
+      const empty = document.createElement('span');
+      empty.className = 'eth-mine-empty';
+      empty.textContent = 'Пока пусто — первая находка ждёт тебя.';
+      log.replaceChildren(empty);
+    }
+  }
+
+  function ethMineUpdateProgress() {
+    const count = document.getElementById('eth-mine-hit-count');
+    const progress = document.getElementById('eth-mine-hit-progress');
+    const scene = document.getElementById('eth-mine-scene');
+    const dots = document.querySelectorAll('.eth-mine-step-dots i');
+    if (count) count.textContent = ethMineRun.hits + ' / 5';
+    if (progress) progress.style.width = (ethMineRun.hits * 20) + '%';
+    if (scene) scene.dataset.cracks = String(ethMineRun.hits);
+    dots.forEach((dot, index) => dot.classList.toggle('done', index < ethMineRun.hits));
+  }
+
+  function ethMineSpawnSpot() {
+    const layer = document.getElementById('eth-mine-spot-layer');
+    if (!layer || !ethMineRun.active || ethMineRun.hits >= 5) return;
+    layer.replaceChildren();
+    const spotData = ETH_MINE_SPOTS[ethMineRun.hits];
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'eth-mine-spot';
+    button.style.left = spotData.left + '%';
+    button.style.top = spotData.top + '%';
+    button.setAttribute('aria-label', 'Слабое место ' + (ethMineRun.hits + 1) + ' из 5. Нажми в нужный момент.');
+    const ring = document.createElement('span');
+    ring.className = 'eth-mine-target-ring';
+    const core = document.createElement('span');
+    core.className = 'eth-mine-spot-core';
+    button.append(ring, core);
+    button.addEventListener('click', () => ethMineJudgeSpot(button, spotData));
+    layer.appendChild(button);
+    ethMineRun.targetNode = button;
+    ethMineRun.targetStartedAt = performance.now();
+  }
+
+  function ethMineJudgeSpot(button, spotData) {
+    if (!ethMineRun.active || button !== ethMineRun.targetNode || !button.isConnected) return;
+    const cycle = 1200;
+    const phase = (performance.now() - ethMineRun.targetStartedAt) % cycle;
+    const difference = Math.abs(phase - 920);
+    if (difference > 145) {
+      button.classList.remove('miss');
+      void button.offsetWidth;
+      button.classList.add('miss');
+      ethMineSetMessage(phase < 775 ? 'Рано! Подожди, пока кольцо почти сойдётся.' : 'Поздно! Следующий круг — твой шанс.');
+      return;
+    }
+
+    button.classList.add('hit');
+    button.disabled = true;
+    ethMineRun.hits++;
+    const cracks = document.getElementById('eth-mine-cracks');
+    if (cracks) {
+      const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+      path.setAttribute('d', spotData.crack);
+      cracks.appendChild(path);
+    }
+    ethMineUpdateProgress();
+    const layer = document.getElementById('eth-mine-spot-layer');
+    if (ethMineRun.hits >= 5) {
+      ethMineRun.active = false;
+      ethMineRun.targetNode = null;
+      if (layer) layer.replaceChildren();
+      const cavity = document.getElementById('eth-mine-cavity');
+      if (cavity) cavity.hidden = false;
+      ethMineSetMessage('Жила расколота! Нажми на светящуюся полость, чтобы забрать добычу.');
+      return;
+    }
+    ethMineSetMessage('Точное попадание! Трещина ' + ethMineRun.hits + ' из 5. Ищи следующее слабое место.');
+    setTimeout(() => {
+      if (ethMineRun.active) ethMineSpawnSpot();
+    }, 260);
+  }
+
+  window.ethMineStartRun = function() {
+    const layer = document.getElementById('eth-mine-spot-layer');
+    const cracks = document.getElementById('eth-mine-cracks');
+    const cavity = document.getElementById('eth-mine-cavity');
+    const next = document.getElementById('eth-mine-next-vein');
+    if (!layer || !cracks) return;
+    ethMineRun = { hits: 0, active: true, targetStartedAt: 0, targetNode: null };
+    layer.replaceChildren();
+    cracks.replaceChildren();
+    if (cavity) cavity.hidden = true;
+    if (next) next.hidden = true;
+    ethMineUpdateProgress();
+    ethMineSetMessage('Попади по слабому месту, когда кольцо почти совпадёт с центром.');
+    ethMineSpawnSpot();
+  };
+  window.mineRock = window.ethMineStartRun;
+
+  window.ethMineClaimLoot = function() {
+    const cavity = document.getElementById('eth-mine-cavity');
+    if (!cavity || cavity.hidden || ethMineRun.hits !== 5) return;
+    const chances = ethMineChances();
+    let roll = Math.random() * 100;
+    let drop = chances[chances.length - 1];
+    for (const candidate of chances) {
+      roll -= candidate.chance;
+      if (roll < 0) { drop = candidate; break; }
+    }
+
+    let rewardLabel = '';
+    if (drop.dark) {
+      state.darkCoins = Math.max(0, Number(state.darkCoins) || 0) + 1;
+      rewardLabel = ' +1 DARK COIN';
+    } else {
+      state.minerals[drop.id] = (Number(state.minerals[drop.id]) || 0) + 1;
+      state.gold = Math.max(0, Number(state.gold) || 0) + drop.gold;
+      rewardLabel = ' +' + drop.gold + ' золота';
+    }
+
+    cavity.hidden = true;
+    const next = document.getElementById('eth-mine-next-vein');
+    if (next) next.hidden = false;
+    ethMineSetMessage('Добыто: ' + drop.icon + ' ' + drop.name + rewardLabel + '. Жила готова к следующему проходу.');
+    const log = document.getElementById('mine-loot-log');
+    if (log) {
+      const entry = document.createElement('div');
+      entry.className = 'eth-mine-log-entry';
+      const label = document.createElement('span');
+      label.textContent = drop.icon + ' ' + drop.name;
+      const value = document.createElement('b');
+      value.textContent = drop.dark ? '+1 DARK COIN' : '+' + drop.gold + ' ◈';
+      entry.append(label, value);
+      const first = log.firstElementChild;
+      if (first && first.classList.contains('eth-mine-empty')) log.replaceChildren(entry);
+      else log.prepend(entry);
+      while (log.children.length > 6) log.lastElementChild.remove();
+    }
+    ethMineRender();
+    ethMinePersist();
+  };
+
+  window.upgradePickaxe = function() {
+    const current = Math.max(1, Math.floor(Number(state.pickaxeLevel) || 1));
+    if (current >= 6) {
+      ethMineSetMessage('Кирка уже получила все пять улучшений.');
+      ethMineRender();
+      return;
+    }
+    const price = ethMineCost();
+    if ((Number(state.gold) || 0) < price) {
+      ethMineSetMessage('Недостаточно золота. Для улучшения нужно ' + price + ' ◈.');
+      return;
+    }
+    state.gold -= price;
+    state.pickaxeLevel = current + 1;
+    ethMineRender();
+    ethMineSetMessage('Кирка улучшена до уровня ' + state.pickaxeLevel + '! Вес шанса лучшей добычи вырос на 50%.');
+    ethMinePersist();
+  };
+
+  window.updateMineScreen = ethMineRender;
+
+  function ethActivateMineView() {
+    const shell = document.getElementById('screen-map');
+    const stage = document.getElementById('eth-game-view-stage');
+    const mine = document.getElementById('screen-mine');
+    if (!shell || !stage || !mine) return false;
+    if (mine.parentElement !== stage) stage.appendChild(mine);
+    shell.classList.add('active', 'eth-mine-mode');
+    document.querySelectorAll('.screen').forEach(node => {
+      if (node !== shell && node !== mine) node.classList.remove('active');
+    });
+    ['eth-game-main-view', 'eth-game-map-view', 'eth-game-settings-view'].forEach(id => {
+      const view = document.getElementById(id);
+      if (!view) return;
+      view.classList.remove('eth-view-active', 'eth-view-entering', 'eth-view-leaving');
+      view.hidden = true;
+      view.setAttribute('aria-hidden', 'true');
+    });
+    mine.hidden = false;
+    mine.classList.add('active', 'eth-view-active');
+    mine.classList.remove('eth-view-entering', 'eth-view-leaving');
+    mine.setAttribute('aria-hidden', 'false');
+    document.body.classList.remove('eth-inventory-open');
+    ethMineRender();
+    window.ethMineStartRun();
+    return true;
+  }
+
+  function ethRestoreMineView() {
+    const shell = document.getElementById('screen-map');
+    const mine = document.getElementById('screen-mine');
+    if (mine) {
+      mine.classList.remove('active', 'eth-view-active', 'eth-view-entering', 'eth-view-leaving');
+      mine.hidden = true;
+      mine.setAttribute('aria-hidden', 'true');
+    }
+    shell?.classList.remove('eth-mine-mode');
+  }
+
+  const ethShowScreenBeforeMine = window.showScreen;
+  window.showScreen = function(id) {
+    if (id === 'mine') {
+      const result = ethShowScreenBeforeMine.call(this, 'map');
+      ethActivateMineView();
+      return result;
+    }
+    if (id === 'map') ethRestoreMineView();
+    return ethShowScreenBeforeMine.apply(this, arguments);
+  };
+
+  window.ethEnterMineFromMap = function(trigger) {
+    if (ethMineTransitionBusy) return;
+    ethMineTransitionBusy = true;
+    const layer = document.createElement('div');
+    layer.className = 'eth-mine-transition-layer';
+    const circle = document.createElement('div');
+    circle.className = 'eth-mine-transition-circle';
+    layer.appendChild(circle);
+    let icon = null;
+    const sourceIcon = trigger && trigger.querySelector('span');
+    if (sourceIcon) {
+      const rect = sourceIcon.getBoundingClientRect();
+      icon = document.createElement('div');
+      icon.className = 'eth-mine-transition-icon';
+      icon.textContent = sourceIcon.textContent || '⛏';
+      icon.style.left = rect.left + 'px';
+      icon.style.top = rect.top + 'px';
+      layer.appendChild(icon);
+      const centerX = Math.round(window.innerWidth / 2 - 21);
+      const centerY = Math.round(window.innerHeight / 2 - 21);
+      requestAnimationFrame(() => {
+        icon.style.left = centerX + 'px';
+        icon.style.top = centerY + 'px';
+        icon.classList.add('centered');
+      });
+    }
+    document.body.appendChild(layer);
+    requestAnimationFrame(() => requestAnimationFrame(() => circle.classList.add('expanded')));
+    setTimeout(() => {
+      if (icon) icon.classList.add('fade');
+      window.showScreen('mine');
+      requestAnimationFrame(() => circle.classList.add('shrinking'));
+    }, 540);
+    setTimeout(() => {
+      layer.remove();
+      ethMineTransitionBusy = false;
+    }, 1080);
+  };
+
+  // Move the Mine into the map's own viewport once; other map panels remain untouched.
+  const ethMineInitial = document.getElementById('screen-mine');
+  const ethMineStage = document.getElementById('eth-game-view-stage');
+  if (ethMineInitial && ethMineStage && ethMineInitial.parentElement !== ethMineStage) {
+    ethMineStage.appendChild(ethMineInitial);
+    ethMineInitial.hidden = true;
+    ethMineInitial.setAttribute('aria-hidden', 'true');
+  }
+
 
   window.ethGameTab('main');
   ethRefreshProfileChrome();
