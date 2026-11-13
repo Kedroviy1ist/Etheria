@@ -3450,6 +3450,7 @@ body.dodge-open{overflow:hidden}
   }
  }
  window.ethStartTrainingDodge=function(){
+  if(dodge.active&&dodge.mode==='training')return false;
   if(!state.hero){window.showScreen('hero-select');return false}
   const overlay=byId('soul-dodge-overlay');
   const canvas=byId('soul-dodge-canvas');
@@ -6566,6 +6567,7 @@ body.dodge-open{overflow:hidden}
   window.ethEnterTrainingFromMap=function(trigger){
     if(ethTrainingTransitionBusy)return;
     const overlay=document.getElementById('soul-dodge-overlay');
+    if(overlay?.classList.contains('open'))return;
     const canvas=document.getElementById('soul-dodge-canvas');
     if(typeof window.ethStartTrainingDodge!=='function'||!overlay||!canvas){
       console.error('[Etheria TRAIN] Arena is not ready.',{start:typeof window.ethStartTrainingDodge,overlay:!!overlay,canvas:!!canvas});
