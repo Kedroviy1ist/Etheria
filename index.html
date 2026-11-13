@@ -3825,11 +3825,11 @@ body.dodge-open{overflow:hidden}
 
   function tuneSoloEnemy(){
     const enemy=state.combat?.enemy;if(!enemy||!state.combat?.isActive)return;
-    const level=Math.max(1,state.level||1),stage=enemyStage(level),stats=getFinalStats(),boss=!!enemy.isBoss;
-    const effectiveStrike=Math.max(14,stats.atk*1.18+level*.42);
-    enemy.def=Math.max(1,Math.round(level*.36+stage*.62+(boss?2.5:0)));
-    enemy.hp=Math.round(effectiveStrike*(boss?(4.35+stage*.085):(2.25+stage*.12)));
+    const level=Math.max(1,Number(state.level)||1),stage=enemyStage(level),boss=!!enemy.isBoss;
+    // Enemy base attributes depend only on campaign level and enemy tier, never player stats.
+    enemy.hp=boss?Math.round(520+level*70+stage*180):Math.round(90+level*28+stage*55);
     enemy.maxHp=enemy.hp;
+    enemy.def=boss?Math.round(4+level*.48+stage*1.4):Math.max(1,Math.round(1+level*.28+stage*.65));
     enemy.atk=boss?Math.round(14+level*1.85+stage*3.7):Math.round(9+level*1.25+stage*4.2);
     enemy.xp=boss?Math.round(240+level*47):Math.round(42+level*19);
     enemy.modelId=MONSTER_IDS[enemy.name]||getMonsterId(enemy,level);
@@ -5206,18 +5206,18 @@ body.dodge-open{overflow:hidden}
     }
   };
 
-  // Enemy HP still scales with the player's final Attack stat; NG+ adds a per-cycle difficulty layer.
+  // Each NG+ multiplies every enemy combat attribute by exactly 1.5.
   function ethApplyNewGamePlusDifficulty() {
     const inCoop = typeof partyNet !== 'undefined' && !!partyNet.roomId;
     if (ethV4.practice.active || inCoop || !state.combat?.isActive || !state.combat.enemy) return;
     const enemy = state.combat.enemy;
-    const cycle = Math.max(0, Number(state.newGamePlus) || 0);
+    const cycle = Math.max(0, Math.floor(Number(state.newGamePlus) || 0));
     if (cycle > 0 && !enemy.ethNgPlusApplied) {
-      enemy.maxHp = Math.max(1, Math.round((Number(enemy.maxHp) || Number(enemy.hp) || 1) * (1 + 0.25 * cycle)));
+      const multiplier = Math.pow(1.5, cycle);
+      enemy.maxHp = Math.max(1, Math.round((Number(enemy.maxHp) || Number(enemy.hp) || 1) * multiplier));
       enemy.hp = enemy.maxHp;
-      enemy.atk = Math.max(1, Math.round((Number(enemy.atk) || 1) * (1 + 0.20 * cycle)));
-      enemy.def = Math.max(0, Math.round((Number(enemy.def) || 0) * (1 + 0.15 * cycle)));
-      enemy.xp = Math.max(0, Math.round((Number(enemy.xp) || 0) * (1 + 0.15 * cycle)));
+      enemy.atk = Math.max(1, Math.round((Number(enemy.atk) || 1) * multiplier));
+      enemy.def = Math.max(0, Math.round((Number(enemy.def) || 0) * multiplier));
       enemy.ethNgPlusApplied = true;
       updateCombatUI();
     }
@@ -7217,6 +7217,94 @@ body.dodge-open{overflow:hidden}
       return result;
     };
   }
+
+  // Etheria balance pass: NG+ reset and reliable, persistent stat upgrades.
+  function ethRenderNgResetControl(){
+    const host=byId('screen-map')?.querySelector('.eth-game-side .eth-side-actions');
+    if(!host)return;
+    let panel=byId('eth-ng-reset-panel');
+    if(!panel){
+      panel=document.createElement('section');
+      panel.id='eth-ng-reset-panel';
+      panel.className='eth-ng-reset-panel';
+      panel.innerHTML='<div class="eth-ng-reset-kicker">ПУТЬ ИСПЫТАНИЙ</div><div class="eth-ng-reset-title">New Game+</div><p id="eth-ng-reset-description"></p><button id="eth-ng-reset-button" type="button">Сбросить цикл · 1 DARK COIN</button><div id="eth-ng-reset-feedback" role="status"></div>';
+      host.appendChild(panel);
+      byId('eth-ng-reset-button').addEventListener('click',window.ethResetNewGamePlus);
+    }
+    const cycle=Math.max(0,Math.floor(Number(state.newGamePlus)||0));
+    const description=byId('eth-ng-reset-description');
+    const button=byId('eth-ng-reset-button');
+    if(description)description.textContent='Текущий цикл: NG+'+cycle+'. Каждый цикл умножает боевые характеристики врагов на ×1,5.';
+    if(button){button.disabled=cycle===0||Number(state.darkCoins)<1;button.textContent=cycle===0?'Сейчас активен базовый цикл':'Сбросить NG+ · 1 DARK COIN';}
+  }
+  window.ethResetNewGamePlus=async function(){
+    const feedback=byId('eth-ng-reset-feedback');
+    if(Math.max(0,Number(state.newGamePlus)||0)<1){if(feedback)feedback.textContent='Сбрасывать нечего: сейчас NG+0.';return;}
+    if(Number(state.darkCoins)<1){if(feedback)feedback.textContent='Не хватает 1 DARK COIN.';return;}
+    if(!window.confirm('Потратить 1 DARK COIN и сбросить NG+ до нуля? Уровень героя, предметы, золото и остальные сохранения останутся без изменений.'))return;
+    state.darkCoins=Math.max(0,Math.floor(Number(state.darkCoins)||0)-1);
+    state.newGamePlus=0;
+    if(state.combat)state.combat={isActive:false,hp:0,mp:0,enemy:null,playerBuffs:[]};
+    updateMapScreen();
+    const saved=await ethCloudSaveCurrentAccount();
+    if(feedback)feedback.textContent=saved===false?'NG+ сброшен локально, но облачное сохранение не подтвердилось.':'NG+ сброшен. Потрачен 1 DARK COIN.';
+    ethRenderNgResetControl();
+  };
+
+  const ethBalanceStyle=document.createElement('style');
+  ethBalanceStyle.textContent=`
+    #screen-upgrade{padding:clamp(16px,3vw,36px)!important;align-items:center}
+    #screen-upgrade>div{width:min(760px,100%)!important;margin:clamp(10px,3vh,34px) auto!important;padding:clamp(18px,3vw,34px)!important;border:1px solid rgba(255,224,174,.42)!important;border-radius:28px 42px 28px 42px!important;background:linear-gradient(145deg,rgba(255,246,224,.97),rgba(239,207,166,.95))!important;color:#432a1a!important;box-shadow:0 24px 70px rgba(49,29,20,.28),inset 0 1px rgba(255,255,255,.9)!important}
+    #screen-upgrade h2{color:#603a24!important;background:none!important;-webkit-text-fill-color:#603a24!important;font-size:clamp(23px,4vw,34px)!important}
+    #screen-upgrade .border-b{border-color:rgba(91,57,34,.2)!important}
+    #screen-upgrade>div>div:nth-of-type(2){background:linear-gradient(120deg,#fff8e9,#f4dfbd)!important;border:1px solid rgba(112,73,43,.22)!important}
+    #screen-upgrade>div>div:nth-of-type(2) p:first-child{color:#76563c!important}
+    #screen-upgrade #upgrade-points{color:#b66b32!important;text-shadow:none!important}
+    #screen-upgrade .space-y-4>div{background:rgba(255,251,241,.82)!important;border:1px solid rgba(112,73,43,.22)!important;border-radius:17px 25px 17px 25px!important;box-shadow:inset 0 1px rgba(255,255,255,.9)}
+    #screen-upgrade .space-y-4>div>div>div:first-child{color:#50321f!important}
+    #screen-upgrade .space-y-4>div .text-slate-400{color:#806247!important}
+    #screen-upgrade .space-y-4>div .text-white{color:#4b2d1b!important}
+    #screen-upgrade .space-y-4 button{min-width:54px;border:1.5px solid #57351f!important;border-radius:13px!important;background:linear-gradient(130deg,#ffe3ad,#e7a06d)!important;color:#422716!important;box-shadow:0 3px 0 rgba(63,39,22,.22)!important}
+    #screen-upgrade .space-y-4 button:disabled{opacity:.42;filter:grayscale(.4)}
+    #screen-upgrade>div>div:first-child>button{background:linear-gradient(120deg,#f7dfb9,#e8b17d)!important;color:#482d1b!important;border:1.5px solid #57351f!important}
+    .eth-ng-reset-panel{margin-top:14px;padding:15px;border:1px solid rgba(255,224,174,.32);border-radius:16px 24px 16px 24px;background:linear-gradient(145deg,rgba(62,42,45,.88),rgba(42,36,48,.92));color:#fff0d2}
+    .eth-ng-reset-kicker{font-size:9px;letter-spacing:.2em;font-weight:900;color:#e9b98a}
+    .eth-ng-reset-title{font-size:20px;font-weight:950;color:#ffe1b0;margin:3px 0}
+    #eth-ng-reset-description{font-size:11px;line-height:1.5;color:#e5d1b7;margin:7px 0 11px}
+    #eth-ng-reset-button{width:100%;padding:10px;border:1px solid #e7b67d;border-radius:11px;background:linear-gradient(120deg,#f5d4a2,#d98d62);color:#3d2618;font-size:12px;font-weight:950}
+    #eth-ng-reset-button:disabled{opacity:.5;filter:grayscale(.35)}
+    #eth-ng-reset-feedback{min-height:16px;margin-top:7px;font-size:10px;color:#f6d7aa}
+  `;
+  document.head.appendChild(ethBalanceStyle);
+
+  const ethPreviousUpdateMapForBalance=updateMapScreen;
+  updateMapScreen=function(){
+    ethPreviousUpdateMapForBalance.apply(this,arguments);
+    ethRenderNgResetControl();
+  };
+  window.updateUpgradeScreen=updateUpgradeScreen;
+  window.upgradeStat=function(stat){
+    const increments={hp:10,atk:2,def:1,mp:5};
+    if(!Object.prototype.hasOwnProperty.call(increments,stat)||Number(state.statPoints)<=0)return;
+    state.statPoints=Math.max(0,Math.floor(Number(state.statPoints)||0)-1);
+    const key={hp:'baseHp',atk:'baseAtk',def:'baseDef',mp:'baseMp'}[stat];
+    state[key]=Math.max(0,Number(state[key])||0)+increments[stat];
+    updateUpgradeScreen();
+    updateMapScreen();
+    Promise.resolve(window.ethCloudSaveCurrentAccount?.()).then(saved=>{
+      if(saved===false)ethCloudStatus('Характеристика улучшена, но облачное сохранение не подтвердилось.',true);
+    }).catch(error=>ethCloudStatus('Не удалось сохранить улучшение: '+(error.message||error),true));
+  };
+  const ethUpgradeOriginalUpdate=updateUpgradeScreen;
+  updateUpgradeScreen=function(){
+    ethUpgradeOriginalUpdate.apply(this,arguments);
+    const buttons=document.querySelectorAll('#screen-upgrade button[onclick*="upgradeStat"]');
+    buttons.forEach(button=>{
+      button.disabled=Number(state.statPoints)<=0;
+      button.setAttribute('aria-disabled',button.disabled?'true':'false');
+    });
+  };
+  ethRenderNgResetControl();
 
   window.ethGameTab('main');
   ethRefreshProfileChrome();
