@@ -6543,9 +6543,8 @@ body.dodge-open{overflow:hidden}
   let ethTrainingTransitionBusy=false;
   window.ethEnterTrainingFromMap=function(trigger){
     if(ethTrainingTransitionBusy)return;
-    const target=document.getElementById('screen-training');
-    if(!target){
-      console.error('[Etheria] Не найден экран #screen-training.');
+    if(typeof window.ethStartTrainingDodge!=='function'){
+      console.error('[Etheria] Не подключён движок тренировочного уклонения.');
       const map=document.getElementById('eth-game-map-view');
       if(map){const toast=document.createElement('div');toast.className='eth-world-map-toast';toast.textContent='Зал тренировок не загрузился. Обнови страницу.';map.appendChild(toast);setTimeout(()=>toast.remove(),3200)}
       return;
@@ -6562,9 +6561,11 @@ body.dodge-open{overflow:hidden}
     document.body.appendChild(layer);requestAnimationFrame(()=>requestAnimationFrame(()=>circle.classList.add('expanded')));
     setTimeout(()=>{
       if(icon)icon.classList.add('fade');
-      document.querySelectorAll('.screen').forEach(node=>node.classList.remove('active'));
-      target.hidden=false;target.classList.add('active');target.setAttribute('aria-hidden','false');
+      const result=document.getElementById('eth-training-result');
+      if(result&&result.parentElement!==document.body)document.body.appendChild(result);
+      document.getElementById('screen-training')?.remove();
       document.body.classList.remove('eth-inventory-open','dodge-open');
+      window.ethStartTrainingDodge();
       requestAnimationFrame(()=>circle.classList.add('shrinking'));
     },540);
     setTimeout(()=>{layer.remove();ethTrainingTransitionBusy=false},1080);
