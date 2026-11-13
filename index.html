@@ -1054,7 +1054,7 @@ checkEtheriaConnection();
                   <span>Опыт <b id="map-hero-xp">0</b>/<b id="map-hero-next-xp">100</b></span>
                   <span>Очки характеристик <b id="stat-points-badge">0</b></span>
                 </div>
-                <button class="eth-game-action" onclick="window.ethStartMainBattle()" type="button">НАЧАТЬ СРАЖЕНИЕ <span>↗</span></button>
+                <button class="eth-game-action" type="button">НАЧАТЬ СРАЖЕНИЕ <span>↗</span></button>
                 <p id="eth-start-battle-feedback" class="mt-2 min-h-5 text-xs text-rose-300" role="status" aria-live="polite"></p>
               </section>
             </div>
@@ -2882,6 +2882,12 @@ body.dodge-open{overflow:hidden}
  function showStoryScene(level,callback){const entry=STORY[level]||{chapter:`Летопись · Уровень ${level}`,title:'Дорога продолжается',sigil:'📜',text:'Следы Безымянного ведут всё дальше. Впереди новые земли, противники и ответы о расколе Светового Сердца.',quote:'«История ещё не закончена». '};byId('story-chapter').textContent=entry.chapter;byId('story-title').textContent=entry.title;byId('story-sigil').textContent=entry.sigil;byId('story-text').textContent=entry.text;byId('story-quote').textContent=entry.quote||'';storyReturn=callback||null;storySeen.add(level);byId('modal-story').classList.add('open')}
  window.closeStoryScene=function(){byId('modal-story').classList.remove('open');const cb=storyReturn;storyReturn=null;if(cb)cb()};
  window.openChronicle=function(){showStoryScene(state.level||1)};
+ window.ethShowBattleStoryIfNeeded=function(level,callback){
+  const nextLevel=Math.max(1,Number(level)||1);
+  if(!STORY[nextLevel]||storySeen.has(nextLevel))return false;
+  showStoryScene(nextLevel,typeof callback==='function'?callback:null);
+  return true;
+ };
  const beginCoopAdventureNow=window.startCoopAdventure;window.startCoopAdventure=function(){if(partyNet.role==='host'&&STORY[state.level]&&!storySeen.has(state.level)){showStoryScene(state.level,()=>beginCoopAdventureNow());return}beginCoopAdventureNow()};
 
  function addChronicleButton(){const header=document.querySelector('#screen-map header .flex.gap-4');if(!header||byId('chronicle-button'))return;const b=document.createElement('button');b.id='chronicle-button';b.className='btn flex-1 md:flex-none px-5 py-3 bg-violet-700/80 hover:bg-violet-600 backdrop-blur-md rounded-xl font-bold border border-violet-400/30';b.textContent='📜 Летопись';b.onclick=openChronicle;header.appendChild(b)}
@@ -3458,8 +3464,17 @@ body.dodge-open{overflow:hidden}
     }
 
     const screen=document.getElementById('screen-combat');
-    if(!screen?.classList.contains('active')){
-      throw new Error('Бой создан, но экран сражения не стал активным.');
+    if(!screen)throw new Error('Не найден экран сражения #screen-combat.');
+    // Recover the view explicitly if another screen wrapper failed to switch it.
+    if(!screen.classList.contains('active')&&typeof window.showScreen==='function'){
+      window.showScreen('combat');
+    }
+    if(!screen.classList.contains('active')){
+      document.querySelectorAll('.screen').forEach(node=>node.classList.remove('active'));
+      screen.classList.add('active');
+    }
+    if(!screen.classList.contains('active')){
+      throw new Error('Не удалось показать экран сражения.');
     }
     return true;
   };
@@ -5407,14 +5422,33 @@ body.dodge-open{overflow:hidden}
         if(feedback)feedback.textContent='Сначала выбери героя.';
         return false;
       }
+      // Do not bypass the chapter intro: close it, then resume this same action.
+      if(typeof window.ethShowBattleStoryIfNeeded==='function'){
+        const storyShown=window.ethShowBattleStoryIfNeeded(state.level,()=>window.ethStartMainBattle());
+        if(storyShown){
+          if(feedback)feedback.textContent='';
+          return true;
+        }
+      }
       if(typeof window.ethStartSoloCombatDirect!=='function'){
         throw new Error('Обработчик боя не загрузился. Загрузка игрового скрипта прервалась.');
       }
       const started=window.ethStartSoloCombatDirect();
       if(!started)throw new Error('Обработчик вернул отказ от запуска.');
       const combat=document.getElementById('screen-combat');
-      if(!state.combat?.isActive||!combat?.classList.contains('active')){
-        throw new Error('После запуска боевой экран не активировался.');
+      if(!state.combat?.isActive||!state.combat.enemy){
+        throw new Error('Боевая система не создала активного противника.');
+      }
+      // Last-resort view switch, separate from combat-state initialization.
+      if(combat&&!combat.classList.contains('active')&&typeof window.showScreen==='function'){
+        window.showScreen('combat');
+      }
+      if(!combat?.classList.contains('active')){
+        document.querySelectorAll('.screen').forEach(node=>node.classList.remove('active'));
+        combat?.classList.add('active');
+      }
+      if(!combat?.classList.contains('active')){
+        throw new Error('Бой создан, но экран сражения остался скрытым.');
       }
       if(feedback)feedback.textContent='';
       return true;
@@ -5423,17 +5457,18 @@ body.dodge-open{overflow:hidden}
       return false;
     }
   };
-  // Bind the MAIN battle button explicitly. Do not rely on an inline onclick
-  // handler being evaluated by the page or by a browser extension/CSP setting.
-  const ethMainBattleButton=document.querySelector('#eth-game-main-view .eth-game-action');
-  if(ethMainBattleButton&&!ethMainBattleButton.dataset.ethBattleBound){
-    ethMainBattleButton.dataset.ethBattleBound='true';
-    ethMainBattleButton.removeAttribute('onclick');
-    ethMainBattleButton.addEventListener('click',event=>{
-      event.preventDefault();
-      window.ethStartMainBattle();
-    });
-  }
+  // Capture the click at document level so the battle action survives DOM
+  // remounts and cannot fall through to a browser default action.
+  document.addEventListener('click',event=>{
+    const target=event.target;
+    const button=target&&typeof target.closest==='function'
+      ?target.closest('#eth-game-main-view .eth-game-action')
+      :null;
+    if(!button)return;
+    event.preventDefault();
+    event.stopImmediatePropagation();
+    window.ethStartMainBattle();
+  },true);
   const ethCloseStoryBeforeBattleGuard=window.closeStoryScene;
   if(typeof ethCloseStoryBeforeBattleGuard==='function')window.closeStoryScene=function(...args){
     try{return ethCloseStoryBeforeBattleGuard.apply(this,args)}
