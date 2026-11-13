@@ -1017,7 +1017,7 @@ body.eth-inventory-open #screen-map.eth-game-shell{transform:translate3d(15vw,0,
 .eth-shop-witch{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;width:100%;min-height:245px;margin-top:5px;padding:0 4px 12px;border:0;border-bottom:9px solid #24110f;border-radius:48% 48% 10px 10px / 24% 24% 4px 4px;background:radial-gradient(ellipse at 50% 67%,rgba(198,70,73,.25),transparent 60%),linear-gradient(180deg,rgba(48,25,34,.2),rgba(7,7,11,.36));color:#f6dfce;cursor:pointer;transition:filter .2s,transform .2s}
 .eth-shop-witch:hover{filter:brightness(1.13);transform:translateY(-2px)}
 .eth-shop-witch:focus-visible{outline:2px solid #f6ca91;outline-offset:3px}
-.eth-shop-witch svg{display:block;width:min(100%,235px);height:clamp(205px,30vh,280px);filter:drop-shadow(0 12px 13px rgba(0,0,0,.55))}
+.eth-shop-witch-sprite{display:block;width:min(100%,150px);height:auto;max-height:205px;object-fit:contain;image-rendering:pixelated;image-rendering:crisp-edges;filter:drop-shadow(0 12px 13px rgba(0,0,0,.55))}
 .eth-shop-witch-name{color:#dca47e;font-size:9px;font-weight:1000;letter-spacing:.23em}
 .eth-shop-witch b{color:#ffe7d7;font-family:Georgia,serif;font-size:19px;letter-spacing:.16em}
 .eth-shop-witch small{margin-top:4px;color:#a98d85;font-size:7px;font-weight:900;letter-spacing:.12em}
@@ -1072,6 +1072,37 @@ body.eth-inventory-open #screen-map.eth-game-shell{transform:translate3d(15vw,0,
 @media(max-width:460px){.eth-shop-counter-top{align-items:flex-start;flex-direction:column}.eth-shop-refresh{width:100%;display:flex;justify-content:space-between}.eth-shop-refresh b{display:inline;margin:0}.eth-shop-stock,.eth-shop-panel-grid{grid-template-columns:1fr}.eth-shop-item{min-height:132px}.eth-shop-header-right{display:grid;grid-template-columns:1fr 1fr}.eth-shop-back{grid-column:1/-1}.eth-shop-floor{flex-direction:column}.eth-shop-floor span:last-child{text-align:left}}
 @media(prefers-reduced-motion:reduce){.eth-shop-item,.eth-shop-tab,.eth-shop-buy,.eth-shop-back,.eth-shop-witch{transition:none!important}}
 </style>
+
+<style id="eth-shop-roulette-and-inventory-style">
+.eth-shop-roulette-backdrop{position:fixed;inset:0;z-index:2147483000;display:grid;place-items:center;padding:18px;background:rgba(7,6,10,.86);backdrop-filter:blur(8px)}
+.eth-shop-roulette-modal{width:min(900px,100%);padding:clamp(18px,3vw,30px);border:1px solid rgba(231,184,125,.5);border-radius:22px 34px;background:linear-gradient(145deg,#302326,#11131b 72%);box-shadow:0 28px 100px rgba(0,0,0,.65),inset 0 1px rgba(255,255,255,.08);color:#f8e8d5;text-align:center;overflow:hidden}
+.eth-shop-roulette-kicker{color:#d9aa77;font-size:10px;font-weight:1000;letter-spacing:.24em}
+.eth-shop-roulette-title{margin:8px 0;color:#ffebd2;font-size:clamp(21px,3vw,32px)}
+.eth-shop-roulette-sub{margin:0 0 18px;color:#bba391;font-size:12px}
+.eth-shop-roulette-window{position:relative;height:170px;overflow:hidden;border:1px solid rgba(225,177,120,.42);border-radius:14px;background:linear-gradient(180deg,rgba(5,6,10,.92),rgba(29,22,26,.96));box-shadow:inset 0 0 35px rgba(0,0,0,.55)}
+.eth-shop-roulette-track{position:absolute;left:0;top:0;display:flex;align-items:center;gap:10px;height:100%;width:max-content;padding:0 12px;transform:translate3d(0,0,0);transition:transform 4.9s cubic-bezier(.08,.78,.12,1);will-change:transform}
+.eth-shop-roulette-marker{position:absolute;z-index:2;left:50%;top:0;bottom:0;width:3px;transform:translateX(-50%);background:#ffe0a1;box-shadow:0 0 12px #f4c17a,0 0 25px #f4a65b;pointer-events:none}
+.eth-shop-roulette-marker:before,.eth-shop-roulette-marker:after{content:"";position:absolute;left:50%;transform:translateX(-50%);border-left:8px solid transparent;border-right:8px solid transparent}
+.eth-shop-roulette-marker:before{top:0;border-top:12px solid #ffe0a1}.eth-shop-roulette-marker:after{bottom:0;border-bottom:12px solid #ffe0a1}
+.eth-shop-roulette-card{display:flex;flex:0 0 126px;flex-direction:column;align-items:center;justify-content:center;gap:7px;height:130px;padding:10px;border:1px solid rgba(183,157,132,.38);border-radius:12px;background:linear-gradient(160deg,rgba(60,47,48,.98),rgba(21,22,29,.98));box-shadow:0 5px 12px #0007}
+.eth-shop-roulette-icon{display:grid;place-items:center;width:38px;height:38px;border-radius:11px;background:#090b11;color:#f1c990;font-size:22px}
+.eth-shop-roulette-card small{font-size:8px;font-weight:1000;letter-spacing:.12em;color:#d5bba1}
+.eth-shop-roulette-card b{max-width:100%;color:#f9ead7;font-size:10px;line-height:1.25;overflow-wrap:anywhere}
+.eth-shop-roulette-card.rarity-uncommon{border-color:#55b98a}.eth-shop-roulette-card.rarity-rare{border-color:#5b9fe6}.eth-shop-roulette-card.rarity-epic{border-color:#a77de5}.eth-shop-roulette-card.rarity-legendary{border-color:#e8a15e}.eth-shop-roulette-card.rarity-holy{border-color:#f4d878;box-shadow:0 0 18px #e9c76033}.eth-shop-roulette-card.rarity-darkness{border-color:#eb5a68;box-shadow:0 0 18px #e84a5b33}
+.eth-shop-roulette-card.is-winner{background:linear-gradient(150deg,#715039,#29202a);border-color:#ffe0a1}
+.eth-shop-roulette-result{min-height:25px;margin:16px 0 10px;color:#ffe0a1;font-size:13px;font-weight:1000;letter-spacing:.04em}
+.eth-shop-roulette-close{min-width:190px;padding:11px 20px;border:1px solid #c18b5d;border-radius:10px 15px;background:linear-gradient(130deg,#f1c38a,#a96d4d);color:#291810;font-size:10px;font-weight:1000;letter-spacing:.1em}
+.eth-shop-roulette-close:disabled{opacity:.55;cursor:wait}
+.eth-shop-owned-section{margin-top:22px;padding:16px;border:1px solid rgba(126,83,53,.3);border-radius:16px;background:rgba(255,248,232,.42)}
+.eth-shop-owned-title{margin:0;color:#603b25;font-size:18px;font-weight:1000}
+.eth-shop-owned-note{margin:5px 0 12px;color:#805c43;font-size:11px}
+.eth-shop-owned-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.eth-shop-owned-card{display:flex;flex-direction:column;gap:5px;min-width:0;padding:10px 12px;border:1px solid rgba(126,83,53,.26);border-radius:10px;background:rgba(255,251,241,.72);color:#573721}
+.eth-shop-owned-card b{font-size:11px}.eth-shop-owned-card span{color:#805c43;font-size:10px;font-weight:800}
+@media(max-width:560px){.eth-shop-roulette-window{height:145px}.eth-shop-roulette-card{flex-basis:112px;height:118px}.eth-shop-owned-grid{grid-template-columns:1fr}}
+@media(prefers-reduced-motion:reduce){.eth-shop-roulette-track{transition:none}}
+</style>
+
 </head>
 
 <body>
@@ -1427,29 +1458,7 @@ checkEtheriaConnection();
           <aside class="eth-shop-witch-panel">
             <div class="eth-shop-witch-caption"><span>ХОЗЯЙКА ЛАВКИ</span><i>✦</i></div>
             <button class="eth-shop-witch" type="button" onclick="ethShopTalk()" aria-label="Поговорить с Supreme Witch Calamitas">
-              <svg viewBox="0 0 280 320" role="img" aria-label="Оригинальная стилизованная иллюстрация ведьмы в тёмно-красной мантии">
-                <defs>
-                  <linearGradient id="ethWitchCape" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#6b1825"/><stop offset=".5" stop-color="#2b101a"/><stop offset="1" stop-color="#100d17"/></linearGradient>
-                  <linearGradient id="ethWitchHair" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ff6b61"/><stop offset=".55" stop-color="#a82037"/><stop offset="1" stop-color="#4a142c"/></linearGradient>
-                  <radialGradient id="ethWitchFace" cx=".42" cy=".25"><stop offset="0" stop-color="#fff0dc"/><stop offset="1" stop-color="#cda9a1"/></radialGradient>
-                  <filter id="ethWitchGlow"><feGaussianBlur stdDeviation="7"/></filter>
-                </defs>
-                <ellipse cx="140" cy="292" rx="105" ry="17" fill="#08070b" opacity=".6"/>
-                <path d="M54 300 Q49 232 75 185 L100 150 L180 150 L211 187 Q233 243 224 300Z" fill="url(#ethWitchCape)" stroke="#170b13" stroke-width="8"/>
-                <path d="M87 208 Q57 164 47 138 Q71 148 101 177 L128 224Z" fill="#7e1c31"/>
-                <path d="M190 207 Q225 163 238 137 Q212 145 180 178 L154 224Z" fill="#4a1427"/>
-                <path d="M103 166 L140 145 L178 167 L165 220 L140 246 L115 218Z" fill="#17131d" stroke="#a64b50" stroke-width="3"/>
-                <path d="M121 158 Q108 125 115 82 Q120 42 140 35 Q163 41 167 82 Q174 123 157 161Z" fill="url(#ethWitchFace)" stroke="#6c2935" stroke-width="4"/>
-                <path d="M112 81 Q91 47 107 19 Q120 28 127 48 Q140 16 158 12 Q162 42 169 53 Q190 29 193 24 Q203 76 169 105 L165 68 Q143 90 112 81Z" fill="url(#ethWitchHair)" stroke="#451224" stroke-width="4"/>
-                <path d="M113 57 Q88 41 79 9 Q105 17 124 39 M169 50 Q191 23 211 15 Q203 51 174 75" fill="none" stroke="#e34c5b" stroke-width="8" stroke-linecap="round"/>
-                <path d="M117 98 Q129 89 137 98 M146 98 Q154 89 164 98" fill="none" stroke="#8b263a" stroke-width="5" stroke-linecap="round"/>
-                <path d="M132 122 Q141 128 151 121" fill="none" stroke="#8a3440" stroke-width="3" stroke-linecap="round"/>
-                <path d="M103 151 Q82 117 92 87 Q106 103 119 111 M177 151 Q198 119 188 85 Q175 103 162 111" fill="none" stroke="#d33c51" stroke-width="12" stroke-linecap="round"/>
-                <path d="M97 163 Q140 183 183 163" fill="none" stroke="#d9a45d" stroke-width="5"/>
-                <path d="M140 171 L151 192 L140 207 L129 192Z" fill="#e3b66d" stroke="#fff0bd" stroke-width="2"/>
-                <circle cx="140" cy="193" r="20" fill="#ffb35c" opacity=".38" filter="url(#ethWitchGlow)"/>
-                <path d="M76 243 Q104 226 119 256 L104 284 Q83 281 76 243 M204 243 Q176 226 161 256 L176 284 Q197 281 204 243" fill="#25202b" stroke="#a94c53" stroke-width="3"/>
-              </svg>
+              <img class="eth-shop-witch-sprite" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACIAAAAuCAYAAABNhcu5AAADJElEQVR42tWYS0gVYRTHf6aGWbdNSYYPSC3LEoPyUVlKlJZhIgoRhL03JQYuehGFUqJSLnoRBGUWVFCYWYIopiSmhYVYpmQt0qioNhklWdrim2N9w1y55mbmv7nzPc43c/73nP85M154iFjfgBH+A0+GPnl5sm8SNoGPp0wEr47R5sMXRAHQ096pzUcuidbGge2dGpPVDx94OZsRM4QJM44VHQHgxu0qy/mCw8c1hs2x4zxGhInZwSEApCTFAXDFWG9qe2oZM03GfomdD63PHZo17rIlNChQGwtDjVU1lufIfHJGGtp5DR1arDg3a+ZHhALQ3ftWZcmhUl03EhZpY4mJZn9vABLXpiq7hg6H6oh48L6/T5svzckH4FLLLQCiVmUAsDvQpe274zMEQILBQOi2rQ6vNZIlZkYkFq5dvqomtmcDEGCyL9q3U12cqtCYdA4joh9Jezdr869fdhlXWZpSdhlKGhUdbnmDuwYTcl7TuevYutaMPtWuqeEjAB0/v45psL+iTNOTHcuzx3VDYUYYrqytt5mymnvRzGl+AMwLmmFpUGLSD0HM5Olj3kiYjo+P1WLFfjEijIhHMflKCUPCEgFIW79SM1gRclQb5xycojwu89XsBRXFPzzq8u3LyKhybvhlabAnLwGA86dbVXW976MxkbxRKW11yhYAXLkqMT/2qN/ayu/2ZsTnH4XTmPGvG9Y2imfuIDElTBwYHFDjsDQjhtq0mBpFsfpH7MOIKOrfbIkHIG7ubwBmRiRrBoV5xVpsCGR/usGEO7jLIvtlzUSxZpNipODkCQA+9zYCcOZCHQD1N72d8TXAy9yHSK2RLJFsEPS9adb+a8kyqSXmWlXS8w4r5RZ7+7/XVH4bBCC6exkA/V/8tfWGi3rUD6ctVJ7WvDCYcI1ZlZ91LzauHtk8Rjz9ViYeChOjHhmMFNYuBeDxK5Ul93LbsOr8nPd9xJwNnnZg5ektpvlBjx7EfoxIbKRmSpaofqSjUvdYqmdWql5Fy+v9tKwTyHnmPsQ5ymqGeDQrUi0PnB0Zu8s3Kem6OS7Ldfu/6Y1XTyYK2zLyB4gmI5lF83PUAAAAAElFTkSuQmCC" alt="Оригинальный пиксельный спрайт Supreme Witch Calamitas, отражённый по горизонтали и смотрящий вправо" width="34" height="46" decoding="async" draggable="false">
               <span class="eth-shop-witch-name">SUPREME WITCH</span>
               <b>CALAMITAS</b>
               <small>НАЖМИ, ЧТОБЫ УСЛЫШАТЬ СОВЕТ</small>
@@ -6447,7 +6456,7 @@ body.dodge-open{overflow:hidden}
   let ethShopTick=null;
   let ethShopBusy=false;
   let ethShopTransitionBusy=false;
-  let ethShopTipIndex=0;
+  let ethShopTipIndex=1;
 
   function ethShopEnsureState(){
     state.shopStockCycle=Number.isFinite(Number(state.shopStockCycle))?Number(state.shopStockCycle):0;
@@ -6482,6 +6491,12 @@ body.dodge-open{overflow:hidden}
   }
   function ethShopRarityRank(rarity){
     return ({common:0,uncommon:1,rare:2,epic:3,legendary:4,holy:5,darkness:6})[rarity]||0;
+  }
+  function ethShopRatesLabel(rates){
+    const boost=Math.max(1,Number(state.shopBoosts?.chanceMultiplier)||1);
+    const weighted=rates.map(([rarity,weight])=>({rarity,weight:weight*Math.pow(boost,ethShopRarityRank(rarity))}));
+    const total=weighted.reduce((sum,item)=>sum+item.weight,0);
+    return weighted.map(item=>item.rarity.toUpperCase()+' '+(item.weight/total*100).toFixed(1).replace(/\\.0$/,'')+'%').join(' · ');
   }
   function ethShopRollRarity(rates,rng,useBoost=true){
     const chanceBoost=useBoost?(Number(state.shopBoosts?.chanceMultiplier)||1):1;
@@ -6574,7 +6589,7 @@ body.dodge-open{overflow:hidden}
     ETH_SHOP_CASES.forEach(tier=>{
       const card=document.createElement('article');card.className='eth-shop-key-card';
       const heading=document.createElement('h3');heading.textContent=tier.icon+' '+tier.name;
-      const description=document.createElement('p');description.textContent='Ключ подходит только к кейсу этой редкости.';
+      const description=document.createElement('p');description.textContent='Ключ подходит только к кейсу этой редкости. Шансы: '+ethShopRatesLabel(tier.rates);
       const owned=document.createElement('div');owned.className='eth-shop-key-count';
       owned.textContent='Кейсы: '+state.shopCases[tier.id]+' · Ключи: '+state.shopKeys[tier.id];
       const actions=document.createElement('div');actions.className='eth-shop-key-actions';
@@ -6623,6 +6638,7 @@ body.dodge-open{overflow:hidden}
         ethShopFeedback('Титул «'+item.title+'» добавлен в коллекцию.');
       }else if(item.kind==='case'){
         state.shopCases[item.tier]=(Number(state.shopCases[item.tier])||0)+1;
+        if(window.updateInventoryScreen)window.updateInventoryScreen();
         ethShopFeedback('Кейс добавлен. Купи ключ той же редкости во вкладке KEYS.');
       }else if(item.kind==='artifact'){
         state.inventory=Array.isArray(state.inventory)?state.inventory:[];
@@ -6646,6 +6662,7 @@ body.dodge-open{overflow:hidden}
     try{
       state.gold-=tier.keyPrice;
       state.shopKeys[tier.id]++;
+      if(window.updateInventoryScreen)window.updateInventoryScreen();
       await ethShopSave();
       ethShopFeedback('Ключ «'+tier.name+'» куплен. Он открывает только такой же кейс.');
       ethShopRenderKeys();
@@ -6659,16 +6676,20 @@ body.dodge-open{overflow:hidden}
     if(state.shopCases[tier.id]<1||state.shopKeys[tier.id]<1){ethShopFeedback('Нужен кейс и ключ одной редкости.',true);return}
     ethShopBusy=true;
     try{
-      state.shopCases[tier.id]--;state.shopKeys[tier.id]--;
       const rng=()=>Math.random();
       const rarity=ethShopRollRarity(tier.rates,rng);
       const artifact=ethShopRandomArtifact(rarity,rng);
+      state.shopCases[tier.id]--;
+      state.shopKeys[tier.id]--;
       state.inventory=Array.isArray(state.inventory)?state.inventory:[];
+      // Add and save the reward before the animation: reloading mid-roll cannot eat the prize.
       state.inventory.push(artifact);
       if(window.updateInventoryScreen)window.updateInventoryScreen();
       await ethShopSave();
-      ethShopFeedback('Кейс открыт: '+artifact.rarityName+' · '+artifact.name+' · артефакт отправлен в инвентарь.');
+      await ethShopPlayRoulette(tier,artifact,rng);
+      ethShopFeedback('Кейс открыт: '+artifact.rarityName+' · '+artifact.name+' · находка уже в инвентаре.');
       ethShopRenderKeys();
+      if(window.updateInventoryScreen)window.updateInventoryScreen();
     }catch(error){ethShopFeedback(error.message||'Кейс не удалось открыть.',true)}
     finally{ethShopBusy=false;ethShopCurrency();}
   }
@@ -6754,6 +6775,8 @@ body.dodge-open{overflow:hidden}
     shell?.classList.remove('eth-shop-mode');
     if(window.ethGameTab)window.ethGameTab('map');
   }
+  window.ethShopTab=ethShopTab;
+  window.ethShopTalk=ethShopTalk;
   window.ethShopBack=function(){
     ethShopRestoreView();
     window.showScreen('map');
@@ -6819,6 +6842,88 @@ body.dodge-open{overflow:hidden}
       const result=ethShopPreviousFinalStats.apply(this,arguments);
       const multiplier=window.ethShopRewardMultiplier?window.ethShopRewardMultiplier('stats'):1;
       ['hp','mp','atk','def'].forEach(key=>{if(Number.isFinite(Number(result[key])))result[key]=Math.floor(result[key]*multiplier)});
+      return result;
+    };
+  }
+
+
+  function ethShopRouletteCard(item,isWinner){
+    const card=document.createElement('div');
+    card.className='eth-shop-roulette-card rarity-'+item.rarity+(isWinner?' is-winner':'');
+    const icon=document.createElement('div');icon.className='eth-shop-roulette-icon';icon.textContent='✦';
+    const rarity=document.createElement('small');rarity.textContent=item.rarityName||String(item.rarity||'').toUpperCase();
+    const name=document.createElement('b');name.textContent=item.name||'Артефакт';
+    card.append(icon,rarity,name);
+    return card;
+  }
+  function ethShopPlayRoulette(tier,prize,rng){
+    return new Promise(resolve=>{
+      const overlay=document.createElement('div');
+      overlay.className='eth-shop-roulette-backdrop';
+      overlay.setAttribute('role','dialog');
+      overlay.setAttribute('aria-modal','true');
+      overlay.setAttribute('aria-label','Открытие кейса '+tier.name);
+      const modal=document.createElement('section');modal.className='eth-shop-roulette-modal';
+      const kicker=document.createElement('div');kicker.className='eth-shop-roulette-kicker';kicker.textContent='ЭТЕРИЯ · ОТКРЫТИЕ КЕЙСА';
+      const title=document.createElement('h2');title.className='eth-shop-roulette-title';title.textContent=tier.name;
+      const sub=document.createElement('p');sub.className='eth-shop-roulette-sub';sub.textContent='Смотри, какая редкость остановится на метке…';
+      const viewport=document.createElement('div');viewport.className='eth-shop-roulette-window';
+      const marker=document.createElement('div');marker.className='eth-shop-roulette-marker';marker.setAttribute('aria-hidden','true');
+      const track=document.createElement('div');track.className='eth-shop-roulette-track';
+      const total=37;const winnerIndex=31;let winner=null;
+      for(let i=0;i<total;i++){
+        const item=i===winnerIndex?prize:ethShopRandomArtifact(ethShopRollRarity(tier.rates,rng),rng);
+        const card=ethShopRouletteCard(item,i===winnerIndex);
+        track.appendChild(card);
+        if(i===winnerIndex)winner=card;
+      }
+      viewport.append(track,marker);
+      const result=document.createElement('div');result.className='eth-shop-roulette-result';result.textContent=' ';
+      const close=document.createElement('button');close.type='button';close.className='eth-shop-roulette-close';close.disabled=true;close.textContent='РУЛЕТКА КРУТИТСЯ…';
+      modal.append(kicker,title,sub,viewport,result,close);overlay.appendChild(modal);document.body.appendChild(overlay);
+      close.addEventListener('click',()=>{overlay.remove();resolve()});
+      const reduceMotion=!!(window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+      requestAnimationFrame(()=>requestAnimationFrame(()=>{
+        const delta=winner.offsetLeft+winner.offsetWidth/2-viewport.clientWidth/2;
+        track.style.transform='translate3d('+(-delta)+'px,0,0)';
+      }));
+      window.setTimeout(()=>{
+        result.textContent='ВЫПАЛО: '+(prize.rarityName||prize.rarity.toUpperCase())+' · '+prize.name;
+        close.disabled=false;close.textContent='ЗАБРАТЬ НАХОДКУ';
+        sub.textContent='Награда уже сохранена в инвентаре героя.';
+      },reduceMotion?120:5000);
+    });
+  }
+  function ethShopRenderOwnedInventory(){
+    const list=document.getElementById('inventory-list');
+    if(!list)return;
+    ethShopEnsureState();
+    let section=document.getElementById('eth-shop-owned-inventory');
+    if(!section){
+      section=document.createElement('section');section.id='eth-shop-owned-inventory';section.className='eth-shop-owned-section';
+      const heading=document.createElement('h3');heading.className='eth-shop-owned-title';heading.textContent='Кейсы и ключи';
+      const note=document.createElement('p');note.className='eth-shop-owned-note';note.textContent='Эти запасы хранятся в профиле отдельно от экипировки и не занимают слоты.';
+      const grid=document.createElement('div');grid.id='eth-shop-owned-inventory-grid';grid.className='eth-shop-owned-grid';
+      section.append(heading,note,grid);list.insertAdjacentElement('afterend',section);
+    }
+    const grid=document.getElementById('eth-shop-owned-inventory-grid');
+    if(!grid)return;
+    grid.replaceChildren();
+    ETH_SHOP_CASES.forEach(tier=>{
+      const card=document.createElement('article');card.className='eth-shop-owned-card';
+      const name=document.createElement('b');name.textContent=tier.icon+' '+tier.name;
+      const counts=document.createElement('span');counts.textContent='Кейсы: '+(state.shopCases[tier.id]||0)+' · Ключи: '+(state.shopKeys[tier.id]||0);
+      card.append(name,counts);grid.appendChild(card);
+    });
+    const empty=document.getElementById('empty-inventory');
+    const hasSupplies=ETH_SHOP_CASES.some(tier=>(state.shopCases[tier.id]||0)>0||(state.shopKeys[tier.id]||0)>0);
+    if(empty)empty.classList.toggle('hidden',(state.inventory||[]).length>0||hasSupplies);
+  }
+  const ethShopOriginalUpdateInventory=window.updateInventoryScreen;
+  if(typeof ethShopOriginalUpdateInventory==='function'){
+    window.updateInventoryScreen=function(){
+      const result=ethShopOriginalUpdateInventory.apply(this,arguments);
+      ethShopRenderOwnedInventory();
       return result;
     };
   }
