@@ -348,7 +348,6 @@
 
 /* Refined chapter presentation and inventory atelier */
 
-/* Align the three larger story acts with the existing campaign lore */
 .eth-chapter-scene[data-chapter="2"]{--scene-a:#d9b58d;--scene-b:#7d8883;--scene-c:#36434a}
 .eth-chapter-scene[data-chapter="2"]:before{background:radial-gradient(ellipse at 65% 28%,rgba(255,237,192,.9) 0 7%,rgba(226,203,163,.3) 18%,transparent 40%),linear-gradient(180deg,rgba(221,234,223,.12),transparent 50%,rgba(27,42,49,.4))}
 .eth-chapter-scene[data-chapter="2"]:after{background:linear-gradient(160deg,#b0b1a3,#3d4b50);clip-path:polygon(0 74%,12% 21%,20% 60%,35% 4%,43% 47%,58% 14%,70% 60%,83% 8%,100% 70%,100% 100%,0 100%)}
@@ -2578,8 +2577,6 @@ body{background-image:radial-gradient(ellipse at 50% 0%,rgba(42,54,111,.55),tran
 .coop-action{background:linear-gradient(145deg,rgba(30,41,59,.95),rgba(15,23,42,.9));border:1px solid rgba(99,102,241,.3);border-radius:14px;padding:13px;text-align:left;transition:.16s}
 .coop-action:hover{border-color:#a5b4fc;background:rgba(49,46,129,.35);transform:translateY(-2px)}
 .coop-action:disabled{opacity:.35;cursor:not-allowed;transform:none}
-.story-sigil{font-size:54px;filter:drop-shadow(0 0 20px rgba(251,191,36,.35));animation:storyFloat 3s ease-in-out infinite}
-@keyframes storyFloat{50%{transform:translateY(-8px) rotate(2deg)}}
 #mine-rhythm-field{height:min(52vh,430px);min-height:280px;position:relative;overflow:hidden;border-radius:18px;border:1px solid rgba(245,158,11,.24);background:radial-gradient(circle at 50% 50%,rgba(120,53,15,.3),transparent 55%),repeating-linear-gradient(0deg,rgba(255,255,255,.025) 0 1px,transparent 1px 42px),repeating-linear-gradient(90deg,rgba(255,255,255,.025) 0 1px,transparent 1px 42px),#080d1b;touch-action:manipulation}
 .osu-note{position:absolute;width:76px;height:76px;border-radius:50%;border:3px solid #fbbf24;background:radial-gradient(circle,#fef3c7 0 16%,#f59e0b 18% 48%,#713f12 52% 100%);box-shadow:0 0 24px rgba(245,158,11,.45);display:grid;place-items:center;cursor:pointer;z-index:3;transform:translate(-50%,-50%);padding:0;touch-action:manipulation}
 .osu-note:after{content:"";position:absolute;inset:-4px;border:4px solid #fef3c7;border-radius:50%;animation:osuApproach .95s linear forwards;pointer-events:none}
@@ -2724,13 +2721,6 @@ body.dodge-open{overflow:hidden}
  </div>
 </div>
 
-<div id="modal-story" class="eth-modal">
- <div class="eth-panel p-7 md:p-9 max-w-2xl w-full relative overflow-hidden">
-  <div class="absolute -right-12 -top-12 w-48 h-48 bg-amber-500/10 blur-3xl rounded-full"></div>
-  <div class="text-center relative"><div class="story-sigil" id="story-sigil">📜</div><div id="story-chapter" class="text-xs tracking-[.35em] text-amber-400 uppercase font-bold mt-2">Глава I</div><h2 id="story-title" class="text-3xl md:text-4xl title-font my-3 text-amber-100">Пробуждение Этерии</h2><p id="story-text" class="text-slate-300 leading-8 text-base md:text-lg"></p><div id="story-quote" class="text-amber-200/80 italic mt-5"></div><button onclick="closeStoryScene()" class="eth-btn w-full mt-7 bg-gradient-to-r from-amber-600 to-orange-700">Продолжить путь</button></div>
- </div>
-</div>
-
 <div id="modal-mining-rhythm" class="eth-modal">
  <div class="eth-panel p-5 md:p-7 max-w-4xl w-full">
   <div class="flex flex-wrap justify-between items-center gap-3 mb-4"><div><div class="text-xs tracking-[.3em] uppercase text-amber-400 font-bold">Ритм-добыча</div><h2 class="text-2xl md:text-3xl title-font">Попади в такт жиле</h2></div><button onclick="closeMiningRhythm()" class="eth-btn bg-slate-800">✕</button></div>
@@ -2752,29 +2742,9 @@ body.dodge-open{overflow:hidden}
  const oldUpdateInventory = updateInventoryScreen;
  const oldMineRock = mineRock;
  let lobbyHeroType = 'warrior';
- let storyReturn = null;
- let storySeen = new Set();
  let spriteSerial = 0;
  const CLASS_INFO = {
   warrior:{label:'Воин',icon:'⚔️',color:'#60a5fa'}, mage:{label:'Маг',icon:'🔮',color:'#c084fc'}, archer:{label:'Лучник',icon:'🏹',color:'#4ade80'}, knight:{label:'Рыцарь',icon:'🛡️',color:'#67e8f9'}, alchemist:{label:'Алхимик',icon:'⚗️',color:'#bef264'}
- };
- const STORY = {
-  1:{chapter:'Пролог · Искра',title:'Когда погасло Сердце',sigil:'🌌',text:'Когда-то Этерия держалась на Световом Сердце — кристалле, который связывал магию, память и жизнь. В ночь Чёрного затмения Сердце раскололось. Из трещины вышел Безымянный, и его тень начала стирать целые земли из летописей. Старые хранители исчезли. Остались только путники, которым предстоит собрать три печати и добраться до Истока.',quote:'«Три искры могут удержать даже самую долгую ночь».',},
-  2:{chapter:'Глава I · Пепельная тропа',title:'Голос у дороги',sigil:'🏚️',text:'На опустевшей дороге отряд встречает странника с обугленной картой. Он утверждает, что видел следы одного из хранителей у старой шахты. На полях карты кто-то вывел одно слово: «Пробуждение».',quote:'«Не доверяйте тишине. Иногда она просто ждёт». '},
-  3:{chapter:'Глава I · Пепельная тропа',title:'Шёпот под землёй',sigil:'⛏️',text:'В шахте камни светятся изнутри. Чем глубже вы спускаетесь, тем отчётливее слышен звон, похожий на бой часов. Это не обычная руда: осколки помнят события до раскола Сердца.',quote:'«Камень хранит то, что люди предпочли забыть». '},
-  4:{chapter:'Глава I · Пепельная тропа',title:'Последняя печать',sigil:'🔑',text:'На воротах древнего святилища обнаруживается пустое гнездо для печати. Следы ведут к лагерю орков. Кто-то собирает осколки Сердца и отдаёт их существам, которые никогда не должны были научиться говорить.',quote:'«Завтра дорога приведёт вас к тому, кто первым предал хранителей». '},
-  5:{chapter:'Глава I · Первый страж',title:'Король Орков',sigil:'👑',text:'Король Орков носит на груди первую печать — медный знак, выломанный из ворот святилища. Он не знает, кто отдаёт ему приказы: каждую ночь голос обещает ему силу и забирает часть воспоминаний. Победите короля, но не уничтожайте печать: она — ключ к следующей земле.',quote:'«Я не служу тьме… я просто больше не помню света». '},
-  6:{chapter:'Глава II · Забытые имена',title:'Прах на страницах',sigil:'📖',text:'За первой печатью открывается путь к городу архивов. Все книги там переписаны чужой рукой, а имена жителей исчезают прямо на глазах. На самой старой башне горит зелёный огонь — знак некроманта, который научился красть не только жизнь, но и воспоминания.',quote:'«Если имя забыто, кто докажет, что ты существовал?» '},
-  10:{chapter:'Глава II · Забытые имена',title:'Некромант архивов',sigil:'💀',text:'Некромант хранит вторую печать в колбе с чёрным стеклом. Он раскрывает правду: Безымянный когда-то был хранителем, добровольно отдавшим своё имя, чтобы остановить первую катастрофу. Теперь он пытается вернуть утраченное, стирая чужие судьбы.',quote:'«Я хотел спасти один мир. Почему вы называете меня разрушителем?» '},
-  11:{chapter:'Глава III · Каменная память',title:'Сердце горы',sigil:'⛰️',text:'В глубине горы обнаруживается древний механизм. Он реагирует на вторую печать и показывает видение: третья печать скрыта за ледяным морем, где спит существо, помнящее настоящее имя Безымянного.',quote:'«Память — это не цепь. Это дорога домой». '},
-  15:{chapter:'Глава III · Каменная память',title:'Испытание гиганта',sigil:'🗿',text:'Каменный Гигант не нападает первым. Он проверяет, способны ли путники действовать вместе. Его удары раскалывают арену, но в трещинах вспыхивают картины прошлого — похоже, гигант был другом первого хранителя.',quote:'«Сила измеряется не тем, что ты можешь разрушить». '},
-  20:{chapter:'Глава IV · Ледяная клятва',title:'Древний Дракон',sigil:'🐉',text:'Дракон охраняет переход к ледяному морю. Он соглашается пропустить отряд только после испытания. В его памяти сохранилась мелодия, которую пели хранители перед тем, как запечатать Сердце. Ритм этой песни совпадает с мерцанием жил Этерии.',quote:'«Слушайте мир — он всё ещё помнит мелодию». '},
-  25:{chapter:'Глава V · Осколки правды',title:'Тёмный Маг',sigil:'🧙',text:'Тёмный Маг оказывается не слугой Безымянного, а его первым учеником. Он раскрывает, что Сердце раскололи сами хранители: они боялись, что один из них получит слишком много власти. Безымянный пытается собрать осколки, чтобы исправить их ошибку.',quote:'«У правды тоже бывает теневая сторона». '},
-  30:{chapter:'Глава VI · Врата',title:'Властелин Тьмы',sigil:'🕳️',text:'За шестой печатью мир начинает распадаться на фрагменты. Властелин Тьмы охраняет врата к небесной цитадели. Он предупреждает: за вратами нельзя победить в одиночку — три сердца должны звучать в одном ритме.',quote:'«Один голос может позвать. Только три — ответить». '},
-  35:{chapter:'Глава VII · Последний рубеж',title:'Страж Ворот',sigil:'🚪',text:'Страж не признаёт титулов и не принимает подношений. Он спрашивает каждого героя, ради кого тот продолжает путь. Ответы становятся ключами к воротам: Этерию можно спасти, только отказавшись от желания владеть её силой.',quote:'«Хранить — не значит владеть». '},
-  40:{chapter:'Глава VIII · Небесная цитадель',title:'Архангел',sigil:'😇',text:'Архангел открывает путь в зал расколотого Сердца. Он был последним, кто видел Безымянного до катастрофы. В его глазах нет ненависти — только усталость от веков молчания.',quote:'«Он всё ещё ждёт, что кто-нибудь произнесёт его имя». '},
-  45:{chapter:'Глава IX · Перед рассветом',title:'Высший Архангел',sigil:'✨',text:'Последняя защита Сердца проверяет не мощь отряда, а верность друг другу. Печати вспыхивают, и перед героями появляется забытая строка летописи. В ней скрыто имя того, кто когда-то пожертвовал собой.',quote:'«Вспомнить — значит дать надежде второй шанс». '},
-  50:{chapter:'Глава X · Исток',title:'Безымянный',sigil:'👁️',text:'У Истока вас ждёт не бог и не чудовище, а бывший хранитель, который слишком долго оставался один. Он собрал осколки Сердца, но не может вернуть утраченное имя. Теперь три героя должны решить судьбу Этерии: не уничтожить Безымянного, а помочь ему вспомнить, кем он был.',quote:'«Меня зовут…» — и впервые за тысячу лет тьма замолкает.'}
  };
  const partyNet = {role:null,peer:null,connection:null,connections:new Map(),roomId:'',myId:'',mySlot:null,players:[null,null,null],battle:null,started:false,result:null,level:1,acted:[],busy:false};
  function byId(id){return document.getElementById(id)}
@@ -2838,7 +2808,7 @@ body.dodge-open{overflow:hidden}
   if(msg.type==='welcome'){partyNet.mySlot=msg.slot;setCoopStatus('Подключено! Твой слот: '+(msg.slot+1)+'.');return}
   if(msg.type==='error'){setCoopStatus(msg.message||'Ошибка комнаты.',true);return}
   if(msg.type==='lobby'){partyNet.players=msg.players;partyNet.started=!!msg.started;partyNet.level=msg.level||1;renderLobby();return}
-  if(msg.type==='battle'){partyNet.players=msg.players;partyNet.battle=msg.battle;partyNet.started=true;if(STORY[partyNet.level]&&!storySeen.has(partyNet.level)){const storyLevel=partyNet.level;showStoryScene(storyLevel,()=>{showScreen('coop-combat');renderCoopCombat()})}else{showScreen('coop-combat');renderCoopCombat()}return}
+  if(msg.type==='battle'){partyNet.players=msg.players;partyNet.battle=msg.battle;partyNet.started=true;showScreen('coop-combat');renderCoopCombat();return}
   if(msg.type==='result'){partyNet.players=msg.players;partyNet.started=false;partyNet.result=msg.result;applyLocalProgress(msg.result);byId('party-result-icon').textContent=msg.result.win?'🏆':'🕯️';byId('party-result-title').textContent=msg.result.win?'Победа отряда':'Отряд отступил';byId('party-result-title').className='text-4xl title-font mb-3 '+(msg.result.win?'text-emerald-300':'text-red-300');byId('party-result-text').textContent=msg.result.message;byId('modal-party-result').classList.add('open');return}
   if(msg.type==='continue'){partyNet.players=msg.players;partyNet.level=msg.level;state.level=msg.level;partyNet.battle=null;partyNet.started=false;applyLocalProgress(msg.result||{});if(msg.victory)byId('modal-victory').classList.remove('hidden');else showScreen('map');return}
  }
@@ -2874,23 +2844,7 @@ body.dodge-open{overflow:hidden}
  function finishPartyBattle(win){const b=partyNet.battle;if(!b||!b.active)return;b.active=false;const xp=win?b.enemy.xp:0;const gold=win?Math.max(10,Math.floor(xp/12)):0;partyNet.players.forEach(p=>{if(!p||p.isBot)return;if(win){p.xp+=xp;while(p.xp>=p.nextXp){p.xp-=p.nextXp;p.heroLvl++;p.statPoints+=6;p.nextXp=Math.floor(p.nextXp*1.5);p.maxHp+=10;p.hp=Math.min(p.maxHp,p.hp+10)}}});const result={win,xp,gold,level:partyNet.level,message:win?`Три героя одолели ${b.enemy.name}. Каждый игрок получил ${xp} опыта. В общей сокровищнице отряда +${gold} золота.`:`Отряд не смог одолеть ${b.enemy.name}. Можно подготовиться и попробовать снова.`};partyNet.result=result;if(partyNet.role==='host'){applyLocalProgress(result);broadcast({type:'result',players:publicPlayers(),result})}byId('party-result-icon').textContent=win?'🏆':'🕯️';byId('party-result-title').textContent=win?'Победа отряда':'Отряд отступил';byId('party-result-title').className='text-4xl title-font mb-3 '+(win?'text-emerald-300':'text-red-300');byId('party-result-text').textContent=result.message;byId('modal-party-result').classList.add('open')}
  function applyLocalProgress(result){if(!result)return;if(typeof result.xp==='number'){state.xp=(state.xp||0)+result.xp;while(state.xp>=state.nextXp){state.xp-=state.nextXp;state.heroLvl++;state.statPoints+=6;state.nextXp=Math.floor(state.nextXp*1.5)}}if(typeof result.gold==='number')state.gold=(state.gold||0)+result.gold;if(typeof result.level==='number')state.level=result.level}
  window.continueCoopAdventure=function(){byId('modal-party-result').classList.remove('open');if(partyNet.role==='host'){if(partyNet.result?.win&&state.level>=state.maxLevel){partyNet.battle=null;partyNet.started=false;broadcast({type:'continue',players:publicPlayers(),level:state.level,victory:true,result:{}});partyNet.result=null;byId('modal-victory').classList.remove('hidden');return}if(partyNet.result?.win){state.level=Math.min(state.maxLevel,state.level+1);partyNet.level=state.level}else{partyNet.level=state.level}partyNet.battle=null;partyNet.started=false;partyNet.result=null;broadcast({type:'continue',players:publicPlayers(),level:partyNet.level,result:{}});broadcastLobby();showScreen('map')}else{partyNet.battle=null;showScreen('map')}};
- const originalStartCombat=oldStartCombat;
- window.startCombat=function(){if(partyNet.role==='host'&&partyNet.roomId){if(!partyNet.started)startCoopAdventure();return}if(partyNet.role==='guest'&&partyNet.roomId){setCoopStatus('Только ведущий начинает следующий бой.');return}if(STORY[state.level]&&!storySeen.has(state.level)){showStoryScene(state.level,()=>{originalStartCombat();renderSoloModels()});return}originalStartCombat();renderSoloModels()};
- const originalSelectHero=oldSelectHero;
- window.selectHero=function(type){originalSelectHero(type);showStoryScene(1)};
 
- function showStoryScene(level,callback){const entry=STORY[level]||{chapter:`Летопись · Уровень ${level}`,title:'Дорога продолжается',sigil:'📜',text:'Следы Безымянного ведут всё дальше. Впереди новые земли, противники и ответы о расколе Светового Сердца.',quote:'«История ещё не закончена». '};byId('story-chapter').textContent=entry.chapter;byId('story-title').textContent=entry.title;byId('story-sigil').textContent=entry.sigil;byId('story-text').textContent=entry.text;byId('story-quote').textContent=entry.quote||'';storyReturn=callback||null;storySeen.add(level);byId('modal-story').classList.add('open')}
- window.closeStoryScene=function(){byId('modal-story').classList.remove('open');const cb=storyReturn;storyReturn=null;if(cb)cb()};
- window.openChronicle=function(){showStoryScene(state.level||1)};
- window.ethShowBattleStoryIfNeeded=function(level,callback){
-  const nextLevel=Math.max(1,Number(level)||1);
-  if(!STORY[nextLevel]||storySeen.has(nextLevel))return false;
-  showStoryScene(nextLevel,typeof callback==='function'?callback:null);
-  return true;
- };
- const beginCoopAdventureNow=window.startCoopAdventure;window.startCoopAdventure=function(){if(partyNet.role==='host'&&STORY[state.level]&&!storySeen.has(state.level)){showStoryScene(state.level,()=>beginCoopAdventureNow());return}beginCoopAdventureNow()};
-
- function addChronicleButton(){const header=document.querySelector('#screen-map header .flex.gap-4');if(!header||byId('chronicle-button'))return;const b=document.createElement('button');b.id='chronicle-button';b.className='btn flex-1 md:flex-none px-5 py-3 bg-violet-700/80 hover:bg-violet-600 backdrop-blur-md rounded-xl font-bold border border-violet-400/30';b.textContent='📜 Летопись';b.onclick=openChronicle;header.appendChild(b)}
 
  function artifactSlot(item){const s=item.stats||{};if((s.atk||0)>0)return 'weapon';if((s.def||0)>0)return 'armor';if((s.mp||0)>0)return 'amulet';return 'ring'}
  function prepareArtifact(item){return {...item,id:item.id||('art-'+Date.now()+'-'+Math.random().toString(36).slice(2,8)),slot:item.slot||artifactSlot(item),equipped:!!item.equipped}}
@@ -2927,10 +2881,10 @@ body.dodge-open{overflow:hidden}
  window.closeMiningRhythm=function(){clearTimeout(rhythm.timer);rhythm.active=false;byId('modal-mining-rhythm').classList.remove('open');updateMineScreen()};
  function replaceMineControls(){const rock=byId('mine-rock');if(rock){rock.innerHTML='⛏️';rock.setAttribute('aria-label','Начать ритм-добычу');rock.onclick=mineRock;rock.style.cursor='pointer'}const btn=document.querySelector('#screen-mine button[onclick="mineRock()"]');if(btn)btn.innerHTML='🎵 Начать ритм-добычу';const msg=byId('mine-message');if(msg)msg.textContent='Пройди ритм-испытание, чтобы получить руду. Чем точнее попадания, тем ценнее добыча.';const label=document.querySelector('#screen-mine .text-slate-400');if(label&&label.textContent.trim()==='Прочность жилы')label.textContent='Ритм-испытание'}
  const oldShowScreen=showScreen;
- window.showScreen=function(id){oldShowScreen(id);if(id==='inventory')updateInventoryScreen();if(id==='mine')replaceMineControls();if(id==='map')addChronicleButton()};
+  window.showScreen=function(id){oldShowScreen(id);if(id==='inventory')updateInventoryScreen();if(id==='mine')replaceMineControls()};
  // Небольшие QoL-фиксы: камень не должен давать бесконечное золото.
  const stone=MINERALS.find(m=>m.id==='stone');if(stone)stone.gold=0;
- document.addEventListener('DOMContentLoaded',()=>{addChronicleButton();replaceMineControls()});
+  document.addEventListener('DOMContentLoaded',()=>{replaceMineControls()});
 
  // ===== НОВАЯ БОЕВАЯ СИСТЕМА: ПРИКАЗЫ + ФАЗА УКЛОНЕНИЯ =====
  const MONSTER_IDS = {
@@ -3438,34 +3392,34 @@ body.dodge-open{overflow:hidden}
   }
 
   // Stable solo entry point: initialise the battle directly instead of passing through
-  // the legacy chain of startCombat wrappers, which could abort after opening the story.
+  // Keep the legacy battle initializer behind one stable public entry point.
   window.ethStartSoloCombatDirect=function(){
     if(!state?.hero){showScreen('hero-select');return false;}
     if(partyNet.role==='host'&&partyNet.roomId){if(!partyNet.started)startCoopAdventure();return true;}
     if(partyNet.role==='guest'&&partyNet.roomId){setCoopStatus('Только ведущий начинает следующий бой.');return false;}
 
-    // Use the game's original battle initializer. It already owns the complete
-    // combat setup (screen, enemy, stats, log, abilities and HUD).
+    // Single entry point: the original engine creates combat state and the enemy;
+    // all battle modifiers and visual repairs are applied here, in a fixed order.
+    ensureExpansionState();
     setEnemyPool(Math.max(1,Number(state.level)||1));
     oldStartCombat();
 
     if(!state.combat?.isActive||!state.combat.enemy){
       throw new Error('Основной обработчик не создал активный бой.');
     }
+
     state.combat.potions=3;
     state.combat.phase='player';
+    soloMenuMode='root';
 
-    // Optional visual upgrades must never replace or interrupt core battle setup.
-    try{tuneSoloEnemy();}catch(error){console.warn('[Etheria] Enemy styling skipped:',error);}
-    try{renderSoloModels();}catch(error){console.warn('[Etheria] Model styling skipped:',error);}
-    try{renderSoloBattleMenu();}catch(error){console.warn('[Etheria] Battle menu styling skipped:',error);}
-    if(typeof ethRepairBattleHUD==='function'){
-      try{ethRepairBattleHUD();}catch(error){console.warn('[Etheria] Battle HUD repair skipped:',error);}
-    }
+    try{tuneSoloEnemy();}catch(error){console.warn('[Etheria] Enemy tuning skipped:',error);}
+    try{ethApplyNewGamePlusDifficulty();}catch(error){console.warn('[Etheria] NG+ scaling skipped:',error);}
+    try{renderSoloModels();}catch(error){console.warn('[Etheria] Model rendering skipped:',error);}
+    try{renderSoloBattleMenu();}catch(error){console.warn('[Etheria] Battle menu rendering skipped:',error);}
+    try{ethRepairBattleHUD();}catch(error){console.warn('[Etheria] HUD repair skipped:',error);}
 
     const screen=document.getElementById('screen-combat');
     if(!screen)throw new Error('Не найден экран сражения #screen-combat.');
-    // Recover the view explicitly if another screen wrapper failed to switch it.
     if(!screen.classList.contains('active')&&typeof window.showScreen==='function'){
       window.showScreen('combat');
     }
@@ -3478,15 +3432,8 @@ body.dodge-open{overflow:hidden}
     }
     return true;
   };
-  const previousWindowStartCombatForStages=window.startCombat;
-  window.startCombat=function(){
-    setEnemyPool(state.level||1);
-    const result=previousWindowStartCombatForStages();
-    if(state.combat?.isActive)tuneSoloEnemy();
-    return result;
-  };
-  const previousCloseStoryForBalance=window.closeStoryScene;
-  window.closeStoryScene=function(){previousCloseStoryForBalance();if(state.combat?.isActive)tuneSoloEnemy()};
+
+
 
   // Fairer damage: avoiding a bullet is rewarded; one mistake is not an instant defeat.
   beginSoloEnemyPhase=function(){
@@ -3756,20 +3703,8 @@ body.dodge-open{overflow:hidden}
     const warning=byId('combat-boss-warning');if(warning)warning.classList.toggle('hidden',!state.combat.enemy?.isBoss);
     if(typeof updateCombatUI==='function')updateCombatUI();
   }
-  const ethPreviousStartCombat=window.startCombat;
-  window.startCombat=function(...args){
-    soloMenuMode='root';
-    const result=ethPreviousStartCombat.apply(this,args);
-    if(state.combat?.isActive){state.combat.potions=3;state.combat.phase=state.combat.phase||'player'}
-    ethRepairBattleHUD();
-    return result;
-  };
-  const ethPreviousCloseStory=window.closeStoryScene;
-  window.closeStoryScene=function(...args){
-    const result=ethPreviousCloseStory.apply(this,args);
-    ethRepairBattleHUD();
-    return result;
-  };
+
+
   const ethBattleRepairStyle=document.createElement('style');
   ethBattleRepairStyle.textContent=`
     #screen-combat .z-10.glass.border-t-0{position:relative;z-index:15!important;min-height:154px!important}
@@ -4766,8 +4701,6 @@ body.dodge-open{overflow:hidden}
     state.level = 1;
     state._etheriaCampaignRecorded = false;
     state.combat = { isActive: false, hp: 0, mp: 0, enemy: null, playerBuffs: [] };
-    if (typeof storySeen !== 'undefined' && storySeen?.clear) storySeen.clear();
-    if (typeof storyReturn !== 'undefined') storyReturn = null;
     updateMapScreen();
     showScreen('map');
     const saved = await ethCloudSaveCurrentAccount();
@@ -4794,19 +4727,8 @@ body.dodge-open{overflow:hidden}
       updateCombatUI();
     }
   }
-  const ethStartCombatBeforeNgPlus = window.startCombat;
-  window.startCombat = function(...args) {
-    const result = ethStartCombatBeforeNgPlus.apply(this, args);
-    ethApplyNewGamePlusDifficulty();
-    return result;
-  };
-  // Story scenes start the actual fight from their close callback; apply NG+ scaling there too.
-  const ethCloseStoryBeforeNgPlus = window.closeStoryScene;
-  window.closeStoryScene = function(...args) {
-    const result = ethCloseStoryBeforeNgPlus.apply(this, args);
-    ethApplyNewGamePlusDifficulty();
-    return result;
-  };
+
+
 
   // Track cumulative XP for campaign battles only (practice does not affect account progress).
   const ethEndCombatBeforeLifetimeXp = window.endCombat;
@@ -5422,18 +5344,10 @@ body.dodge-open{overflow:hidden}
         if(feedback)feedback.textContent='Сначала выбери героя.';
         return false;
       }
-      // Do not bypass the chapter intro: close it, then resume this same action.
-      if(typeof window.ethShowBattleStoryIfNeeded==='function'){
-        const storyShown=window.ethShowBattleStoryIfNeeded(state.level,()=>window.ethStartMainBattle());
-        if(storyShown){
-          if(feedback)feedback.textContent='';
-          return true;
-        }
-      }
       if(typeof window.ethStartSoloCombatDirect!=='function'){
         throw new Error('Обработчик боя не загрузился. Загрузка игрового скрипта прервалась.');
       }
-      const started=window.ethStartSoloCombatDirect();
+      const started=window.startCombat();
       if(!started)throw new Error('Обработчик вернул отказ от запуска.');
       const combat=document.getElementById('screen-combat');
       if(!state.combat?.isActive||!state.combat.enemy){
@@ -5469,11 +5383,6 @@ body.dodge-open{overflow:hidden}
     event.stopImmediatePropagation();
     window.ethStartMainBattle();
   },true);
-  const ethCloseStoryBeforeBattleGuard=window.closeStoryScene;
-  if(typeof ethCloseStoryBeforeBattleGuard==='function')window.closeStoryScene=function(...args){
-    try{return ethCloseStoryBeforeBattleGuard.apply(this,args)}
-    catch(error){ethReportBattleStartError(error);return false;}
-  };
 
   // Make every solo entry route through the deterministic battle initializer above.
   window.startCombat=function(){return window.ethStartSoloCombatDirect();};
