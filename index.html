@@ -1106,6 +1106,7 @@ body.eth-inventory-open #screen-map.eth-game-shell{transform:translate3d(15vw,0,
 @media(prefers-reduced-motion:reduce){.eth-shop-roulette-track{transition:none}}
 </style>
 
+<style id="eth-training-overlay-fix">#soul-dodge-overlay{position:fixed!important;inset:0!important;z-index:2147483100!important;pointer-events:auto!important}#soul-dodge-overlay.open{display:grid!important}</style>
 </head>
 
 <body>
@@ -3449,9 +3450,19 @@ body.dodge-open{overflow:hidden}
   }
  }
  window.ethStartTrainingDodge=function(){
-  if(!state.hero){window.showScreen('hero-select');return}
-  byId('eth-training-result')?.classList.remove('open');
+  if(!state.hero){window.showScreen('hero-select');return false}
+  const overlay=byId('soul-dodge-overlay');
+  const canvas=byId('soul-dodge-canvas');
+  if(!overlay||!canvas)throw new Error('Не найдена арена уклонения или её холст.');
+  if(overlay.parentElement!==document.body)document.body.appendChild(overlay);
+  const result=byId('eth-training-result');
+  if(result&&result.parentElement!==document.body)document.body.appendChild(result);
+  result?.classList.remove('open');
+  overlay.style.zIndex='2147483100';
+  document.body.classList.remove('eth-inventory-open');
   startDodgeArena({enemy:{name:'Тренировочный скелет',icon:'💀',modelId:'skeleton'},level:1,duration:86400000,pattern:'fan',mode:'training',onComplete:ethFinishTrainingSession});
+  if(!overlay.classList.contains('open'))throw new Error('Арена не перешла в активное состояние.');
+  return true;
  };
  window.ethStopTrainingDodge=function(){if(dodge.active&&dodge.mode==='training')finishDodgeArena()};
  window.ethTrainingAgain=function(){byId('eth-training-result')?.classList.remove('open');window.ethStartTrainingDodge()};
@@ -6104,8 +6115,9 @@ body.dodge-open{overflow:hidden}
     const current = Math.min(20, Math.max(1, Math.floor(Number(state.pickaxeLevel) || 1)));
     if (current <= 7) return Math.floor(100 * Math.pow(1.5, current - 1));
     const base = Math.floor(100 * Math.pow(1.5, 6));
-    const growth = Math.pow(99000 / base, 1 / 12);
-    return Math.min(99000, Math.floor(base * Math.pow(growth, current - 7)));
+    const growth = Math.pow(100000 / base, 1 / 12);
+    // The final upgrade (19 -> 20) is exactly 100,000 gold.
+    return Math.min(100000, Math.floor(base * Math.pow(growth, current - 7)));
   }
   function ethMinePersist() {
     try {
@@ -6385,7 +6397,7 @@ body.dodge-open{overflow:hidden}
       return;
     }
     const nextLevel=upgradeLevel+1;
-    const nextPrice=nextLevel*20000;
+    const nextPrice=[20000,40000,60000,80000,100000][upgradeLevel];
     upgrade.disabled=upgradeLevel>=5||Number(state.gold)<nextPrice;
     upgrade.textContent=upgradeLevel>=5?'АВТОДОБЫЧА · МАКСИМУМ':'УЛУЧШИТЬ · '+nextPrice.toLocaleString('ru-RU')+' ◈';
     status.textContent='Установка активна. Она автоматически добывает руду и добавляет её в твои запасы.';
@@ -6404,7 +6416,7 @@ body.dodge-open{overflow:hidden}
     if(!state.autoMineUnlocked)return;
     const current=Math.min(5,Math.max(0,Number(state.autoMineLevel)||0));
     if(current>=5){ethMineSetMessage('Автодобыча уже достигла максимального уровня.');return}
-    const next=current+1,price=next*20000;
+    const next=current+1,price=[20000,40000,60000,80000,100000][current];
     if((Number(state.gold)||0)<price){ethMineSetMessage('Для улучшения автодобычи нужно '+price.toLocaleString('ru-RU')+' ◈.');return}
     state.gold-=price;state.autoMineLevel=next;
     state.autoMineNextAt=Date.now()+ethMineAutoIntervalMs();
@@ -6541,35 +6553,52 @@ body.dodge-open{overflow:hidden}
   };
 
   let ethTrainingTransitionBusy=false;
+  function ethTrainingToast(message){
+    const map=document.getElementById('eth-game-map-view');
+    if(!map)return;
+    map.querySelector('.eth-world-map-toast')?.remove();
+    const toast=document.createElement('div');
+    toast.className='eth-world-map-toast';
+    toast.textContent=message;
+    map.appendChild(toast);
+    setTimeout(()=>toast.remove(),3800);
+  }
   window.ethEnterTrainingFromMap=function(trigger){
     if(ethTrainingTransitionBusy)return;
-    if(typeof window.ethStartTrainingDodge!=='function'){
-      console.error('[Etheria] Не подключён движок тренировочного уклонения.');
-      const map=document.getElementById('eth-game-map-view');
-      if(map){const toast=document.createElement('div');toast.className='eth-world-map-toast';toast.textContent='Зал тренировок не загрузился. Обнови страницу.';map.appendChild(toast);setTimeout(()=>toast.remove(),3200)}
+    const overlay=document.getElementById('soul-dodge-overlay');
+    const canvas=document.getElementById('soul-dodge-canvas');
+    if(typeof window.ethStartTrainingDodge!=='function'||!overlay||!canvas){
+      console.error('[Etheria TRAIN] Arena is not ready.',{start:typeof window.ethStartTrainingDodge,overlay:!!overlay,canvas:!!canvas});
+      ethTrainingToast('Тренировочная арена не загрузилась. Перезагрузи игру.');
       return;
     }
     ethTrainingTransitionBusy=true;
-    const layer=document.createElement('div'),circle=document.createElement('div');
-    layer.className='eth-mine-transition-layer';circle.className='eth-mine-transition-circle';layer.appendChild(circle);
-    const sourceIcon=trigger&&trigger.querySelector('.eth-world-map-sign-icon');let icon=null;
-    if(sourceIcon){
-      const rect=sourceIcon.getBoundingClientRect();icon=document.createElement('div');icon.className='eth-mine-transition-icon';
-      icon.textContent=sourceIcon.textContent||'🎯';icon.style.left=rect.left+'px';icon.style.top=rect.top+'px';layer.appendChild(icon);
-      requestAnimationFrame(()=>{icon.style.left=Math.round(window.innerWidth/2-21)+'px';icon.style.top=Math.round(window.innerHeight/2-21)+'px';icon.classList.add('centered')});
-    }
-    document.body.appendChild(layer);requestAnimationFrame(()=>requestAnimationFrame(()=>circle.classList.add('expanded')));
-    setTimeout(()=>{
-      if(icon)icon.classList.add('fade');
+    try{
+      if(overlay.parentElement!==document.body)document.body.appendChild(overlay);
       const result=document.getElementById('eth-training-result');
       if(result&&result.parentElement!==document.body)document.body.appendChild(result);
-      document.getElementById('screen-training')?.remove();
       document.body.classList.remove('eth-inventory-open','dodge-open');
-      window.ethStartTrainingDodge();
-      requestAnimationFrame(()=>circle.classList.add('shrinking'));
-    },540);
-    setTimeout(()=>{layer.remove();ethTrainingTransitionBusy=false},1080);
+      const started=window.ethStartTrainingDodge();
+      if(started===false)ethTrainingToast('Сначала выбери героя, затем можно войти в зал тренировок.');
+    }catch(error){
+      console.error('[Etheria TRAIN] Failed to start dodge arena:',error);
+      overlay.classList.remove('open');
+      document.body.classList.remove('dodge-open');
+      ethTrainingToast('Не удалось запустить тренировку: '+(error?.message||'ошибка арены'));
+    }finally{
+      ethTrainingTransitionBusy=false;
+    }
   };
+  if(!window.__ethTrainingClickBound){
+    window.__ethTrainingClickBound=true;
+    document.addEventListener('click',event=>{
+      const target=event.target instanceof Element?event.target.closest('.eth-world-map-train'):null;
+      if(!target)return;
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      window.ethEnterTrainingFromMap(target);
+    },true);
+  }
 
   window.ethEnterMineFromMap = function(trigger) {
     if (ethMineTransitionBusy) return;
