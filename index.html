@@ -6496,7 +6496,7 @@ body.dodge-open{overflow:hidden}
     const boost=Math.max(1,Number(state.shopBoosts?.chanceMultiplier)||1);
     const weighted=rates.map(([rarity,weight])=>({rarity,weight:weight*Math.pow(boost,ethShopRarityRank(rarity))}));
     const total=weighted.reduce((sum,item)=>sum+item.weight,0);
-    return weighted.map(item=>item.rarity.toUpperCase()+' '+(item.weight/total*100).toFixed(1).replace(/\\.0$/,'')+'%').join(' · ');
+    return weighted.map(item=>item.rarity.toUpperCase()+' '+(item.weight/total*100).toFixed(1).replace(/\.0$/,'')+'%').join(' · ');
   }
   function ethShopRollRarity(rates,rng,useBoost=true){
     const chanceBoost=useBoost?(Number(state.shopBoosts?.chanceMultiplier)||1):1;
