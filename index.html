@@ -6483,8 +6483,8 @@ body.dodge-open{overflow:hidden}
   function ethShopRarityRank(rarity){
     return ({common:0,uncommon:1,rare:2,epic:3,legendary:4,holy:5,darkness:6})[rarity]||0;
   }
-  function ethShopRollRarity(rates,rng){
-    const chanceBoost=Number(state.shopBoosts?.chanceMultiplier)||1;
+  function ethShopRollRarity(rates,rng,useBoost=true){
+    const chanceBoost=useBoost?(Number(state.shopBoosts?.chanceMultiplier)||1):1;
     const weights=rates.map(([rarity,weight])=>weight*Math.pow(chanceBoost,ethShopRarityRank(rarity)));
     const total=weights.reduce((sum,value)=>sum+value,0);
     let roll=rng()*total;
@@ -6507,7 +6507,7 @@ body.dodge-open{overflow:hidden}
     selectedTitles.forEach((item,index)=>stock.push({id:'title-'+cycle+'-'+index,kind:'title',title:item.name,name:item.name,icon:item.icon,price:item.price,desc:item.desc,rarity:'ТИТУЛ'}));
     selectedCases.forEach((item,index)=>stock.push({id:'case-'+cycle+'-'+index,kind:'case',tier:item.id,name:item.name,icon:item.icon,price:item.casePrice,desc:'Кейс открывается только ключом своей редкости.',rarity:item.id.toUpperCase()}));
     for(let index=0;index<2;index++){
-      const rarity=ethShopRollRarity(rarityRates,rng);
+      const rarity=ethShopRollRarity(rarityRates,rng,false);
       const artifact=ethShopRandomArtifact(rarity,rng);
       stock.push({id:'artifact-'+cycle+'-'+index,kind:'artifact',artifact,name:artifact.name,icon:'✧',price:Math.max(700,Math.round((900+ethShopRarityRank(rarity)*850)*(0.85+rng()*.35)/50)*50),desc:artifact.desc,rarity:artifact.rarityName,color:artifact.color});
     }
