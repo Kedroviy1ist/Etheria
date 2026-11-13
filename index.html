@@ -1374,9 +1374,9 @@ checkEtheriaConnection();
               <path d="M505 410 C610 350 690 252 850 165" fill="none" stroke="#a5744d" stroke-width="19" stroke-linecap="round"/>
               <path d="M490 550 Q470 505 491 470 M518 486 Q540 450 522 416 M488 356 Q461 332 477 305" fill="none" stroke="#d29b63" stroke-width="5" stroke-linecap="round" opacity=".45"/>
             </svg>
-            <button class="eth-world-map-sign eth-world-map-train" type="button" onclick="ethWorldMapLocked(this,'TRAIN')" aria-label="TRAIN — откроется позже">
-              <span class="eth-world-map-sign-icon">🚂</span>
-              <span><b>TRAIN</b><small>Железная дорога</small></span>
+            <button class="eth-world-map-sign eth-world-map-train" type="button" onclick="ethEnterTrainingFromMap(this)" aria-label="Открыть зал тренировок">
+              <span class="eth-world-map-sign-icon">🎯</span>
+              <span><b>TRAIN</b><small>Зал тренировок</small></span>
             </button>
             <button class="eth-world-map-sign eth-world-map-shop" type="button" onclick="ethEnterShopFromMap(this)" aria-label="Открыть лавку Этерии">
               <span class="eth-world-map-sign-icon">⚒</span>
@@ -1502,7 +1502,7 @@ checkEtheriaConnection();
           <div class="eth-mine-header-actions">
             <div class="eth-mine-balance"><small>ЗОЛОТО</small><b><span id="gold-display">0</span> <i>◈</i></b></div>
             <div class="eth-mine-balance eth-mine-dark-balance"><small>DARK COIN</small><b><span id="eth-mine-dark-coins">0</span> <i>◆</i></b></div>
-            <div class="eth-mine-tool-level"><span>⛏</span><div><small>КИРКА</small><b><span id="pickaxe-level">1</span> / 6</b></div></div>
+            <div class="eth-mine-tool-level"><span>⛏</span><div><small>КИРКА</small><b><span id="pickaxe-level">1</span> / 20</b></div></div>
             <button class="eth-mine-back" onclick="showScreen('map')" type="button">← ВЕРНУТЬСЯ</button>
           </div>
         </header>
@@ -1583,11 +1583,11 @@ checkEtheriaConnection();
               <div class="eth-mine-card-kicker">ИНСТРУМЕНТ</div>
               <div class="eth-mine-pickaxe-art">⛏</div>
               <h3>Кирка искателя</h3>
-              <div class="eth-mine-level-line"><span>УРОВЕНЬ</span><b><span id="eth-mine-upgrade-count">0</span> / 5 улучшений</b></div>
-              <div id="eth-mine-upgrade-dots" class="eth-mine-upgrade-dots" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div>
-              <p>Каждое улучшение повышает вес меди, алмаза и DARK COIN на 50%.</p>
+              <div class="eth-mine-level-line"><span>УРОВЕНЬ</span><b><span id="eth-mine-upgrade-count">0</span> / 19 улучшений</b></div>
+              <div id="eth-mine-upgrade-dots" class="eth-mine-upgrade-dots" aria-hidden="true"></div>
+              <p>Новые уровни открывают дополнительные жилы и повышают вероятность более ценной руды. После 8-го уровня цена резко растёт.</p>
               <button id="eth-mine-upgrade-button" class="eth-mine-upgrade" type="button" onclick="upgradePickaxe()">УЛУЧШИТЬ · <b id="pickaxe-cost">100</b> ◈</button>
-              <small id="eth-mine-upgrade-status" class="eth-mine-upgrade-status">Доступно 5 улучшений</small>
+              <small id="eth-mine-upgrade-status" class="eth-mine-upgrade-status">Доступно 19 улучшений</small>
             </section>
 
             <section class="eth-mine-card">
@@ -5584,6 +5584,7 @@ body.dodge-open{overflow:hidden}
 
 <script>
 (function(){
+  document.body.insertAdjacentHTML('beforeend', "<style id=\"eth-training-hall-style\">\n.eth-training-screen{align-items:center;justify-content:center;min-height:100vh;padding:24px;overflow:auto;background:radial-gradient(ellipse at 50% 10%,#463249,#171b2c 46%,#080b14);color:#f7eadb}\n.eth-training-room{width:min(940px,100%);padding:clamp(20px,4vw,38px);border:1px solid #dfb18655;border-radius:22px 36px;background:linear-gradient(145deg,#2a222cf5,#0e121ef7);box-shadow:0 24px 70px #0008}\n.eth-training-kicker{color:#dcae7e;font-size:10px;font-weight:1000;letter-spacing:.28em}\n.eth-training-title{margin:9px 0;color:#fff0d7;font-family:Georgia,serif;font-size:clamp(30px,5vw,48px);font-weight:900}\n.eth-training-copy{max-width:690px;color:#c4b3a8;font-size:14px;line-height:1.7}\n.eth-training-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:23px 0}\n.eth-training-rule{padding:15px;border:1px solid #e1b28333;border-radius:12px 18px;background:#070a1277}\n.eth-training-rule b{display:block;margin-bottom:5px;color:#ffe0b5;font-size:12px}.eth-training-rule span{color:#b5a49a;font-size:11px;line-height:1.5}\n.eth-training-actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:22px}\n.eth-training-start,.eth-training-back{min-height:48px;padding:12px 20px;border:1px solid #c58f60;border-radius:10px 15px;font-size:11px;font-weight:1000;letter-spacing:.1em}\n.eth-training-start{background:linear-gradient(120deg,#d99a62,#8e4c3d);color:#281611;box-shadow:0 5px 0 #241412}.eth-training-back{border-color:#d0ae914d;background:#0a0d16b3;color:#efdbc8}\n.eth-training-result{position:fixed;inset:0;z-index:2147482900;display:none;place-items:center;padding:18px;background:#04060cdc;backdrop-filter:blur(7px)}.eth-training-result.open{display:grid}\n.eth-training-result-panel{width:min(460px,100%);padding:28px;border:1px solid #e6b88966;border-radius:19px 29px;background:linear-gradient(145deg,#312530,#101521);color:#f7e7d6;text-align:center;box-shadow:0 25px 80px #0009}\n.eth-training-result-panel h2{margin:9px 0;color:#ffe6c6;font-size:28px}.eth-training-result-time{color:#ffe0a8;font-size:26px;font-weight:1000}.eth-training-result-xp{margin:8px 0;color:#92e3ad;font-size:19px;font-weight:1000}\n.eth-training-result-note{min-height:36px;color:#b7a69a;font-size:12px;line-height:1.5}.eth-training-result-save{min-height:18px;color:#8995a8;font-size:10px}\n.eth-training-result-actions{display:flex;justify-content:center;flex-wrap:wrap;gap:9px;margin-top:18px}.eth-training-result-actions button{padding:10px 14px;border:1px solid #dab08561;border-radius:9px;background:#634233;color:#ffe6ce;font-size:10px;font-weight:1000}.eth-training-result-actions button:last-child{background:#232b3d}\n@media(max-width:640px){.eth-training-grid{grid-template-columns:1fr}.eth-training-actions>*{flex:1}.eth-training-room{border-radius:16px 24px}}\n#dodge-training-exit{padding:9px 12px;border:1px solid #f8717166;border-radius:9px;background:#7f1d1d80;color:#fecaca;font-size:10px;font-weight:900}\n</style>\n<section id=\"screen-training\" class=\"screen flex-col eth-training-screen\">\n <div class=\"eth-training-room\">\n  <div class=\"eth-training-kicker\">TRAIN · ПОЛИГОН УКЛОНЕНИЯ</div>\n  <h1 class=\"eth-training-title\">Зал тренировок</h1>\n  <p class=\"eth-training-copy\">Враг атакует без остановки. Не нужно наносить ответные удары — двигайся по арене и избегай всех атак. Первая отметка попадания завершит попытку. Чем дольше продержишься, тем больше опыта получишь.</p>\n  <div class=\"eth-training-grid\">\n   <div class=\"eth-training-rule\"><b>⌨️ WASD / стрелки</b><span>Управляй движением героя с клавиатуры.</span></div>\n   <div class=\"eth-training-rule\"><b>🖱️ Мышь / касание</b><span>Можно перемещать героя указателем или пальцем по арене.</span></div>\n   <div class=\"eth-training-rule\"><b>✦ Опыт за выживание</b><span>За каждую секунду без попаданий начисляется 2 базового опыта. Усиление опыта тоже учитывается.</span></div>\n  </div>\n  <div class=\"eth-training-actions\">\n   <button class=\"eth-training-start\" type=\"button\" onclick=\"ethStartTrainingDodge()\">НАЧАТЬ УКЛОНЕНИЕ</button>\n   <button class=\"eth-training-back\" type=\"button\" onclick=\"showScreen('map')\">← НА КАРТУ</button>\n  </div>\n </div>\n <div id=\"eth-training-result\" class=\"eth-training-result\" role=\"dialog\" aria-modal=\"true\" aria-label=\"Результат тренировки\">\n  <div class=\"eth-training-result-panel\">\n   <div class=\"eth-training-kicker\">ПОПЫТКА ЗАВЕРШЕНА</div><h2>Результат уклонения</h2>\n   <div id=\"eth-training-result-time\" class=\"eth-training-result-time\">0.0 сек.</div>\n   <div id=\"eth-training-result-xp\" class=\"eth-training-result-xp\">+0 опыта</div>\n   <p id=\"eth-training-result-note\" class=\"eth-training-result-note\">Попадание завершило попытку.</p>\n   <p id=\"eth-training-result-save\" class=\"eth-training-result-save\">Сохранение результата…</p>\n   <div class=\"eth-training-result-actions\">\n    <button type=\"button\" onclick=\"ethTrainingAgain()\">ЕЩЁ РАЗ</button><button type=\"button\" onclick=\"ethTrainingDismiss()\">В ЗАЛ</button><button type=\"button\" onclick=\"ethTrainingDismiss();showScreen('map')\">НА КАРТУ</button>\n   </div>\n  </div>\n </div>\n</section>");
   let ethCurrentGameTab='main';
   let ethSelectedChapter=1;
   let ethAvatarPreviewUrl=null;
@@ -6028,10 +6029,18 @@ body.dodge-open{overflow:hidden}
 
   // ===== SHAXTA / MINE OVERHAUL =====
   const ETH_MINE_DROPS = [
-    { id: 'stone', name: 'Камень', icon: '🪨', gold: 5, weight: 60 },
-    { id: 'copper', name: 'Медь', icon: '🟠', gold: 50, weight: 30 },
-    { id: 'diamond', name: 'Алмаз', icon: '💎', gold: 500, weight: 9.99 },
-    { id: 'darkCoin', name: 'DARK COIN', icon: '◆', gold: 0, weight: 0.01, dark: true }
+    { id: 'stone', name: 'Камень', icon: '🪨', gold: 5, weight: 60, rank: 0, minLevel: 1 },
+    { id: 'copper', name: 'Медь', icon: '🟠', gold: 50, weight: 30, rank: 1, minLevel: 1 },
+    { id: 'iron', name: 'Железо', icon: '⚙️', gold: 110, weight: 14, rank: 2, minLevel: 3 },
+    { id: 'silver', name: 'Серебро', icon: '🥈', gold: 180, weight: 9, rank: 3, minLevel: 4 },
+    { id: 'goldOre', name: 'Золотая руда', icon: '🟡', gold: 330, weight: 6, rank: 4, minLevel: 5 },
+    { id: 'crystal', name: 'Кристалл', icon: '💠', gold: 520, weight: 4.5, rank: 5, minLevel: 7 },
+    { id: 'diamond', name: 'Алмаз', icon: '💎', gold: 500, weight: 9.99, rank: 6, minLevel: 1 },
+    { id: 'mythril', name: 'Мифрил', icon: '🔷', gold: 1000, weight: 2.2, rank: 7, minLevel: 9 },
+    { id: 'cobalt', name: 'Кобальт', icon: '🟦', gold: 1800, weight: 1.4, rank: 8, minLevel: 11 },
+    { id: 'orichalcum', name: 'Орихалк', icon: '🧿', gold: 3200, weight: 0.8, rank: 9, minLevel: 14 },
+    { id: 'etherium', name: 'Этериум', icon: '🔮', gold: 6000, weight: 0.25, rank: 10, minLevel: 17 },
+    { id: 'darkCoin', name: 'DARK COIN', icon: '◆', gold: 0, weight: 0.01, rank: 11, minLevel: 1, dark: true }
   ];
   const ETH_MINE_SPOTS = [
     { left: 29, top: 38, crack: 'M 175 153 L 208 179 L 193 207 L 222 230 L 212 258' },
@@ -6044,21 +6053,29 @@ body.dodge-open{overflow:hidden}
   let ethMineTransitionBusy = false;
 
   function ethMineUpgradeCount() {
-    return Math.min(5, Math.max(0, Math.floor(Number(state.pickaxeLevel) || 1) - 1));
+    return Math.min(19, Math.max(0, Math.floor(Number(state.pickaxeLevel) || 1) - 1));
   }
   function ethMineChances() {
-    const boost = Math.pow(1.5, ethMineUpgradeCount());
+    const level = Math.min(20, Math.max(1, Math.floor(Number(state.pickaxeLevel) || 1)));
+    const upgrades = ethMineUpgradeCount();
     const chanceBoost = window.ethShopRewardMultiplier ? window.ethShopRewardMultiplier('chance') : 1;
-    const weights = ETH_MINE_DROPS.map((drop, index) => index === 0 ? drop.weight : drop.weight * boost * chanceBoost);
+    const available = ETH_MINE_DROPS.filter(drop => level >= (Number(drop.minLevel) || 1));
+    const weights = available.map(drop => {
+      if (drop.dark || drop.id === 'stone') return drop.weight;
+      const rank = Math.max(1, Number(drop.rank) || 1);
+      return drop.weight * Math.pow(1.055, upgrades * Math.sqrt(rank)) * chanceBoost;
+    });
     const total = weights.reduce((sum, value) => sum + value, 0);
-    return ETH_MINE_DROPS.map((drop, index) => ({ ...drop, chance: weights[index] / total * 100 }));
+    return available.map((drop, index) => ({ ...drop, chance: weights[index] / total * 100 }));
   }
   function ethMineFormatChance(value) {
     const digits = value < 0.1 ? 3 : 2;
     return value.toFixed(digits).replace(/0+$/, '').replace(/\.$/, '') + '%';
   }
   function ethMineCost() {
-    return Math.floor(100 * Math.pow(1.5, Math.max(0, (Number(state.pickaxeLevel) || 1) - 1)));
+    const current = Math.min(20, Math.max(1, Math.floor(Number(state.pickaxeLevel) || 1)));
+    if (current <= 7) return Math.floor(100 * Math.pow(1.5, current - 1));
+    return Math.floor(100 * Math.pow(1.5, 6) * Math.pow(2.5, current - 7));
   }
   function ethMinePersist() {
     try {
@@ -6076,25 +6093,32 @@ body.dodge-open{overflow:hidden}
   }
   function ethMineRender() {
     if (typeof ensureExpansionState === 'function') ensureExpansionState();
+    state.pickaxeLevel = Math.min(20, Math.max(1, Math.floor(Number(state.pickaxeLevel) || 1)));
     const gold = document.getElementById('gold-display');
     const darkCoins = document.getElementById('eth-mine-dark-coins');
     const level = document.getElementById('pickaxe-level');
     const cost = document.getElementById('pickaxe-cost');
     if (gold) gold.textContent = String(Math.max(0, Number(state.gold) || 0));
     if (darkCoins) darkCoins.textContent = String(Math.max(0, Number(state.darkCoins) || 0));
-    if (level) level.textContent = String(Math.min(6, Math.max(1, Number(state.pickaxeLevel) || 1)));
+    if (level) level.textContent = String(Math.min(20, Math.max(1, Number(state.pickaxeLevel) || 1)));
     const upgrades = ethMineUpgradeCount();
     const upgradeCount = document.getElementById('eth-mine-upgrade-count');
     if (upgradeCount) upgradeCount.textContent = String(upgrades);
     const upgradeStatus = document.getElementById('eth-mine-upgrade-status');
     const upgradeButton = document.getElementById('eth-mine-upgrade-button');
-    const isMaxed = (Number(state.pickaxeLevel) || 1) >= 6;
+    const isMaxed = (Number(state.pickaxeLevel) || 1) >= 20;
     const nextCost = ethMineCost();
     if (cost) cost.textContent = isMaxed ? 'МАКС.' : String(nextCost);
     if (upgradeButton) upgradeButton.disabled = isMaxed || Number(state.gold) < nextCost;
-    if (upgradeStatus) upgradeStatus.textContent = isMaxed ? 'Все 5 улучшений установлены' : 'Следующий уровень повышает вес редкой добычи';
+    if (upgradeStatus) upgradeStatus.textContent = isMaxed ? 'Все 19 улучшений установлены' : 'Новый уровень усиливает шанс редкой руды';
     const upgradeDots = document.getElementById('eth-mine-upgrade-dots');
-    if (upgradeDots) [...upgradeDots.children].forEach((dot, index) => dot.classList.toggle('done', index < upgrades));
+    if (upgradeDots) {
+      if (upgradeDots.children.length !== 19) {
+        upgradeDots.replaceChildren();
+        for (let index = 0; index < 19; index++) upgradeDots.appendChild(document.createElement('i'));
+      }
+      [...upgradeDots.children].forEach((dot, index) => dot.classList.toggle('done', index < upgrades));
+    }
 
     const chances = ethMineChances();
     const chanceHost = document.getElementById('eth-mine-drop-chances');
@@ -6293,8 +6317,8 @@ body.dodge-open{overflow:hidden}
 
   window.upgradePickaxe = function() {
     const current = Math.max(1, Math.floor(Number(state.pickaxeLevel) || 1));
-    if (current >= 6) {
-      ethMineSetMessage('Кирка уже получила все пять улучшений.');
+    if (current >= 20) {
+      ethMineSetMessage('Кирка уже достигла максимального уровня 20.');
       ethMineRender();
       return;
     }
@@ -6306,7 +6330,7 @@ body.dodge-open{overflow:hidden}
     state.gold -= price;
     state.pickaxeLevel = current + 1;
     ethMineRender();
-    ethMineSetMessage('Кирка улучшена до уровня ' + state.pickaxeLevel + '! Вес шанса лучшей добычи вырос на 50%.');
+    ethMineSetMessage('Кирка улучшена до уровня ' + state.pickaxeLevel + '! Теперь доступны более редкие породы, а шанс ценной руды вырос.');
     ethMinePersist();
   };
 
@@ -6405,6 +6429,23 @@ body.dodge-open{overflow:hidden}
       }
       ethMapLockedBusy = false;
     }, 1080);
+  };
+
+  let ethTrainingTransitionBusy=false;
+  window.ethEnterTrainingFromMap=function(trigger){
+    if(ethTrainingTransitionBusy)return;
+    ethTrainingTransitionBusy=true;
+    const layer=document.createElement('div'),circle=document.createElement('div');
+    layer.className='eth-mine-transition-layer';circle.className='eth-mine-transition-circle';layer.appendChild(circle);
+    const sourceIcon=trigger&&trigger.querySelector('.eth-world-map-sign-icon');let icon=null;
+    if(sourceIcon){
+      const rect=sourceIcon.getBoundingClientRect();icon=document.createElement('div');icon.className='eth-mine-transition-icon';
+      icon.textContent=sourceIcon.textContent||'🎯';icon.style.left=rect.left+'px';icon.style.top=rect.top+'px';layer.appendChild(icon);
+      requestAnimationFrame(()=>{icon.style.left=Math.round(window.innerWidth/2-21)+'px';icon.style.top=Math.round(window.innerHeight/2-21)+'px';icon.classList.add('centered')});
+    }
+    document.body.appendChild(layer);requestAnimationFrame(()=>requestAnimationFrame(()=>circle.classList.add('expanded')));
+    setTimeout(()=>{if(icon)icon.classList.add('fade');window.showScreen('training');requestAnimationFrame(()=>circle.classList.add('shrinking'))},540);
+    setTimeout(()=>{layer.remove();ethTrainingTransitionBusy=false},1080);
   };
 
   window.ethEnterMineFromMap = function(trigger) {
