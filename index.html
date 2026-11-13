@@ -1107,9 +1107,41 @@ body.eth-inventory-open #screen-map.eth-game-shell{transform:translate3d(15vw,0,
 </style>
 
 <style id="eth-training-overlay-fix">#soul-dodge-overlay{position:fixed!important;inset:0!important;z-index:2147483100!important;pointer-events:auto!important}#soul-dodge-overlay.open{display:grid!important}</style>
+
+<style id="eth-maintenance-style">
+  html,body{margin:0!important;min-height:100%!important;background:#070b18!important}
+  body{overflow:hidden!important}
+  body>*:not(#eth-maintenance-screen){display:none!important}
+  #eth-maintenance-screen{position:fixed;inset:0;z-index:2147483647;display:grid;place-items:center;overflow:hidden;padding:24px;background:radial-gradient(ellipse at 50% 38%,rgba(48,65,111,.55) 0%,rgba(12,19,39,.96) 48%,#050812 100%);color:#f5edda;font-family:Ubuntu,Arial,sans-serif;text-align:center}
+  #eth-maintenance-screen:before,#eth-maintenance-screen:after{content:"";position:absolute;width: min(76vw,620px);aspect-ratio:1;border:1px solid rgba(222,185,111,.13);border-radius:50%;pointer-events:none}
+  #eth-maintenance-screen:after{width:min(92vw,760px);border-color:rgba(222,185,111,.07)}
+  .eth-maintenance-card{position:relative;z-index:1;width:min(100%,620px);padding:clamp(28px,6vw,58px) clamp(22px,5vw,48px);border:1px solid rgba(224,190,125,.32);border-radius:24px;background:linear-gradient(145deg,rgba(24,34,61,.94),rgba(10,16,32,.96));box-shadow:0 28px 90px rgba(0,0,0,.48),inset 0 1px rgba(255,255,255,.07)}
+  .eth-maintenance-mark{display:grid;place-items:center;width:76px;height:76px;margin:0 auto 24px;border:1px solid rgba(224,190,125,.48);border-radius:22px;color:#e8c77f;font-size:36px;box-shadow:0 0 42px rgba(224,190,125,.12)}
+  .eth-maintenance-kicker{margin:0 0 12px;color:#d7b878;font-size:11px;font-weight:700;letter-spacing:.28em;text-transform:uppercase}
+  .eth-maintenance-card h1{margin:0;color:#fff4d9;font-family:'Russo One',Ubuntu,sans-serif;font-size:clamp(28px,6vw,44px);line-height:1.15;letter-spacing:.02em}
+  .eth-maintenance-line{width:76px;height:2px;margin:24px auto;background:linear-gradient(90deg,transparent,#d9b66f,transparent)}
+  .eth-maintenance-copy{max-width:440px;margin:0 auto;color:#c4c9d7;font-size:15px;line-height:1.75}
+  .eth-maintenance-note{margin:28px 0 0;color:#8f9ab2;font-size:12px;letter-spacing:.04em}
+  .eth-maintenance-pulse{display:inline-block;width:7px;height:7px;margin-right:9px;border-radius:50%;background:#d9b66f;box-shadow:0 0 12px #d9b66f;animation:eth-maintenance-pulse 1.8s ease-in-out infinite}
+  @keyframes eth-maintenance-pulse{50%{opacity:.35;box-shadow:0 0 3px #d9b66f}}
+  @media(prefers-reduced-motion:reduce){.eth-maintenance-pulse{animation:none}}
+</style>
+
 </head>
 
 <body>
+
+<div id="eth-maintenance-screen" role="status" aria-live="polite">
+  <main class="eth-maintenance-card">
+    <div class="eth-maintenance-mark" aria-hidden="true">✧</div>
+    <p class="eth-maintenance-kicker">Хроники Этерии</p>
+    <h1>Технические работы</h1>
+    <div class="eth-maintenance-line"></div>
+    <p class="eth-maintenance-copy">Этерия временно закрыта на обслуживание. Мы проводим необходимые работы, чтобы мир игры снова стал доступен.</p>
+    <p class="eth-maintenance-note"><span class="eth-maintenance-pulse"></span>Портал временно недоступен</p>
+  </main>
+</div>
+
 
     <script>
         // Переключатель технических работ: true — показать экран, false — обычный вход в игру.
