@@ -6752,6 +6752,7 @@ body.dodge-open{overflow:hidden}
     if(ethShopTick){clearInterval(ethShopTick);ethShopTick=null}
     if(shop){shop.classList.remove('active','eth-view-active','eth-view-entering','eth-view-leaving');shop.hidden=true;shop.setAttribute('aria-hidden','true')}
     shell?.classList.remove('eth-shop-mode');
+    if(window.ethGameTab)window.ethGameTab('map');
   }
   window.ethShopBack=function(){
     ethShopRestoreView();
