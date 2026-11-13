@@ -987,6 +987,91 @@ body.eth-inventory-open #screen-map.eth-game-shell{transform:translate3d(15vw,0,
 @media(max-width:760px){.eth-world-map-canvas{min-height:520px}.eth-world-map-train{left:2%;top:8%;width:32%;min-height:72px;padding:8px}.eth-world-map-shop{left:38%;top:8%;width:27%;min-height:68px;padding:8px}.eth-world-map-sign-icon{font-size:23px}.eth-world-map-sign small{font-size:7px}.eth-world-map-mine{right:2%;top:20%;width:31%;min-width:0;height:210px}.eth-world-map-caption{font-size:7px;letter-spacing:.1em}}
 @media(max-width:480px){.eth-world-map-view{padding:12px}.eth-world-map-header h2{font-size:23px}.eth-world-map-canvas{min-height:480px}.eth-world-map-train{left:2%;top:8%;width:38%;gap:5px;transform:rotate(-2deg)}.eth-world-map-shop{left:43%;top:7%;width:31%;gap:5px}.eth-world-map-sign{min-height:65px;padding:7px}.eth-world-map-sign b{font-size:14px}.eth-world-map-sign-icon{font-size:20px}.eth-world-map-mine{right:4%;top:34%;width:52%;height:205px}.eth-world-map-caption{bottom:12px}}
 </style>
+
+<style id="eth-shop-overhaul">
+#screen-map.eth-shop-mode .eth-game-topbar{display:none!important}
+#screen-map.eth-shop-mode #eth-game-view-stage{position:relative;flex:1;min-height:0;height:100%;overflow:hidden}
+#screen-shop.eth-shop-screen{position:absolute;inset:0;z-index:31;width:100%;height:100%;min-height:0;padding:0!important;display:flex;overflow:hidden;background:#170f13;color:#f8e6d0;opacity:0;visibility:hidden;transform:none;filter:none;pointer-events:none;transition:opacity .25s ease}
+#screen-shop.eth-shop-screen.active.eth-view-active{display:flex;opacity:1;visibility:visible;pointer-events:auto}
+#screen-shop.eth-shop-screen[hidden]{display:none!important}
+.eth-shop-room{position:relative;isolation:isolate;display:flex;flex-direction:column;gap:13px;width:100%;min-height:100%;padding:clamp(12px,1.7vw,24px);overflow:auto;background:radial-gradient(ellipse at 15% 34%,rgba(174,57,54,.17),transparent 32%),radial-gradient(ellipse at 85% 7%,rgba(238,178,107,.16),transparent 27%),linear-gradient(145deg,#26191a 0%,#181519 45%,#100e13 100%)}
+.eth-shop-room:before{content:"";position:absolute;z-index:-2;inset:0;pointer-events:none;opacity:.55;background:repeating-linear-gradient(90deg,transparent 0 90px,rgba(10,7,9,.18) 91px 97px),linear-gradient(180deg,rgba(0,0,0,.06),transparent 32%,rgba(0,0,0,.35))}
+.eth-shop-room:after{content:"";position:absolute;z-index:-1;left:0;right:0;bottom:0;height:19%;pointer-events:none;background:repeating-linear-gradient(0deg,rgba(18,11,12,.94) 0 5px,rgba(112,66,42,.7) 6px 8px),linear-gradient(180deg,#503324,#1a1111);clip-path:polygon(0 23%,100% 23%,100% 100%,0 100%);opacity:.64}
+.eth-shop-header{display:flex;justify-content:space-between;align-items:center;gap:14px;padding:11px 14px;border:1px solid rgba(232,178,119,.3);border-radius:16px 27px 16px 27px;background:linear-gradient(115deg,rgba(56,34,33,.92),rgba(25,23,29,.94));box-shadow:0 12px 30px rgba(0,0,0,.27),inset 0 1px rgba(255,255,255,.06)}
+.eth-shop-heading{min-width:0}
+.eth-shop-kicker{color:#d69a66;font-size:9px;font-weight:1000;letter-spacing:.22em}
+.eth-shop-heading h1{margin:4px 0 3px;color:#ffedda;font-size:clamp(20px,2.25vw,30px);letter-spacing:.03em}
+.eth-shop-heading p{margin:0;color:#bda99b;font-size:11px}
+.eth-shop-header-right{display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+.eth-shop-wallet{display:flex;flex-direction:column;min-width:85px;padding:7px 10px;border:1px solid rgba(235,188,119,.25);border-radius:10px;background:rgba(8,8,11,.42)}
+.eth-shop-wallet small{color:#b99c7c;font-size:8px;font-weight:900;letter-spacing:.15em}
+.eth-shop-wallet b{color:#ffdfa8;font-size:15px}
+.eth-shop-wallet-dark b{color:#d6b1ff}
+.eth-shop-back{padding:10px 13px;border:1px solid #9a654d;border-radius:10px 16px;background:linear-gradient(130deg,#6c3e35,#3a2528);color:#ffe4ca;font-size:10px;font-weight:1000;letter-spacing:.08em;transition:transform .2s,filter .2s}
+.eth-shop-back:hover{transform:translateY(-2px);filter:brightness(1.17)}
+.eth-shop-layout{display:grid;grid-template-columns:minmax(205px,248px) minmax(0,1fr) 112px;gap:clamp(10px,1.35vw,18px);flex:1;min-height:430px;align-items:stretch}
+.eth-shop-witch-panel{position:relative;display:flex;flex-direction:column;align-items:center;min-width:0;padding:13px 11px 15px;border:1px solid rgba(212,135,101,.35);border-radius:17px 29px 17px 29px;background:linear-gradient(160deg,rgba(48,24,31,.97),rgba(19,17,25,.97));box-shadow:0 15px 36px rgba(0,0,0,.3),inset 0 1px rgba(255,255,255,.05);overflow:hidden}
+.eth-shop-witch-panel:before{content:"";position:absolute;inset:0;pointer-events:none;background:radial-gradient(ellipse at 50% 35%,rgba(185,48,70,.23),transparent 56%),linear-gradient(180deg,transparent 45%,rgba(0,0,0,.5))}
+.eth-shop-witch-caption{position:relative;z-index:1;display:flex;justify-content:space-between;width:100%;color:#d7a875;font-size:9px;font-weight:1000;letter-spacing:.18em}
+.eth-shop-witch-caption i{color:#f1c47e;font-style:normal}
+.eth-shop-witch{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;width:100%;min-height:245px;margin-top:5px;padding:0 4px 12px;border:0;border-bottom:9px solid #24110f;border-radius:48% 48% 10px 10px / 24% 24% 4px 4px;background:radial-gradient(ellipse at 50% 67%,rgba(198,70,73,.25),transparent 60%),linear-gradient(180deg,rgba(48,25,34,.2),rgba(7,7,11,.36));color:#f6dfce;cursor:pointer;transition:filter .2s,transform .2s}
+.eth-shop-witch:hover{filter:brightness(1.13);transform:translateY(-2px)}
+.eth-shop-witch:focus-visible{outline:2px solid #f6ca91;outline-offset:3px}
+.eth-shop-witch svg{display:block;width:min(100%,235px);height:clamp(205px,30vh,280px);filter:drop-shadow(0 12px 13px rgba(0,0,0,.55))}
+.eth-shop-witch-name{color:#dca47e;font-size:9px;font-weight:1000;letter-spacing:.23em}
+.eth-shop-witch b{color:#ffe7d7;font-family:Georgia,serif;font-size:19px;letter-spacing:.16em}
+.eth-shop-witch small{margin-top:4px;color:#a98d85;font-size:7px;font-weight:900;letter-spacing:.12em}
+.eth-shop-dialog{position:relative;z-index:1;width:100%;min-height:69px;margin-top:11px;padding:11px 12px;border:1px solid rgba(236,177,123,.34);border-radius:12px 18px;background:rgba(8,9,13,.62);color:#f2d7bd;font-family:Georgia,serif;font-size:12px;line-height:1.5;box-shadow:inset 0 1px rgba(255,255,255,.05)}
+.eth-shop-npc-note{position:relative;z-index:1;margin-top:9px;color:#9f8881;font-size:9px;line-height:1.45;text-align:center}
+.eth-shop-center{display:flex;flex-direction:column;gap:12px;min-width:0;padding:14px;border:1px solid rgba(223,168,110,.28);border-radius:17px 27px 17px 27px;background:linear-gradient(145deg,rgba(49,35,32,.86),rgba(23,22,28,.93));box-shadow:0 15px 36px rgba(0,0,0,.25),inset 0 1px rgba(255,255,255,.05)}
+.eth-shop-counter-top{display:flex;justify-content:space-between;align-items:center;gap:10px;min-width:0;padding:0 3px 10px;border-bottom:1px solid rgba(218,165,109,.2)}
+.eth-shop-counter-top h2{margin:4px 0 0;color:#ffecd5;font-size:clamp(19px,2vw,27px)}
+.eth-shop-refresh{padding:8px 10px;border:1px solid rgba(213,160,106,.28);border-radius:10px;background:rgba(11,10,13,.45);color:#bda38d;font-size:8px;font-weight:1000;letter-spacing:.1em;white-space:nowrap}
+.eth-shop-refresh b{display:block;margin-top:3px;color:#ffe0a8;font-size:14px;text-align:right}
+.eth-shop-stock{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:11px;align-content:start;flex:1;min-height:0}
+.eth-shop-item{position:relative;display:flex;flex-direction:column;min-width:0;min-height:148px;padding:13px;border:1px solid rgba(202,155,110,.27);border-radius:13px 21px 13px 21px;background:linear-gradient(145deg,rgba(75,50,43,.92),rgba(30,27,33,.96));box-shadow:0 8px 16px rgba(0,0,0,.2),inset 0 1px rgba(255,255,255,.045);transition:transform .2s,border-color .2s,box-shadow .2s}
+.eth-shop-item:hover{transform:translateY(-3px);border-color:rgba(244,195,129,.65);box-shadow:0 12px 22px rgba(0,0,0,.27),0 0 20px rgba(212,147,91,.08)}
+.eth-shop-item-top{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.eth-shop-item-icon{display:grid;place-items:center;width:37px;height:37px;flex:0 0 37px;border:1px solid rgba(226,184,127,.25);border-radius:11px;background:rgba(8,8,12,.42);font-size:21px}
+.eth-shop-rarity{color:#d3b28e;font-size:8px;font-weight:1000;letter-spacing:.13em;text-align:right}
+.eth-shop-item h3{margin:10px 0 4px;color:#ffead3;font-size:14px;line-height:1.2}
+.eth-shop-item p{margin:0 0 10px;color:#baa698;font-size:10px;line-height:1.45}
+.eth-shop-item-bottom{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:auto}
+.eth-shop-price{color:#ffd48f;font-size:12px;font-weight:1000;white-space:nowrap}
+.eth-shop-buy{padding:8px 11px;border:1px solid #b37a51;border-radius:9px 13px;background:linear-gradient(130deg,#e1ad73,#9c6047);color:#271611;font-size:9px;font-weight:1000;letter-spacing:.06em;transition:filter .2s,transform .2s}
+.eth-shop-buy:hover:not(:disabled){filter:brightness(1.13);transform:translateY(-1px)}
+.eth-shop-buy:disabled{opacity:.42;filter:grayscale(.8);cursor:not-allowed}
+.eth-shop-item.sold{opacity:.52;filter:saturate(.45)}
+.eth-shop-sold{position:absolute;top:11px;right:11px;padding:5px 7px;border:1px solid #927c6d;border-radius:7px;background:#191519;color:#e1c9b2;font-size:8px;font-weight:1000;letter-spacing:.1em}
+.eth-shop-feedback{min-height:28px;padding:8px 10px;border:1px solid rgba(212,164,115,.18);border-radius:9px;background:rgba(5,7,10,.38);color:#c9b49f;font-size:10px;line-height:1.4}
+.eth-shop-tabs{display:flex;flex-direction:column;gap:10px;min-width:0}
+.eth-shop-tab{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;min-height:107px;padding:10px 5px;border:1px solid rgba(223,170,119,.3);border-radius:13px 21px 13px 21px;background:linear-gradient(145deg,rgba(64,43,42,.96),rgba(24,23,29,.96));color:#bda38f;box-shadow:0 8px 16px rgba(0,0,0,.2);transition:transform .2s,border-color .2s,background .2s,color .2s}
+.eth-shop-tab:hover{transform:translateX(-3px);border-color:#e7b779;color:#ffe2bb}
+.eth-shop-tab.active{border-color:#f2c184;background:linear-gradient(145deg,#79513e,#39272b);color:#fff0d3;box-shadow:0 0 20px rgba(238,170,99,.13),inset 0 1px rgba(255,255,255,.12)}
+.eth-shop-tab>span{font-size:25px;color:#e6b87e}
+.eth-shop-tab>b{font-size:11px;font-weight:1000;letter-spacing:.16em}
+.eth-shop-tab>small{color:#b89e88;font-size:8px}
+.eth-shop-tab-dark{border-color:rgba(153,111,205,.38)}
+.eth-shop-tab-dark>span{color:#c7a1f2}
+.eth-shop-panel-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;align-content:start}
+.eth-shop-key-card{display:flex;flex-direction:column;gap:8px;min-width:0;padding:12px;border:1px solid rgba(210,165,117,.25);border-radius:12px 18px;background:linear-gradient(145deg,rgba(69,48,42,.91),rgba(27,25,31,.96))}
+.eth-shop-key-card h3{margin:0;color:#f5e1c9;font-size:13px}
+.eth-shop-key-card p{margin:0;color:#b9a596;font-size:9px;line-height:1.4}
+.eth-shop-key-count{color:#e7c38f;font-size:10px;font-weight:900}
+.eth-shop-key-actions{display:flex;flex-wrap:wrap;gap:6px;margin-top:auto}
+.eth-shop-key-actions .eth-shop-buy{flex:1}
+.eth-shop-empty{grid-column:1/-1;display:grid;place-items:center;min-height:170px;padding:20px;border:1px dashed rgba(214,174,130,.28);border-radius:14px;color:#bda995;font-size:12px;text-align:center;line-height:1.6}
+.eth-shop-dark-card{border-color:rgba(155,121,196,.29);background:linear-gradient(145deg,rgba(55,37,64,.9),rgba(25,21,33,.97))}
+.eth-shop-dark-card .eth-shop-price{color:#d8b5ff}
+.eth-shop-dark-card .eth-shop-buy{border-color:#a78aca;background:linear-gradient(130deg,#c7a5ed,#6f548d)}
+.eth-shop-dark-card .eth-shop-item-icon{border-color:#8e70b2;color:#e4c5ff}
+.eth-shop-floor{display:flex;justify-content:space-between;gap:12px;padding:5px 9px 0;color:rgba(214,179,143,.55);font-size:8px;font-weight:900;letter-spacing:.13em}
+.eth-shop-floor span:last-child{text-align:right}
+@media(max-width:1050px){.eth-shop-layout{grid-template-columns:minmax(180px,215px) minmax(0,1fr) 92px;gap:9px}.eth-shop-center{padding:11px}.eth-shop-witch-panel{padding:10px 8px}.eth-shop-tab{min-height:94px}}
+@media(max-width:760px){.eth-shop-room{padding:9px}.eth-shop-header{align-items:flex-start;flex-direction:column}.eth-shop-header-right{width:100%;justify-content:flex-start}.eth-shop-layout{grid-template-columns:minmax(0,1fr);min-height:auto}.eth-shop-witch-panel{display:grid;grid-template-columns:minmax(125px,40%) minmax(0,1fr);grid-template-rows:auto 1fr;align-items:center;gap:5px 10px}.eth-shop-witch-caption{grid-column:1/-1}.eth-shop-witch{grid-row:2;min-height:0;height:190px;margin:0}.eth-shop-witch svg{height:145px}.eth-shop-witch-name{font-size:7px}.eth-shop-witch b{font-size:13px}.eth-shop-witch small{font-size:6px}.eth-shop-dialog{grid-column:2;grid-row:2;align-self:center;margin:0}.eth-shop-npc-note{grid-column:1/-1;margin:0}.eth-shop-tabs{grid-row:1;flex-direction:row;order:-1}.eth-shop-tab{flex:1;min-height:68px}.eth-shop-tab>span{font-size:19px}.eth-shop-stock{min-height:280px}.eth-shop-floor{font-size:7px}}
+@media(max-width:460px){.eth-shop-counter-top{align-items:flex-start;flex-direction:column}.eth-shop-refresh{width:100%;display:flex;justify-content:space-between}.eth-shop-refresh b{display:inline;margin:0}.eth-shop-stock,.eth-shop-panel-grid{grid-template-columns:1fr}.eth-shop-item{min-height:132px}.eth-shop-header-right{display:grid;grid-template-columns:1fr 1fr}.eth-shop-back{grid-column:1/-1}.eth-shop-floor{flex-direction:column}.eth-shop-floor span:last-child{text-align:left}}
+@media(prefers-reduced-motion:reduce){.eth-shop-item,.eth-shop-tab,.eth-shop-buy,.eth-shop-back,.eth-shop-witch{transition:none!important}}
+</style>
 </head>
 
 <body>
@@ -1262,7 +1347,7 @@ checkEtheriaConnection();
               <span class="eth-world-map-sign-icon">🚂</span>
               <span><b>TRAIN</b><small>Железная дорога</small></span>
             </button>
-            <button class="eth-world-map-sign eth-world-map-shop" type="button" onclick="ethWorldMapLocked(this,'SHOP')" aria-label="SHOP — откроется позже">
+            <button class="eth-world-map-sign eth-world-map-shop" type="button" onclick="ethEnterShopFromMap(this)" aria-label="Открыть лавку Этерии">
               <span class="eth-world-map-sign-icon">⚒</span>
               <span><b>SHOP</b><small>Лавка путешественника</small></span>
             </button>
@@ -1321,6 +1406,76 @@ checkEtheriaConnection();
         </section>
       </div>
     </div>
+
+    <!-- Локация: лавка Верховной Ведьмы -->
+    <section id="screen-shop" class="screen eth-game-view eth-shop-screen" hidden aria-hidden="true">
+      <div class="eth-shop-room">
+        <header class="eth-shop-header">
+          <div class="eth-shop-heading">
+            <span class="eth-shop-kicker">ТОРГОВЫЙ ДОМ · СЕВЕРНЫЕ ПРЕДЕЛЫ</span>
+            <h1>Лавка Верховной Ведьмы</h1>
+            <p>Редкости, титулы и вещи, которые не встретишь на обычном рынке.</p>
+          </div>
+          <div class="eth-shop-header-right">
+            <div class="eth-shop-wallet"><small>ЗОЛОТО</small><b><span id="eth-shop-gold">0</span> ◈</b></div>
+            <div class="eth-shop-wallet eth-shop-wallet-dark"><small>DARK COIN</small><b><span id="eth-shop-dark-coins">0</span> ◆</b></div>
+            <button class="eth-shop-back" onclick="ethShopBack()" type="button">← НА КАРТУ</button>
+          </div>
+        </header>
+
+        <div class="eth-shop-layout">
+          <aside class="eth-shop-witch-panel">
+            <div class="eth-shop-witch-caption"><span>ХОЗЯЙКА ЛАВКИ</span><i>✦</i></div>
+            <button class="eth-shop-witch" type="button" onclick="ethShopTalk()" aria-label="Поговорить с Supreme Witch Calamitas">
+              <svg viewBox="0 0 280 320" role="img" aria-label="Оригинальная стилизованная иллюстрация ведьмы в тёмно-красной мантии">
+                <defs>
+                  <linearGradient id="ethWitchCape" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#6b1825"/><stop offset=".5" stop-color="#2b101a"/><stop offset="1" stop-color="#100d17"/></linearGradient>
+                  <linearGradient id="ethWitchHair" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ff6b61"/><stop offset=".55" stop-color="#a82037"/><stop offset="1" stop-color="#4a142c"/></linearGradient>
+                  <radialGradient id="ethWitchFace" cx=".42" cy=".25"><stop offset="0" stop-color="#fff0dc"/><stop offset="1" stop-color="#cda9a1"/></radialGradient>
+                  <filter id="ethWitchGlow"><feGaussianBlur stdDeviation="7"/></filter>
+                </defs>
+                <ellipse cx="140" cy="292" rx="105" ry="17" fill="#08070b" opacity=".6"/>
+                <path d="M54 300 Q49 232 75 185 L100 150 L180 150 L211 187 Q233 243 224 300Z" fill="url(#ethWitchCape)" stroke="#170b13" stroke-width="8"/>
+                <path d="M87 208 Q57 164 47 138 Q71 148 101 177 L128 224Z" fill="#7e1c31"/>
+                <path d="M190 207 Q225 163 238 137 Q212 145 180 178 L154 224Z" fill="#4a1427"/>
+                <path d="M103 166 L140 145 L178 167 L165 220 L140 246 L115 218Z" fill="#17131d" stroke="#a64b50" stroke-width="3"/>
+                <path d="M121 158 Q108 125 115 82 Q120 42 140 35 Q163 41 167 82 Q174 123 157 161Z" fill="url(#ethWitchFace)" stroke="#6c2935" stroke-width="4"/>
+                <path d="M112 81 Q91 47 107 19 Q120 28 127 48 Q140 16 158 12 Q162 42 169 53 Q190 29 193 24 Q203 76 169 105 L165 68 Q143 90 112 81Z" fill="url(#ethWitchHair)" stroke="#451224" stroke-width="4"/>
+                <path d="M113 57 Q88 41 79 9 Q105 17 124 39 M169 50 Q191 23 211 15 Q203 51 174 75" fill="none" stroke="#e34c5b" stroke-width="8" stroke-linecap="round"/>
+                <path d="M117 98 Q129 89 137 98 M146 98 Q154 89 164 98" fill="none" stroke="#8b263a" stroke-width="5" stroke-linecap="round"/>
+                <path d="M132 122 Q141 128 151 121" fill="none" stroke="#8a3440" stroke-width="3" stroke-linecap="round"/>
+                <path d="M103 151 Q82 117 92 87 Q106 103 119 111 M177 151 Q198 119 188 85 Q175 103 162 111" fill="none" stroke="#d33c51" stroke-width="12" stroke-linecap="round"/>
+                <path d="M97 163 Q140 183 183 163" fill="none" stroke="#d9a45d" stroke-width="5"/>
+                <path d="M140 171 L151 192 L140 207 L129 192Z" fill="#e3b66d" stroke="#fff0bd" stroke-width="2"/>
+                <circle cx="140" cy="193" r="20" fill="#ffb35c" opacity=".38" filter="url(#ethWitchGlow)"/>
+                <path d="M76 243 Q104 226 119 256 L104 284 Q83 281 76 243 M204 243 Q176 226 161 256 L176 284 Q197 281 204 243" fill="#25202b" stroke="#a94c53" stroke-width="3"/>
+              </svg>
+              <span class="eth-shop-witch-name">SUPREME WITCH</span>
+              <b>CALAMITAS</b>
+              <small>НАЖМИ, ЧТОБЫ УСЛЫШАТЬ СОВЕТ</small>
+            </button>
+            <div id="eth-shop-dialog" class="eth-shop-dialog" aria-live="polite">«Не спеши тратить всё золото. Иногда лучшая покупка — та, которую ты ещё не сделал».</div>
+            <div class="eth-shop-npc-note">Она видит больше, чем говорит. И почти никогда не повторяется.</div>
+          </aside>
+
+          <main class="eth-shop-center">
+            <div class="eth-shop-counter-top">
+              <div><span class="eth-shop-kicker" id="eth-shop-section-kicker">СЕГОДНЯШНЯЯ ВЫКЛАДКА</span><h2 id="eth-shop-section-title">Главная витрина</h2></div>
+              <div class="eth-shop-refresh">НОВЫЙ СТОК ЧЕРЕЗ <b id="eth-shop-countdown">05:00</b></div>
+            </div>
+            <div id="eth-shop-stock" class="eth-shop-stock" aria-live="polite"></div>
+            <div id="eth-shop-feedback" class="eth-shop-feedback" aria-live="polite">Выбери товар. Покупки и содержимое кейсов сохраняются в профиль.</div>
+          </main>
+
+          <nav class="eth-shop-tabs" aria-label="Разделы магазина">
+            <button class="eth-shop-tab active" id="eth-shop-tab-main" type="button" onclick="ethShopTab('main')"><span>▤</span><b>MAIN</b><small>Витрина</small></button>
+            <button class="eth-shop-tab" id="eth-shop-tab-keys" type="button" onclick="ethShopTab('keys')"><span>⚿</span><b>KEYS</b><small>Ключи</small></button>
+            <button class="eth-shop-tab eth-shop-tab-dark" id="eth-shop-tab-dark" type="button" onclick="ethShopTab('dark')"><span>◆</span><b>DARK</b><small>Особое</small></button>
+          </nav>
+        </div>
+        <div class="eth-shop-floor"><span>ЭТЕРИЯ · ЛАВКА ВЕРХОВНОЙ ВЕДЬМЫ</span><span>«ЦЕНА У КАЖДОЙ ВЕЩИ ЕСТЬ. НЕ У КАЖДОЙ — В ЗОЛОТЕ»</span></div>
+      </div>
+    </section>
 
     <!-- Подлокация: обновлённая шахта -->
     <div id="screen-mine" class="screen eth-game-view eth-mine-screen" hidden aria-hidden="true">
@@ -2629,7 +2784,7 @@ checkEtheriaConnection();
                     return;
                 }
                 
-                const xpGained = state.combat.enemy.xp;
+                const xpGained = Math.floor(state.combat.enemy.xp * (window.ethShopRewardMultiplier ? window.ethShopRewardMultiplier('xp') : 1));
                 state.xp += xpGained;
                 
                 getElement('result-xp').innerText = xpGained;
@@ -2665,7 +2820,7 @@ checkEtheriaConnection();
                     }
                 }
                 
-                const lootChance = state.combat.enemy.isBoss ? 1.0 : 0.35;
+                const lootChance = Math.min(1, (state.combat.enemy.isBoss ? 1.0 : 0.35) * (window.ethShopRewardMultiplier ? window.ethShopRewardMultiplier('chance') : 1));
                 if (Math.random() < lootChance) {
                     const roll = Math.random() * 105; 
                     let rarityKey = '';
@@ -3020,7 +3175,7 @@ body.dodge-open{overflow:hidden}
  }
  function sendPartyAction(index){if(partyNet.role==='host'){performPartyAction(partyNet.mySlot,index)}else if(partyNet.connection?.open){partyNet.connection.send({type:'action',slot:partyNet.mySlot,index})}}
  function finishPartyBattle(win){const b=partyNet.battle;if(!b||!b.active)return;b.active=false;const xp=win?b.enemy.xp:0;const gold=win?Math.max(10,Math.floor(xp/12)):0;partyNet.players.forEach(p=>{if(!p||p.isBot)return;if(win){p.xp+=xp;while(p.xp>=p.nextXp){p.xp-=p.nextXp;p.heroLvl++;p.statPoints+=6;p.nextXp=Math.floor(p.nextXp*1.5);p.maxHp+=10;p.hp=Math.min(p.maxHp,p.hp+10)}}});const result={win,xp,gold,level:partyNet.level,message:win?`Три героя одолели ${b.enemy.name}. Каждый игрок получил ${xp} опыта. В общей сокровищнице отряда +${gold} золота.`:`Отряд не смог одолеть ${b.enemy.name}. Можно подготовиться и попробовать снова.`};partyNet.result=result;if(partyNet.role==='host'){applyLocalProgress(result);broadcast({type:'result',players:publicPlayers(),result})}byId('party-result-icon').textContent=win?'🏆':'🕯️';byId('party-result-title').textContent=win?'Победа отряда':'Отряд отступил';byId('party-result-title').className='text-4xl title-font mb-3 '+(win?'text-emerald-300':'text-red-300');byId('party-result-text').textContent=result.message;byId('modal-party-result').classList.add('open')}
- function applyLocalProgress(result){if(!result)return;if(typeof result.xp==='number'){state.xp=(state.xp||0)+result.xp;while(state.xp>=state.nextXp){state.xp-=state.nextXp;state.heroLvl++;state.statPoints+=6;state.nextXp=Math.floor(state.nextXp*1.5)}}if(typeof result.gold==='number')state.gold=(state.gold||0)+result.gold;if(typeof result.level==='number')state.level=result.level}
+ function applyLocalProgress(result){if(!result)return;if(typeof result.xp==='number'){state.xp=(state.xp||0)+Math.floor(result.xp*(window.ethShopRewardMultiplier?window.ethShopRewardMultiplier('xp'):1));while(state.xp>=state.nextXp){state.xp-=state.nextXp;state.heroLvl++;state.statPoints+=6;state.nextXp=Math.floor(state.nextXp*1.5)}}if(typeof result.gold==='number')state.gold=(state.gold||0)+Math.floor(result.gold*(window.ethShopRewardMultiplier?window.ethShopRewardMultiplier('money'):1));if(typeof result.level==='number')state.level=result.level}
  window.continueCoopAdventure=function(){byId('modal-party-result').classList.remove('open');if(partyNet.role==='host'){if(partyNet.result?.win&&state.level>=state.maxLevel){partyNet.battle=null;partyNet.started=false;broadcast({type:'continue',players:publicPlayers(),level:state.level,victory:true,result:{}});partyNet.result=null;byId('modal-victory').classList.remove('hidden');return}if(partyNet.result?.win){state.level=Math.min(state.maxLevel,state.level+1);partyNet.level=state.level}else{partyNet.level=state.level}partyNet.battle=null;partyNet.started=false;partyNet.result=null;broadcast({type:'continue',players:publicPlayers(),level:partyNet.level,result:{}});broadcastLobby();showScreen('map')}else{partyNet.battle=null;showScreen('map')}};
 
 
@@ -4048,18 +4203,48 @@ body.dodge-open{overflow:hidden}
     return ethFallbackHash(pass,salt);
   }
   function ethNormName(name){return String(name||'').trim().toLocaleLowerCase('ru-RU')}
-  function ethProfileFromState(){return {heroType:state.hero?.type||null,level:state.level||1,newGamePlus:Math.max(0,Number(state.newGamePlus)||0),totalXpEarned:Math.max(0,Number(state.totalXpEarned)||0),campaignRecorded:!!state._etheriaCampaignRecorded,xp:state.xp||0,nextXp:state.nextXp||100,heroLvl:state.heroLvl||1,statPoints:state.statPoints||0,baseHp:state.baseHp||0,baseMp:state.baseMp||0,baseAtk:state.baseAtk||0,baseDef:state.baseDef||0,inventory:JSON.parse(JSON.stringify(state.inventory||[])),learnedAbilities:JSON.parse(JSON.stringify(state.learnedAbilities||[])),gold:state.gold||0,pickaxeLevel:state.pickaxeLevel||1,minerals:JSON.parse(JSON.stringify(state.minerals||{})),darkCoins:Math.max(0,Number(state.darkCoins)||0),mineRockHp:state.mineRockHp||5,mineRockMaxHp:state.mineRockMaxHp||5,evolved:!!state.evolved,evolutionPending:!!state.evolutionPending};}
+  function ethProfileFromState(){return {heroType:state.hero?.type||null,level:state.level||1,newGamePlus:Math.max(0,Number(state.newGamePlus)||0),totalXpEarned:Math.max(0,Number(state.totalXpEarned)||0),campaignRecorded:!!state._etheriaCampaignRecorded,xp:state.xp||0,nextXp:state.nextXp||100,heroLvl:state.heroLvl||1,statPoints:state.statPoints||0,baseHp:state.baseHp||0,baseMp:state.baseMp||0,baseAtk:state.baseAtk||0,baseDef:state.baseDef||0,inventory:JSON.parse(JSON.stringify(state.inventory||[])),learnedAbilities:JSON.parse(JSON.stringify(state.learnedAbilities||[])),gold:state.gold||0,pickaxeLevel:state.pickaxeLevel||1,minerals:JSON.parse(JSON.stringify(state.minerals||{})),darkCoins:Math.max(0,Number(state.darkCoins)||0),mineRockHp:state.mineRockHp||5,mineRockMaxHp:state.mineRockMaxHp||5,evolved:!!state.evolved,evolutionPending:!!state.evolutionPending,shopStockCycle:Number(state.shopStockCycle)||0,shopPurchased:JSON.parse(JSON.stringify(state.shopPurchased||{})),shopCases:JSON.parse(JSON.stringify(state.shopCases||{})),shopKeys:JSON.parse(JSON.stringify(state.shopKeys||{})),shopDarkOwned:JSON.parse(JSON.stringify(state.shopDarkOwned||[])),shopBoosts:JSON.parse(JSON.stringify(state.shopBoosts||{})),shopTitles:JSON.parse(JSON.stringify(state.shopTitles||[]))};}
   function ethSaveCurrentAccount(){if(!ethV4.account)return;const record=ethV4.accounts[ethNormName(ethV4.account.username)];if(!record)return;record.profile=ethProfileFromState();record.stats=record.stats||{};record.stats.gold=record.profile.gold;record.stats.bestLevel=Math.max(record.stats.bestLevel||1,record.profile.level||1);record.lastPlayed=new Date().toISOString();ethV4.account=record;ethSaveAccounts();ethRefreshAccountUI()}
   function ethRestoreProfile(record){
     const p=record?.profile;if(!p?.heroType)return false;
     const template=HERO_TEMPLATES[p.heroType]||HERO_TEMPLATES.warrior;
     state.hero={...template,type:p.heroType};state.level=Math.max(1,Math.min(50,Number(p.level)||1));state.newGamePlus=Math.max(0,Number(p.newGamePlus)||0);state.totalXpEarned=Math.max(0,Number(p.totalXpEarned)||0,Number(record?.stats?.totalXp)||0);state._etheriaCampaignRecorded=!!p.campaignRecorded;state.xp=Number(p.xp)||0;state.nextXp=Number(p.nextXp)||100;state.heroLvl=Number(p.heroLvl)||1;state.statPoints=Number(p.statPoints)||0;
     state.baseHp=Number(p.baseHp)||template.baseHp;state.baseMp=Number(p.baseMp)||template.baseMp;state.baseAtk=Number(p.baseAtk)||template.baseAtk;state.baseDef=Number(p.baseDef)||template.baseDef;
-    state.inventory=Array.isArray(p.inventory)?p.inventory.map(prepareArtifact):[];state.learnedAbilities=Array.isArray(p.learnedAbilities)?p.learnedAbilities:[];state.gold=Number(p.gold)||0;state.pickaxeLevel=Number(p.pickaxeLevel)||1;state.minerals=p.minerals||{};state.darkCoins=Math.max(0,Math.floor(Number(p.darkCoins)||0));state.mineRockHp=Number(p.mineRockHp)||5;state.mineRockMaxHp=Number(p.mineRockMaxHp)||5;state.evolved=!!p.evolved;state.evolutionPending=!!p.evolutionPending;
+    state.inventory=Array.isArray(p.inventory)?p.inventory.map(prepareArtifact):[];state.learnedAbilities=Array.isArray(p.learnedAbilities)?p.learnedAbilities:[];state.gold=Number(p.gold)||0;state.pickaxeLevel=Number(p.pickaxeLevel)||1;state.minerals=p.minerals||{};state.darkCoins=Math.max(0,Math.floor(Number(p.darkCoins)||0));state.mineRockHp=Number(p.mineRockHp)||5;state.mineRockMaxHp=Number(p.mineRockMaxHp)||5;state.evolved=!!p.evolved;state.evolutionPending=!!p.evolutionPending;state.shopStockCycle=Number(p.shopStockCycle)||0;state.shopPurchased=p.shopPurchased&&typeof p.shopPurchased==='object'?p.shopPurchased:{};state.shopCases=p.shopCases&&typeof p.shopCases==='object'?p.shopCases:{};state.shopKeys=p.shopKeys&&typeof p.shopKeys==='object'?p.shopKeys:{};state.shopDarkOwned=Array.isArray(p.shopDarkOwned)?p.shopDarkOwned:[];state.shopBoosts=p.shopBoosts&&typeof p.shopBoosts==='object'?p.shopBoosts:{};state.shopTitles=Array.isArray(p.shopTitles)?p.shopTitles:[];
     state.combat={isActive:false,hp:0,mp:0,enemy:null,playerBuffs:[]};updateMapScreen();return true;
   }
-  function ethTitlesFor(record){const a=Array.isArray(record?.titles)?record.titles:['Путник'];if(record?.role==='developer')return ['DEVELOPER'];return a.filter(t=>t!=='DEVELOPER')}
+  function ethTitlesFor(record){const a=Array.isArray(record?.titles)?record.titles:['Путник'];const shop=Array.isArray(record?.profile?.shopTitles)?record.profile.shopTitles:[];if(record?.role==='developer')return ['DEVELOPER'];return [...new Set([...a,...shop])].filter(t=>t!=='DEVELOPER')}
   function ethCurrentTitle(record){return record?.role==='developer'?'DEVELOPER':(record?.currentTitle||ethTitlesFor(record)[0]||'Путник')}
+  window.ethShopAccountReady=function(){return !!ethV4.account};
+  window.ethShopIsSpecialTitleActive=function(){return !!ethV4.account&&ethCurrentTitle(ethV4.account)==='Печать Верховной Ведьмы'};
+  window.ethShopUnlockProfileTitle=async function(title,autoEquip=false){
+    title=String(title||'').trim();
+    if(!title||!ethV4.account)throw new Error('Для покупки титула сначала войди в аккаунт.');
+    const titles=[...new Set([...ethTitlesFor(ethV4.account),title])];
+    if(ethCloudUser&&ethSupabaseClient){
+      const patch={titles};
+      if(autoEquip)patch.current_title=title;
+      const result=await ethSupabaseClient.from('profiles').update(patch).eq('id',ethCloudUser.id).select('id,titles,current_title').single();
+      if(result.error)throw new Error('Не удалось сохранить титул: '+result.error.message);
+      if(!result.data)throw new Error('База данных не подтвердила сохранение титула.');
+    }else if(ethV4.localOnly){
+      ethV4.account.titles=titles;
+      if(autoEquip)ethV4.account.currentTitle=title;
+      ethSaveAccounts();
+    }else{
+      throw new Error('Нет активного облачного профиля. Перезайди в аккаунт.');
+    }
+    ethV4.account.titles=titles;
+    ethV4.account.profile=ethV4.account.profile||{};
+    ethV4.account.profile.shopTitles=[...new Set([...(ethV4.account.profile.shopTitles||[]),title])];
+    if(autoEquip)ethV4.account.currentTitle=title;
+    state.shopTitles=[...new Set([...(state.shopTitles||[]),title])];
+    if(window.ethCloudSaveCurrentAccount)await window.ethCloudSaveCurrentAccount();
+    ethRefreshAccountUI();
+    await ethRenderLeaderboard();
+    if(window.ethRefreshProfileChrome)window.ethRefreshProfileChrome();
+    return true;
+  };
   function ethRefreshAccountUI(){
     const label=byId('eth-account-label'),admin=byId('eth-admin-open');
     if(label)label.textContent=ethV4.account?`${ethV4.account.username} · ${ethCurrentTitle(ethV4.account)}`:'Не выполнен вход';
@@ -4194,7 +4379,7 @@ body.dodge-open{overflow:hidden}
       ethV4.practice.active=false;byId('eth-practice-result').classList.add('open');return;
     }
     if(isVictory&&state.combat?.enemy&&!state.combat.rewardGoldApplied){
-      const enemy=state.combat.enemy;const reward=Math.max(8,Math.floor((enemy.xp||50)/(enemy.isBoss?5:10)));
+      const enemy=state.combat.enemy;const reward=Math.max(8,Math.floor((enemy.xp||50)/(enemy.isBoss?5:10)*(window.ethShopRewardMultiplier?window.ethShopRewardMultiplier('money'):1)));
       state.gold=(state.gold||0)+reward;enemy.rewardGoldApplied=true;
       const resultModal=byId('modal-result');if(resultModal){let g=byId('eth-result-gold');if(!g){g=document.createElement('div');g.id='eth-result-gold';g.className='text-amber-300 text-sm font-bold mb-3';byId('result-xp')?.parentElement?.after(g)}if(g)g.textContent=`Получено золота: +${reward} 🪙`}
       if(state.level===state.maxLevel){const a=ethV4.account;if(a){a.stats=a.stats||{};a.titles=Array.isArray(a.titles)?a.titles:['Путник'];a.stats.gold=state.gold||0;a.stats.bestLevel=50;if(!a.titles.includes('Спаситель Этерии'))a.titles.push('Спаситель Этерии');a.currentTitle='Спаситель Этерии'}}
@@ -5811,7 +5996,8 @@ body.dodge-open{overflow:hidden}
   }
   function ethMineChances() {
     const boost = Math.pow(1.5, ethMineUpgradeCount());
-    const weights = ETH_MINE_DROPS.map((drop, index) => index === 0 ? drop.weight : drop.weight * boost);
+    const chanceBoost = window.ethShopRewardMultiplier ? window.ethShopRewardMultiplier('chance') : 1;
+    const weights = ETH_MINE_DROPS.map((drop, index) => index === 0 ? drop.weight : drop.weight * boost * chanceBoost);
     const total = weights.reduce((sum, value) => sum + value, 0);
     return ETH_MINE_DROPS.map((drop, index) => ({ ...drop, chance: weights[index] / total * 100 }));
   }
@@ -6027,7 +6213,7 @@ body.dodge-open{overflow:hidden}
       rewardLabel = ' +1 DARK COIN';
     } else {
       state.minerals[drop.id] = (Number(state.minerals[drop.id]) || 0) + 1;
-      state.gold = Math.max(0, Number(state.gold) || 0) + drop.gold;
+      state.gold = Math.max(0, Number(state.gold) || 0) + Math.floor(drop.gold * (window.ethShopRewardMultiplier ? window.ethShopRewardMultiplier('money') : 1));
       rewardLabel = ' +' + drop.gold + ' золота';
     }
 
@@ -6217,6 +6403,425 @@ body.dodge-open{overflow:hidden}
     ethMineInitial.setAttribute('aria-hidden', 'true');
   }
 
+
+
+  // ===== ETHERIA SHOP =====
+  const ETH_SHOP_CASES = [
+    {id:'common',name:'Обычный кейс',icon:'📦',casePrice:250,keyPrice:400,rates:[['common',70],['uncommon',25],['rare',5]]},
+    {id:'uncommon',name:'Необычный кейс',icon:'🧰',casePrice:500,keyPrice:750,rates:[['uncommon',65],['rare',25],['epic',10]]},
+    {id:'rare',name:'Редкий кейс',icon:'💠',casePrice:1000,keyPrice:1500,rates:[['rare',60],['epic',30],['legendary',10]]},
+    {id:'epic',name:'Эпический кейс',icon:'🔮',casePrice:1800,keyPrice:2700,rates:[['epic',65],['legendary',25],['holy',10]]},
+    {id:'legendary',name:'Легендарный кейс',icon:'👑',casePrice:3500,keyPrice:5200,rates:[['legendary',65],['holy',25],['darkness',10]]},
+    {id:'mythic',name:'Мифический кейс',icon:'🌑',casePrice:7000,keyPrice:10000,rates:[['holy',70],['darkness',30]]}
+  ];
+  const ETH_SHOP_TITLE_STOCK = [
+    {name:'Искатель реликвий',price:1200,icon:'🧭',desc:'Титул исследователя забытых сокровищ.'},
+    {name:'Тихий алхимик',price:1800,icon:'⚗️',desc:'Титул тех, кто знает цену редким смесям.'},
+    {name:'Пламенный след',price:2400,icon:'🔥',desc:'Титул, оставляющий за героем легенду.'},
+    {name:'Страж сумерек',price:3200,icon:'🌘',desc:'Титул хранителя границы света и тьмы.'},
+    {name:'Собиратель звёзд',price:4400,icon:'✨',desc:'Титул охотника за далёкими чудесами.'},
+    {name:'Проводник Бездны',price:6500,icon:'🜂',desc:'Титул для тех, кто заглядывал за грань.'},
+    {name:'Хранитель древних клятв',price:5200,icon:'📜',desc:'Титул, отмеченный старой магией.'},
+    {name:'Королевский гость',price:3900,icon:'♛',desc:'Титул, который открывает двери без стука.'}
+  ];
+  const ETH_SHOP_DARK_ITEMS = [
+    {id:'money',name:'2× деньги',icon:'🪙',price:10,desc:'Навсегда удваивает золото за сражения и добычу.',boost:'moneyMultiplier'},
+    {id:'xp',name:'2× опыт',icon:'✦',price:10,desc:'Навсегда удваивает получаемый опыт.',boost:'xpMultiplier'},
+    {id:'specialTitle',name:'Печать Верховной Ведьмы',icon:'♜',price:5,desc:'+15% ко всем итоговым характеристикам и +10% к золоту и опыту, пока титул выбран.',special:true},
+    {id:'chance',name:'2× шансы',icon:'🎲',price:10,desc:'Повышает шанс получить предмет и смещает редкость наград вверх.',boost:'chanceMultiplier'},
+    {id:'stats',name:'2× статистики',icon:'⚔️',price:15,desc:'Навсегда удваивает итоговые характеристики героя.',boost:'statsMultiplier'},
+    {id:'characterCase',name:'Особый кейс персонажа',icon:'🌌',price:30,desc:'Особый персонаж будет подключён в будущем. Покупка пока закрыта.',disabled:true}
+  ];
+  const ETH_SHOP_TIPS = [
+    'Не спеши тратить всё золото. Иногда лучшая покупка — та, которую ты ещё не сделал.',
+    'У каждого кейса свой ключ. Не пытайся открыть мифический обычным железом.',
+    'Мой совет: сначала собери запас золота, а затем охоться за редкостями.',
+    'Витрина меняется каждые пять минут. Следи за таймером — хорошие вещи долго не ждут.',
+    'DARK COIN не так прост. Его ценность не в блеске, а в том, что он способен изменить.',
+    'Титул — не украшение. Некоторые из них меняют самого героя.',
+    'Если хочешь артефакт, выбирай кейс под свой бюджет. И помни: случайность не обещает нужный предмет.',
+    'Я не продаю силу бесплатно. Но иногда правильный выбор сильнее лишнего уровня.'
+  ];
+  let ethShopActiveTab='main';
+  let ethShopStock=[];
+  let ethShopTick=null;
+  let ethShopBusy=false;
+  let ethShopTransitionBusy=false;
+  let ethShopTipIndex=0;
+
+  function ethShopEnsureState(){
+    state.shopStockCycle=Number.isFinite(Number(state.shopStockCycle))?Number(state.shopStockCycle):0;
+    state.shopPurchased=state.shopPurchased&&typeof state.shopPurchased==='object'?state.shopPurchased:{};
+    state.shopCases=state.shopCases&&typeof state.shopCases==='object'?state.shopCases:{};
+    state.shopKeys=state.shopKeys&&typeof state.shopKeys==='object'?state.shopKeys:{};
+    state.shopDarkOwned=Array.isArray(state.shopDarkOwned)?state.shopDarkOwned:[];
+    state.shopBoosts=state.shopBoosts&&typeof state.shopBoosts==='object'?state.shopBoosts:{};
+    state.shopTitles=Array.isArray(state.shopTitles)?state.shopTitles:[];
+    for(const tier of ETH_SHOP_CASES){
+      state.shopCases[tier.id]=Math.max(0,Math.floor(Number(state.shopCases[tier.id])||0));
+      state.shopKeys[tier.id]=Math.max(0,Math.floor(Number(state.shopKeys[tier.id])||0));
+    }
+    for(const key of ['moneyMultiplier','xpMultiplier','chanceMultiplier','statsMultiplier']){
+      state.shopBoosts[key]=Math.max(1,Number(state.shopBoosts[key])||1);
+    }
+    const cycle=Math.floor(Date.now()/300000);
+    if(state.shopStockCycle!==cycle){
+      state.shopStockCycle=cycle;
+      state.shopPurchased={};
+    }
+  }
+  function ethShopRng(seed){
+    let value=(seed>>>0)||1;
+    return function(){value=(value*1664525+1013904223)>>>0;return value/4294967296};
+  }
+  function ethShopPick(list,rng){return list[Math.floor(rng()*list.length)]}
+  function ethShopShuffle(list,rng){
+    const result=list.slice();
+    for(let i=result.length-1;i>0;i--){const j=Math.floor(rng()*(i+1));[result[i],result[j]]=[result[j],result[i]]}
+    return result;
+  }
+  function ethShopRarityRank(rarity){
+    return ({common:0,uncommon:1,rare:2,epic:3,legendary:4,holy:5,darkness:6})[rarity]||0;
+  }
+  function ethShopRollRarity(rates,rng){
+    const chanceBoost=Number(state.shopBoosts?.chanceMultiplier)||1;
+    const weights=rates.map(([rarity,weight])=>weight*Math.pow(chanceBoost,ethShopRarityRank(rarity)));
+    const total=weights.reduce((sum,value)=>sum+value,0);
+    let roll=rng()*total;
+    for(let i=0;i<rates.length;i++){roll-=weights[i];if(roll<0)return rates[i][0]}
+    return rates[rates.length-1][0];
+  }
+  function ethShopRandomArtifact(rarity,rng){
+    const pool=ARTIFACT_POOLS[rarity]||ARTIFACT_POOLS.common;
+    const base=ethShopPick(pool.items,rng);
+    const stats=base.stats||{};
+    const slot=(Number(stats.atk)>0)?'weapon':(Number(stats.def)>0)?'armor':(Number(stats.mp)>0)?'amulet':'ring';
+    return {...base,id:'shop-art-'+Date.now()+'-'+Math.floor(rng()*1e9).toString(36),rarity,rarityName:rarity.toUpperCase(),color:pool.color,slot,equipped:false};
+  }
+  function ethShopBuildStock(cycle){
+    const rng=ethShopRng((cycle*2654435761+0x51a7c3)>>>0);
+    const owned=new Set(state.shopTitles||[]);
+    const titlePool=ETH_SHOP_TITLE_STOCK.filter(item=>!owned.has(item.name));
+    const selectedTitles=ethShopShuffle(titlePool.length?titlePool:ETH_SHOP_TITLE_STOCK,rng).slice(0,2);
+    const selectedCases=ethShopShuffle(ETH_SHOP_CASES,rng).slice(0,2);
+    const rarityRates=[['common',40],['uncommon',25],['rare',16],['epic',10],['legendary',6],['holy',2.5],['darkness',.5]];
+    const stock=[];
+    selectedTitles.forEach((item,index)=>stock.push({id:'title-'+cycle+'-'+index,kind:'title',title:item.name,name:item.name,icon:item.icon,price:item.price,desc:item.desc,rarity:'ТИТУЛ'}));
+    selectedCases.forEach((item,index)=>stock.push({id:'case-'+cycle+'-'+index,kind:'case',tier:item.id,name:item.name,icon:item.icon,price:item.casePrice,desc:'Кейс открывается только ключом своей редкости.',rarity:item.id.toUpperCase()}));
+    for(let index=0;index<2;index++){
+      const rarity=ethShopRollRarity(rarityRates,rng);
+      const artifact=ethShopRandomArtifact(rarity,rng);
+      stock.push({id:'artifact-'+cycle+'-'+index,kind:'artifact',artifact,name:artifact.name,icon:'✧',price:Math.max(700,Math.round((900+ethShopRarityRank(rarity)*850)*(0.85+rng()*.35)/50)*50),desc:artifact.desc,rarity:artifact.rarityName,color:artifact.color});
+    }
+    return stock;
+  }
+  function ethShopCurrency(){
+    const gold=document.getElementById('eth-shop-gold');
+    const dark=document.getElementById('eth-shop-dark-coins');
+    if(gold)gold.textContent=String(Math.max(0,Number(state.gold)||0));
+    if(dark)dark.textContent=String(Math.max(0,Number(state.darkCoins)||0));
+  }
+  function ethShopFeedback(message,isError=false){
+    const node=document.getElementById('eth-shop-feedback');
+    if(node){node.textContent=message;node.style.color=isError?'#ffaaa1':'#c9b49f';}
+  }
+  function ethShopAccountGate(){
+    if(window.ethShopAccountReady&&window.ethShopAccountReady())return true;
+    ethShopFeedback('Сначала войди в аккаунт Этерии. Покупки должны сохраняться в твоём профиле.',true);
+    return false;
+  }
+  async function ethShopSave(){
+    ethShopCurrency();
+    if(window.ethCloudSaveCurrentAccount){
+      const saved=await window.ethCloudSaveCurrentAccount();
+      if(saved===false)ethShopFeedback('Покупка выполнена в текущей сессии, но облако не подтвердило сохранение. Проверь подключение.',true);
+    }
+  }
+  function ethShopOwnedTitle(title){
+    return (state.shopTitles||[]).includes(title);
+  }
+  function ethShopMakeCard(item,dark=false){
+    const card=document.createElement('article');
+    card.className='eth-shop-item'+(dark?' eth-shop-dark-card':'')+(item.sold?' sold':'');
+    const top=document.createElement('div');top.className='eth-shop-item-top';
+    const icon=document.createElement('div');icon.className='eth-shop-item-icon';icon.textContent=item.icon||'✦';
+    const rarity=document.createElement('span');rarity.className='eth-shop-rarity';rarity.textContent=item.rarity||'РЕДКОСТЬ';
+    top.append(icon,rarity);
+    const title=document.createElement('h3');title.textContent=item.name;
+    const desc=document.createElement('p');desc.textContent=item.desc||'Особый товар лавки.';
+    const bottom=document.createElement('div');bottom.className='eth-shop-item-bottom';
+    const price=document.createElement('span');price.className='eth-shop-price';price.textContent=(dark?item.price+' ◆':item.price+' ◈');
+    const buy=document.createElement('button');buy.type='button';buy.className='eth-shop-buy';buy.textContent=item.sold?'КУПЛЕНО':item.disabled?'СКОРО':(dark?'ПРИОБРЕСТИ':'КУПИТЬ');
+    buy.disabled=!!item.sold||!!item.disabled;
+    if(item.kind==='title'&&ethShopOwnedTitle(item.title)){buy.disabled=true;buy.textContent='УЖЕ ЕСТЬ'}
+    if(item.kind==='dark'&&state.shopDarkOwned.includes(item.id)){buy.disabled=true;buy.textContent='АКТИВИРОВАНО'}
+    if(!item.sold&&!item.disabled)buy.addEventListener('click',()=>item.kind==='dark'?ethShopBuyDark(item.id):ethShopPurchase(item.id));
+    bottom.append(price,buy);
+    card.append(top,title,desc,bottom);
+    if(item.sold){const tag=document.createElement('span');tag.className='eth-shop-sold';tag.textContent='ПРОДАНО';card.append(tag)}
+    return card;
+  }
+  function ethShopRenderMain(){
+    const host=document.getElementById('eth-shop-stock');if(!host)return;
+    host.replaceChildren();
+    ethShopStock.forEach(item=>{
+      const sold=!!state.shopPurchased[item.id];
+      const card=ethShopMakeCard({...item,sold});
+      host.appendChild(card);
+    });
+  }
+  function ethShopRenderKeys(){
+    const host=document.getElementById('eth-shop-stock');if(!host)return;
+    host.replaceChildren();
+    ETH_SHOP_CASES.forEach(tier=>{
+      const card=document.createElement('article');card.className='eth-shop-key-card';
+      const heading=document.createElement('h3');heading.textContent=tier.icon+' '+tier.name;
+      const description=document.createElement('p');description.textContent='Ключ подходит только к кейсу этой редкости.';
+      const owned=document.createElement('div');owned.className='eth-shop-key-count';
+      owned.textContent='Кейсы: '+state.shopCases[tier.id]+' · Ключи: '+state.shopKeys[tier.id];
+      const actions=document.createElement('div');actions.className='eth-shop-key-actions';
+      const buy=document.createElement('button');buy.type='button';buy.className='eth-shop-buy';buy.textContent='КЛЮЧ · '+tier.keyPrice+' ◈';buy.disabled=Number(state.gold)<tier.keyPrice;
+      buy.addEventListener('click',()=>ethShopBuyKey(tier.id));
+      const open=document.createElement('button');open.type='button';open.className='eth-shop-buy';open.textContent='ОТКРЫТЬ';
+      open.disabled=state.shopCases[tier.id]<1||state.shopKeys[tier.id]<1;
+      open.addEventListener('click',()=>ethShopOpenCase(tier.id));
+      actions.append(buy,open);card.append(heading,description,owned,actions);host.appendChild(card);
+    });
+  }
+  function ethShopRenderDark(){
+    const host=document.getElementById('eth-shop-stock');if(!host)return;
+    host.replaceChildren();
+    ETH_SHOP_DARK_ITEMS.forEach(item=>{
+      const card=ethShopMakeCard({...item,kind:'dark',rarity:item.special?'УНИКАЛЬНЫЙ ТИТУЛ':'DARK MARKET'},true);
+      host.appendChild(card);
+    });
+  }
+  function ethShopTab(tab){
+    if(!['main','keys','dark'].includes(tab))tab='main';
+    ethShopActiveTab=tab;
+    const titles={main:['СЕГОДНЯШНЯЯ ВЫКЛАДКА','Главная витрина'],keys:['КЕЙСЫ И КЛЮЧИ','Шесть ступеней редкости'],dark:['ЗАКРЫТЫЙ РЫНОК','Товары за DARK COIN']};
+    const section=document.getElementById('eth-shop-section-kicker');
+    const heading=document.getElementById('eth-shop-section-title');
+    if(section)section.textContent=titles[tab][0];
+    if(heading)heading.textContent=titles[tab][1];
+    ['main','keys','dark'].forEach(key=>document.getElementById('eth-shop-tab-'+key)?.classList.toggle('active',key===tab));
+    if(tab==='main')ethShopRenderMain();
+    else if(tab==='keys')ethShopRenderKeys();
+    else ethShopRenderDark();
+    ethShopCurrency();
+  }
+  async function ethShopPurchase(id){
+    if(ethShopBusy||!ethShopAccountGate())return;
+    ethShopEnsureState();
+    const item=ethShopStock.find(entry=>entry.id===id);
+    if(!item||state.shopPurchased[id])return;
+    if(Number(state.gold)<item.price){ethShopFeedback('Недостаточно золота. Нужно '+item.price+' ◈.',true);return}
+    if(item.kind==='title'&&ethShopOwnedTitle(item.title)){ethShopFeedback('Этот титул уже есть в твоей коллекции.',true);return}
+    ethShopBusy=true;
+    try{
+      if(item.kind==='title'){
+        await window.ethShopUnlockProfileTitle(item.title,false);
+        state.shopTitles=[...new Set([...(state.shopTitles||[]),item.title])];
+        ethShopFeedback('Титул «'+item.title+'» добавлен в коллекцию.');
+      }else if(item.kind==='case'){
+        state.shopCases[item.tier]=(Number(state.shopCases[item.tier])||0)+1;
+        ethShopFeedback('Кейс добавлен. Купи ключ той же редкости во вкладке KEYS.');
+      }else if(item.kind==='artifact'){
+        state.inventory=Array.isArray(state.inventory)?state.inventory:[];
+        state.inventory.push(item.artifact);
+        if(window.updateInventoryScreen)window.updateInventoryScreen();
+        ethShopFeedback('Артефакт «'+item.name+'» отправлен в инвентарь.');
+      }
+      state.gold=Math.max(0,Number(state.gold)||0)-item.price;
+      state.shopPurchased[id]=true;
+      await ethShopSave();
+      ethShopTab('main');
+    }catch(error){ethShopFeedback(error.message||'Покупку не удалось завершить.',true)}
+    finally{ethShopBusy=false;ethShopCurrency();}
+  }
+  async function ethShopBuyKey(tierId){
+    if(ethShopBusy||!ethShopAccountGate())return;
+    ethShopEnsureState();
+    const tier=ETH_SHOP_CASES.find(item=>item.id===tierId);if(!tier)return;
+    if(Number(state.gold)<tier.keyPrice){ethShopFeedback('Недостаточно золота. Ключ стоит '+tier.keyPrice+' ◈.',true);return}
+    ethShopBusy=true;
+    try{
+      state.gold-=tier.keyPrice;
+      state.shopKeys[tier.id]++;
+      await ethShopSave();
+      ethShopFeedback('Ключ «'+tier.name+'» куплен. Он открывает только такой же кейс.');
+      ethShopRenderKeys();
+    }catch(error){ethShopFeedback(error.message||'Не удалось купить ключ.',true)}
+    finally{ethShopBusy=false;ethShopCurrency();}
+  }
+  async function ethShopOpenCase(tierId){
+    if(ethShopBusy||!ethShopAccountGate())return;
+    ethShopEnsureState();
+    const tier=ETH_SHOP_CASES.find(item=>item.id===tierId);if(!tier)return;
+    if(state.shopCases[tier.id]<1||state.shopKeys[tier.id]<1){ethShopFeedback('Нужен кейс и ключ одной редкости.',true);return}
+    ethShopBusy=true;
+    try{
+      state.shopCases[tier.id]--;state.shopKeys[tier.id]--;
+      const rng=()=>Math.random();
+      const rarity=ethShopRollRarity(tier.rates,rng);
+      const artifact=ethShopRandomArtifact(rarity,rng);
+      state.inventory=Array.isArray(state.inventory)?state.inventory:[];
+      state.inventory.push(artifact);
+      if(window.updateInventoryScreen)window.updateInventoryScreen();
+      await ethShopSave();
+      ethShopFeedback('Кейс открыт: '+artifact.rarityName+' · '+artifact.name+' · артефакт отправлен в инвентарь.');
+      ethShopRenderKeys();
+    }catch(error){ethShopFeedback(error.message||'Кейс не удалось открыть.',true)}
+    finally{ethShopBusy=false;ethShopCurrency();}
+  }
+  async function ethShopBuyDark(id){
+    if(ethShopBusy||!ethShopAccountGate())return;
+    ethShopEnsureState();
+    const item=ETH_SHOP_DARK_ITEMS.find(entry=>entry.id===id);if(!item||item.disabled)return;
+    if(state.shopDarkOwned.includes(id)){ethShopFeedback('Этот товар уже приобретён.',true);return}
+    if(Number(state.darkCoins)<item.price){ethShopFeedback('Недостаточно DARK COIN. Нужно '+item.price+' ◆.',true);return}
+    ethShopBusy=true;
+    try{
+      if(item.special)await window.ethShopUnlockProfileTitle('Печать Верховной Ведьмы',true);
+      state.darkCoins=Math.max(0,Number(state.darkCoins)||0)-item.price;
+      state.shopDarkOwned.push(id);
+      if(item.boost)state.shopBoosts[item.boost]=2;
+      await ethShopSave();
+      ethShopFeedback(item.special?'Титул получен и надет. Его эффекты действуют, пока он выбран.':item.name+' активировано навсегда.');
+      ethShopRenderDark();
+    }catch(error){ethShopFeedback(error.message||'Не удалось приобрести товар.',true)}
+    finally{ethShopBusy=false;ethShopCurrency();}
+  }
+  function ethShopRewardMultiplier(kind){
+    const keys={money:'moneyMultiplier',xp:'xpMultiplier',chance:'chanceMultiplier',stats:'statsMultiplier'};
+    let multiplier=Math.max(1,Number(state.shopBoosts?.[keys[kind]])||1);
+    if(window.ethShopIsSpecialTitleActive&&window.ethShopIsSpecialTitleActive()){
+      if(kind==='money'||kind==='xp')multiplier*=1.1;
+      if(kind==='stats')multiplier*=1.15;
+    }
+    return multiplier;
+  }
+  window.ethShopRewardMultiplier=ethShopRewardMultiplier;
+  function ethShopTalk(){
+    const dialog=document.getElementById('eth-shop-dialog');if(!dialog)return;
+    dialog.textContent='«'+ETH_SHOP_TIPS[ethShopTipIndex%ETH_SHOP_TIPS.length]+'»';
+    ethShopTipIndex++;
+  }
+  function ethShopUpdateCountdown(){
+    const node=document.getElementById('eth-shop-countdown');if(!node)return;
+    const remaining=300000-(Date.now()%300000);
+    const mins=Math.floor(remaining/60000);
+    const secs=Math.floor((remaining%60000)/1000);
+    node.textContent=String(mins).padStart(2,'0')+':'+String(secs).padStart(2,'0');
+    ethShopEnsureState();
+    if(Math.floor(Date.now()/300000)!==Number(state.shopStockCycle)){
+      ethShopStock=ethShopBuildStock(state.shopStockCycle);
+      ethShopTab(ethShopActiveTab);
+      ethShopFeedback('Витрина обновилась. Новые товары уже на местах.');
+      if(window.ethCloudSaveCurrentAccount)window.ethCloudSaveCurrentAccount();
+    }
+  }
+  function ethShopActivateView(){
+    const shell=document.getElementById('screen-map');
+    const stage=document.getElementById('eth-game-view-stage');
+    const shop=document.getElementById('screen-shop');
+    if(!shell||!stage||!shop)return false;
+    if(shop.parentElement!==stage)stage.appendChild(shop);
+    shell.classList.add('active','eth-shop-mode');
+    document.querySelectorAll('.screen').forEach(node=>{if(node!==shell&&node!==shop)node.classList.remove('active')});
+    ['eth-game-main-view','eth-game-map-view','eth-game-settings-view'].forEach(id=>{
+      const view=document.getElementById(id);if(!view)return;
+      view.classList.remove('eth-view-active','eth-view-entering','eth-view-leaving');
+      view.hidden=true;view.setAttribute('aria-hidden','true');
+    });
+    shop.hidden=false;shop.classList.add('active','eth-view-active');
+    shop.classList.remove('eth-view-entering','eth-view-leaving');
+    shop.setAttribute('aria-hidden','false');
+    document.body.classList.remove('eth-inventory-open');
+    ethShopEnsureState();
+    ethShopStock=ethShopBuildStock(state.shopStockCycle);
+    ethShopTab(ethShopActiveTab);
+    ethShopCurrency();
+    if(ethShopTick)clearInterval(ethShopTick);
+    ethShopUpdateCountdown();
+    ethShopTick=setInterval(ethShopUpdateCountdown,1000);
+    return true;
+  }
+  function ethShopRestoreView(){
+    const shell=document.getElementById('screen-map');
+    const shop=document.getElementById('screen-shop');
+    if(ethShopTick){clearInterval(ethShopTick);ethShopTick=null}
+    if(shop){shop.classList.remove('active','eth-view-active','eth-view-entering','eth-view-leaving');shop.hidden=true;shop.setAttribute('aria-hidden','true')}
+    shell?.classList.remove('eth-shop-mode');
+  }
+  window.ethShopBack=function(){
+    ethShopRestoreView();
+    window.showScreen('map');
+    window.ethGameTab('map');
+  };
+  const ethShowScreenBeforeShop=window.showScreen;
+  window.showScreen=function(id){
+    if(id==='shop'){
+      const result=ethShowScreenBeforeShop.call(this,'map');
+      ethShopActivateView();
+      return result;
+    }
+    if(id==='map')ethShopRestoreView();
+    return ethShowScreenBeforeShop.apply(this,arguments);
+  };
+  window.ethEnterShopFromMap=function(trigger){
+    if(ethShopTransitionBusy)return;
+    ethShopTransitionBusy=true;
+    const layer=document.createElement('div');
+    layer.className='eth-mine-transition-layer';
+    const circle=document.createElement('div');
+    circle.className='eth-mine-transition-circle';
+    layer.appendChild(circle);
+    const sourceIcon=trigger&&trigger.querySelector('.eth-world-map-sign-icon');
+    let icon=null;
+    if(sourceIcon){
+      const rect=sourceIcon.getBoundingClientRect();
+      icon=document.createElement('div');
+      icon.className='eth-mine-transition-icon';
+      icon.textContent=sourceIcon.textContent||'⚒';
+      icon.style.left=rect.left+'px';icon.style.top=rect.top+'px';
+      layer.appendChild(icon);
+      requestAnimationFrame(()=>{
+        icon.style.left=Math.round(window.innerWidth/2-21)+'px';
+        icon.style.top=Math.round(window.innerHeight/2-21)+'px';
+        icon.classList.add('centered');
+      });
+    }
+    document.body.appendChild(layer);
+    requestAnimationFrame(()=>requestAnimationFrame(()=>circle.classList.add('expanded')));
+    setTimeout(()=>{
+      if(icon)icon.classList.add('fade');
+      window.showScreen('shop');
+      requestAnimationFrame(()=>circle.classList.add('shrinking'));
+    },540);
+    setTimeout(()=>{layer.remove();ethShopTransitionBusy=false},1080);
+  };
+
+  // The shop lives in the same fixed game viewport as the reworked mine.
+  const ethShopInitial=document.getElementById('screen-shop');
+  const ethShopStage=document.getElementById('eth-game-view-stage');
+  if(ethShopInitial&&ethShopStage&&ethShopInitial.parentElement!==ethShopStage){
+    ethShopStage.appendChild(ethShopInitial);
+    ethShopInitial.hidden=true;
+    ethShopInitial.setAttribute('aria-hidden','true');
+  }
+
+  // The mine's rare drops also respect the purchased permanent chance boost.
+
+  const ethShopPreviousFinalStats=window.getFinalStats;
+  if(typeof ethShopPreviousFinalStats==='function'){
+    window.getFinalStats=function(){
+      const result=ethShopPreviousFinalStats.apply(this,arguments);
+      const multiplier=window.ethShopRewardMultiplier?window.ethShopRewardMultiplier('stats'):1;
+      ['hp','mp','atk','def'].forEach(key=>{if(Number.isFinite(Number(result[key])))result[key]=Math.floor(result[key]*multiplier)});
+      return result;
+    };
+  }
 
   window.ethGameTab('main');
   ethRefreshProfileChrome();
