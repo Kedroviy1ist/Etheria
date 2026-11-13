@@ -3904,11 +3904,10 @@ body.dodge-open{overflow:hidden}
     const level=partyNet.level||state.level||1;setEnemyPool(level);previousStartPartyBattleForStages();
     const battle=partyNet.battle;if(!battle?.enemy)return;
     const enemy=battle.enemy,party=partyNet.players.filter(p=>p&&p.hp>0),count=Math.max(1,party.length);
-    const avgAtk=party.reduce((sum,p)=>sum+(p.atk||20),0)/count;
-    const avgDef=party.reduce((sum,p)=>sum+(p.def||8),0)/count;
-    const boss=!!enemy.isBoss||level%5===0,stage=enemyStage(level),strike=Math.max(16,avgAtk*1.12+level*.34);
-    enemy.def=Math.max(2,Math.round(level*.34+stage*.58+avgAtk*.035+(boss?2.5:0)));
-    enemy.hp=Math.round(strike*count*(boss?(4.1+stage*.10):(1.9+stage*.09)));
+    const boss=!!enemy.isBoss||level%5===0,stage=enemyStage(level);
+    // Co-op enemies use level/tier templates too; party size adjusts encounter HP, not player stats.
+    enemy.def=Math.max(2,Math.round(level*.34+stage*.58+(boss?2.5:0)));
+    enemy.hp=Math.round((boss?(720+level*100+stage*220):(140+level*32+stage*70))*count);
     enemy.maxHp=enemy.hp;
     enemy.atk=boss?Math.round(12+level*1.5+stage*3):Math.round(7+level*1.15+stage*2.5);
     enemy.xp=boss?Math.round(240+level*47):Math.round(42+level*19);
