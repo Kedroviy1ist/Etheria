@@ -2842,15 +2842,6 @@ body.dodge-open{overflow:hidden}
  </div>
 </div>
 
-<div id="modal-mining-rhythm" class="eth-modal">
- <div class="eth-panel p-5 md:p-7 max-w-4xl w-full">
-  <div class="flex flex-wrap justify-between items-center gap-3 mb-4"><div><div class="text-xs tracking-[.3em] uppercase text-amber-400 font-bold">Ритм-добыча</div><h2 class="text-2xl md:text-3xl title-font">Попади в такт жиле</h2></div><button onclick="closeMiningRhythm()" class="eth-btn bg-slate-800">✕</button></div>
-  <div class="flex flex-wrap justify-between items-center gap-3 mb-3 text-sm"><div>Ноты: <b id="rhythm-note-count" class="text-amber-300">0 / 7</b></div><div>Комбо: <b id="rhythm-combo" class="text-emerald-300">0</b></div><div>Очки: <b id="rhythm-score" class="text-cyan-300">0</b></div></div>
-  <div id="mine-rhythm-field"><div id="mine-rhythm-target-layer"></div><div id="rhythm-ready" class="absolute inset-0 flex flex-col items-center justify-center text-center p-5 z-10"><div class="text-6xl mb-3">🎵</div><h3 class="text-2xl font-black text-amber-200">Слушай ритм шахты</h3><p class="text-slate-300 max-w-md mt-2">Нажимай на круг, когда внешнее кольцо почти совпадёт с ним. 7 нот — и руда твоя.</p><button onclick="beginMiningRhythm()" class="eth-btn mt-5 bg-gradient-to-r from-amber-600 to-orange-700 px-8">Начать мини-игру</button></div><div id="rhythm-judge" class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-20 pointer-events-none"></div></div>
-  <div class="flex flex-wrap justify-between items-center gap-3 mt-4"><p id="rhythm-message" class="text-sm text-slate-400">Точность влияет на редкость награды.</p><div id="rhythm-result-actions" class="hidden"><button onclick="closeMiningRhythm()" class="eth-btn bg-emerald-700">Забрать добычу</button></div></div>
- </div>
-</div>
-
 <script src="https://cdnjs.cloudflare.com/ajax/libs/peerjs/1.5.5/peerjs.min.js" referrerpolicy="no-referrer"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
