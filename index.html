@@ -2079,6 +2079,22 @@ checkEtheriaConnection();
             }
         });
 
+        function ethFilterLearnedAbilitiesFor(type, learned) {
+            const allowed = HERO_TEMPLATES[type]?.unlockableAbilities;
+            if (!Array.isArray(allowed) || !Array.isArray(learned)) return [];
+            const byName = new Map(allowed.map(ability => [String(ability.name), ability]));
+            const result = [];
+            const seen = new Set();
+            for (const ability of learned) {
+                const name = String(ability?.name || '');
+                const canonical = byName.get(name);
+                if (!canonical || seen.has(name)) continue;
+                seen.add(name);
+                result.push(JSON.parse(JSON.stringify(canonical)));
+            }
+            return result;
+        }
+
         const CHESTS = {
             wooden: {
                 name: 'Деревянный Сундук',
@@ -3574,7 +3590,7 @@ body.dodge-open{overflow:hidden}
 
  // Одиночная игра: три команды, а магия содержит только доступные классовые умения.
  let soloMenuMode='root';
- function soloMagicSkills(){const base=(state.hero?.abilities||[]).filter(a=>a.cost>0);return base.concat(state.learnedAbilities||[])}
+ function soloMagicSkills(){const type=state.hero?.type;const base=(state.hero?.abilities||[]).filter(a=>a.cost>0);const learned=ethFilterLearnedAbilitiesFor(type,state.learnedAbilities);return base.concat(learned)}
  function renderSoloBattleMenu(){const box=byId('ability-container');if(!box||!state.combat?.isActive)return;box.className='w-full md:w-2/3 flex flex-col gap-3';const phase=state.combat.phase||'player';const busy=phase!=='player';let sub='';
   if(!busy&&soloMenuMode==='items'){const count=state.combat.potions??3;sub=`<div class="battle-submenu"><div class="text-xs text-slate-400 mb-2">Предметы в бою</div><button id="solo-use-potion" class="battle-choice" ${count<=0?'disabled':''}><span>🧪 Зелье лечения</span><b>×${count}</b><small>Восстанавливает 30% максимального HP.</small></button><button id="solo-sub-back" class="battle-back">← Назад</button></div>`}
   else if(!busy&&soloMenuMode==='magic'){const skills=soloMagicSkills();sub=skills.length?`<div class="battle-submenu"><div class="text-xs text-slate-400 mb-2">Изученные умения · расход маны</div>${skills.map((a,i)=>`<button class="battle-choice" data-magic="${i}" ${state.combat.mp<a.cost?'disabled':''}><span>${escapeHTML(a.name)}</span><b>${a.cost} MP</b><small>${escapeHTML(a.desc||'Классовое умение')}</small></button>`).join('')}<button id="solo-sub-back" class="battle-back">← Назад</button></div>`:`<div class="battle-submenu"><p class="text-slate-300 text-sm">Пока нет открытых умений. Новые навыки появятся при повышении уровня героя.</p><button id="solo-sub-back" class="battle-back">← Назад</button></div>`}
@@ -3954,15 +3970,49 @@ body.dodge-open{overflow:hidden}
   // Fairer damage: avoiding a bullet is rewarded; one mistake is not an instant defeat.
   beginSoloEnemyPhase=function(){
     if(!state.combat?.isActive)return;
-    state.combat.phase='dodge';renderSoloBattleMenu();const enemy=state.combat.enemy;
-    startDodgeArena({enemy,level:state.level,mode:'solo',duration:Math.max(7600,8500-enemyStage(state.level)*65),onComplete:result=>{
-      if(!state.combat?.isActive)return;
-      const defense=getActiveDefense();const perHit=Math.max(3,Math.floor((enemy.atk||12)*.13-defense*.07));
-      const damage=perHit*result.hits;state.combat.hp=Math.max(0,state.combat.hp-damage);
-      if(result.hits){soloBattleLog(`${enemy.name} задел вас ${result.hits} раз. Получено ${damage} урона.`,'text-red-300');showFloatingText('combat-player',`-${damage}`,'dmg');triggerAnim('player-sprite','anim-damage')}
-      else soloBattleLog(`Вы полностью уклонились от атаки ${enemy.name}!`,'text-emerald-300');
-      updateCombatUI();if(state.combat.hp<=0){window.endCombat(false);return}if(typeof processBuffs==='function')processBuffs();state.combat.phase='player';renderSoloBattleMenu();
-    }});
+    state.combat.phase='dodge';
+    renderSoloBattleMenu();
+    const enemy=state.combat.enemy;
+    startDodgeArena({
+      enemy,level:state.level,mode:'solo',
+      duration:Math.max(7600,8500-enemyStage(state.level)*65),
+      onComplete:result=>{
+        if(!state.combat?.isActive)return;
+        try{
+          const defense=getActiveDefense();
+          const perHit=Math.max(3,Math.floor((enemy.atk||12)*.13-defense*.07));
+          const damage=perHit*result.hits;
+          state.combat.hp=Math.max(0,state.combat.hp-damage);
+          if(result.hits){
+            soloBattleLog(`${enemy.name} задел вас ${result.hits} раз. Получено ${damage} урона.`,'text-red-300');
+            showFloatingText('combat-player',`-${damage}`,'dmg');
+            triggerAnim('player-sprite','anim-damage');
+          }else{
+            soloBattleLog(`Вы полностью уклонились от атаки ${enemy.name}!`,'text-emerald-300');
+          }
+          updateCombatUI();
+          if(state.combat.hp<=0){
+            window.endCombat(false);
+            return;
+          }
+          if(typeof processBuffs==='function')processBuffs();
+        }catch(error){
+          console.error('[Etheria] Ошибка после уклонения:',error);
+          soloBattleLog('Ошибка обработки атаки врага. Ход игрока восстановлен.','text-amber-300');
+        }finally{
+          if(state.combat?.isActive){
+            state.combat.phase='player';
+            soloMenuMode='root';
+            byId('soul-dodge-overlay')?.classList.remove('open');
+            document.body.classList.remove('dodge-open');
+            try{updateCombatUI()}catch(error){console.error('[Etheria] Не удалось обновить боевые показатели:',error)}
+            renderSoloBattleMenu();
+            const sprite=byId('player-sprite');
+            if(sprite&&state.hero?.type==='flawery')sprite.innerHTML=heroSVG(state.hero.type);
+          }
+        }
+      }
+    });
   };
 
   // Co-op difficulty scales to the real party size and gear; enemies change after each boss.
@@ -4410,7 +4460,7 @@ body.dodge-open{overflow:hidden}
         xp:state.xp||0,nextXp:state.nextXp||100,heroLvl:state.heroLvl||1,statPoints:state.statPoints||0,
         baseHp:state.baseHp||0,baseMp:state.baseMp||0,baseAtk:state.baseAtk||0,baseDef:state.baseDef||0,
         inventory:JSON.parse(JSON.stringify(state.inventory||[])),
-        learnedAbilities:JSON.parse(JSON.stringify(state.learnedAbilities||[])),
+        learnedAbilities:ethFilterLearnedAbilitiesFor(state.hero?.type,state.learnedAbilities),
         evolved:!!state.evolved,evolutionPending:!!state.evolutionPending
       };
     }
@@ -4420,7 +4470,7 @@ body.dodge-open{overflow:hidden}
       totalXpEarned:Math.max(0,Number(state.totalXpEarned)||0),campaignRecorded:!!state._etheriaCampaignRecorded,
       xp:state.xp||0,nextXp:state.nextXp||100,heroLvl:state.heroLvl||1,statPoints:state.statPoints||0,
       baseHp:state.baseHp||0,baseMp:state.baseMp||0,baseAtk:state.baseAtk||0,baseDef:state.baseDef||0,
-      inventory:JSON.parse(JSON.stringify(state.inventory||[])),learnedAbilities:JSON.parse(JSON.stringify(state.learnedAbilities||[])),
+      inventory:JSON.parse(JSON.stringify(state.inventory||[])),learnedAbilities:ethFilterLearnedAbilitiesFor(state.hero?.type,state.learnedAbilities),
       gold:state.gold||0,pickaxeLevel:state.pickaxeLevel||1,minerals:JSON.parse(JSON.stringify(state.minerals||{})),
       darkCoins:Math.max(0,Number(state.darkCoins)||0),autoMineUnlocked:!!state.autoMineUnlocked,
       autoMineLevel:Math.min(5,Math.max(0,Number(state.autoMineLevel)||0)),autoMineNextAt:Math.max(0,Number(state.autoMineNextAt)||0),
@@ -4455,7 +4505,7 @@ body.dodge-open{overflow:hidden}
     state.baseHp=Number(active.baseHp)||template.baseHp;state.baseMp=Number(active.baseMp)||template.baseMp;
     state.baseAtk=Number(active.baseAtk)||template.baseAtk;state.baseDef=Number(active.baseDef)||template.baseDef;
     state.inventory=Array.isArray(active.inventory)?active.inventory.map(prepareArtifact):[];
-    state.learnedAbilities=Array.isArray(active.learnedAbilities)?active.learnedAbilities:[];
+    state.learnedAbilities=ethFilterLearnedAbilitiesFor(p.heroType,active.learnedAbilities);
     state.evolved=!!active.evolved;state.evolutionPending=!!active.evolutionPending;
     state.gold=Number(p.gold)||0;state.pickaxeLevel=Number(p.pickaxeLevel)||1;state.minerals=p.minerals||{};
     state.darkCoins=Math.max(0,Math.floor(Number(p.darkCoins)||0));
@@ -7548,7 +7598,7 @@ body.dodge-open{overflow:hidden}
       xp:state.xp||0,nextXp:state.nextXp||100,heroLvl:state.heroLvl||1,statPoints:state.statPoints||0,
       baseHp:state.baseHp||0,baseMp:state.baseMp||0,baseAtk:state.baseAtk||0,baseDef:state.baseDef||0,
       inventory:JSON.parse(JSON.stringify(state.inventory||[])),
-      learnedAbilities:JSON.parse(JSON.stringify(state.learnedAbilities||[])),
+      learnedAbilities:ethFilterLearnedAbilitiesFor(state.hero?.type,state.learnedAbilities),
       evolved:!!state.evolved,evolutionPending:!!state.evolutionPending
     };
   }
@@ -8007,7 +8057,7 @@ body.dodge-open{overflow:hidden}
     state.baseAtk=Number(saved.baseAtk)||template.baseAtk;
     state.baseDef=Number(saved.baseDef)||template.baseDef;
     state.inventory=Array.isArray(saved.inventory)?saved.inventory.map(prepareArtifact):[];
-    state.learnedAbilities=Array.isArray(saved.learnedAbilities)?JSON.parse(JSON.stringify(saved.learnedAbilities)):[];
+    state.learnedAbilities=ethFilterLearnedAbilitiesFor(type,saved.learnedAbilities);
     if(typeof soloMenuMode!=='undefined')soloMenuMode='root';
     const abilityBox=byId('ability-container');if(abilityBox)abilityBox.replaceChildren();
     state.evolved=!!saved.evolved;
