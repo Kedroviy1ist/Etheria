@@ -5325,63 +5325,54 @@ body.dodge-open{overflow:hidden}
     showScreen('menu');
   };
 
+  window.ethRedeemPromo = async function () {
+    const input=byId('eth-promo-input'),status=byId('eth-promo-status'),button=input?.parentElement?.querySelector('button');
+    if(!input||!status)return;
+    const code=String(input.value||'').trim().toUpperCase();
+    if(!code){status.textContent='Введи промокод.';return;}
+    if(!ethSupabaseClient||!ethCloudUser||!ethV4.account){status.textContent='Для активации войди в облачный аккаунт.';return;}
+    if(button?.disabled)return;
+    if(button)button.disabled=true;status.textContent='Проверяю промокод…';
+    try{
+      const {data,error}=await ethSupabaseClient.rpc('redeem_etheria_promo',{p_code:code});
+      if(error)throw error;if(!data)throw new Error('База не вернула результат активации.');
+      state.darkCoins=Math.max(0,Number(data.dark_coins)||0);
+      state.specialCharacterCases=Math.max(0,Math.floor(Number(data.special_character_cases)||0));
+      ethSaveCurrentAccount();
+      if(typeof ethShopCurrency==='function')ethShopCurrency();
+      if(typeof ethShopRenderDark==='function')ethShopRenderDark();
+      const extra=data.character_case_awarded?' Также выпал кейс особого персонажа!':'';
+      status.textContent='Промокод '+code+' активирован: +'+data.dark_coins_awarded+' DARK COIN.'+extra;input.value='';
+      await window.ethCloudSaveCurrentAccount?.();
+    }catch(error){status.textContent=error.message||'Не удалось активировать промокод.';}
+    finally{if(button)button.disabled=false;}
+  };
   window.ethRenderLeaderboard = async function () {
-    const body = byId('eth-leaderboard-body');
-    if (!body) return;
-    body.innerHTML = '';
-    if (!ethSupabaseClient) {
-      const row = document.createElement('tr');
-      const cell = document.createElement('td');
-      cell.colSpan = 5;
-      cell.textContent = 'Облачный рейтинг сейчас недоступен.';
-      row.appendChild(cell);
-      body.appendChild(row);
-      return;
-    }
-
-    const { data, error } = await ethSupabaseClient.from('etheria_leaderboard')
-      .select('username,current_title,completed_runs,gold,best_level')
-      .order('completed_runs', { ascending: false })
-      .order('gold', { ascending: false })
-      .order('best_level', { ascending: false })
-      .limit(100);
-
-    if (error) {
-      const row = document.createElement('tr');
-      const cell = document.createElement('td');
-      cell.colSpan = 5;
-      cell.textContent = 'Ошибка рейтинга: ' + error.message;
-      row.appendChild(cell);
-      body.appendChild(row);
-      return;
-    }
-
-    (data || []).forEach((entry, index) => {
-      const row = document.createElement('tr');
-      const values = [
-        String(index + 1),
-        entry.username || 'Игрок',
-        entry.current_title || 'Путник',
-        String(entry.completed_runs || 0),
-        String(entry.gold || 0)
-      ];
-      values.forEach((value, columnIndex) => {
-        const cell = document.createElement('td');
-        cell.textContent = value;
-        if (columnIndex === 2 && value === 'DEVELOPER') cell.style.color = '#fbbf24';
-        row.appendChild(cell);
-      });
-      body.appendChild(row);
+    const body=byId('eth-leaderboard-body');
+    if(!body)return;
+    body.replaceChildren();
+    if(!ethSupabaseClient){const row=document.createElement('tr'),cell=document.createElement('td');cell.colSpan=7;cell.textContent='Облачный рейтинг сейчас недоступен.';row.appendChild(cell);body.appendChild(row);return;}
+    body.innerHTML='<tr><td colspan="7">Загружаю рейтинг Этерии…</td></tr>';
+    const {data,error}=await ethSupabaseClient.rpc('get_etheria_leaderboard_details');
+    body.replaceChildren();
+    if(error){const row=document.createElement('tr'),cell=document.createElement('td');cell.colSpan=7;cell.textContent='Ошибка рейтинга: '+error.message;row.appendChild(cell);body.appendChild(row);return;}
+    const names={arthas:'Артас',vergil:'Вергилий',illidan:'Иллидан',flawery:'Флавери',calamitas:'Каламитас'};
+    (data||[]).forEach((entry,index)=>{
+      const row=document.createElement('tr');
+      const rank=document.createElement('td');rank.textContent=String(index+1);row.appendChild(rank);
+      const playerCell=document.createElement('td'),player=document.createElement('div');player.className='eth-lb-player';
+      const avatar=document.createElement('img');avatar.className='eth-lb-avatar';avatar.alt='';
+      if(entry.avatar_url){avatar.src=entry.avatar_url;avatar.onerror=()=>{avatar.remove();};}else avatar.style.display='none';
+      const playerName=document.createElement('b');playerName.textContent=entry.username||'Игрок';player.append(avatar,playerName);playerCell.appendChild(player);row.appendChild(playerCell);
+      const title=document.createElement('td');title.textContent=entry.current_title||'Путник';if(title.textContent==='DEVELOPER')title.style.color='#b7791f';row.appendChild(title);
+      const runs=document.createElement('td');runs.textContent=String(entry.completed_runs||0);row.appendChild(runs);
+      const ng=document.createElement('td');ng.textContent='NG+'+String(entry.new_game_plus||0);row.appendChild(ng);
+      const chars=document.createElement('td'),wrap=document.createElement('div');wrap.className='eth-lb-chars';
+      (Array.isArray(entry.special_characters)?entry.special_characters:[]).forEach(id=>{if(!names[id])return;const tag=document.createElement('span');tag.className='eth-lb-char';tag.textContent=names[id];wrap.appendChild(tag);});
+      if(!wrap.childElementCount)wrap.textContent='—';chars.appendChild(wrap);row.appendChild(chars);
+      const coins=document.createElement('td');coins.textContent=String(entry.dark_coins||0);row.appendChild(coins);body.appendChild(row);
     });
-
-    if (!data?.length) {
-      const row = document.createElement('tr');
-      const cell = document.createElement('td');
-      cell.colSpan = 5;
-      cell.textContent = 'Пока нет игроков.';
-      row.appendChild(cell);
-      body.appendChild(row);
-    }
+    if(!data?.length){const row=document.createElement('tr'),cell=document.createElement('td');cell.colSpan=7;cell.textContent='Пока нет игроков.';row.appendChild(cell);body.appendChild(row);}
   };
 
   window.ethOpenLeaderboard = function () {
