@@ -7984,7 +7984,7 @@ body.dodge-open{overflow:hidden}
     }
     const saved=state.characterProfiles[type]||ethMakeFreshCharacterProfile(type);
     const template=HERO_TEMPLATES[type];
-    state.hero={...template,type:type};
+    state.hero={...template,type:type,abilities:Array.isArray(template.abilities)?JSON.parse(JSON.stringify(template.abilities)):[]};
     state.level=Math.max(1,Math.min(50,Number(saved.level)||1));
     state.newGamePlus=Math.max(0,Number(saved.newGamePlus)||0);
     state.totalXpEarned=Math.max(0,Number(saved.totalXpEarned)||0);
@@ -7999,6 +7999,8 @@ body.dodge-open{overflow:hidden}
     state.baseDef=Number(saved.baseDef)||template.baseDef;
     state.inventory=Array.isArray(saved.inventory)?saved.inventory.map(prepareArtifact):[];
     state.learnedAbilities=Array.isArray(saved.learnedAbilities)?JSON.parse(JSON.stringify(saved.learnedAbilities)):[];
+    if(typeof soloMenuMode!=='undefined')soloMenuMode='root';
+    const abilityBox=byId('ability-container');if(abilityBox)abilityBox.replaceChildren();
     state.evolved=!!saved.evolved;
     state.evolutionPending=!!saved.evolutionPending;
     state.characterProfiles[type]=ethCharacterSnapshot();
