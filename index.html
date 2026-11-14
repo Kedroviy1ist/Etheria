@@ -7574,7 +7574,7 @@ body.dodge-open{overflow:hidden}
       const stats=document.createElement('p');stats.textContent='❤️ '+template.baseHp+' · 🔵 '+template.baseMp+' · ⚔️ '+template.baseAtk+' · 🛡️ '+template.baseDef;
       const skills=document.createElement('p');skills.className='eth-special-hero-skills';skills.textContent='Способности: '+template.abilities.map(a=>a.name).join(' · ');
       const choose=document.createElement('button');choose.type='button';choose.className='eth-special-hero-select';choose.textContent=state.hero?.type===type?'ВЫБРАН':'ВЫБРАТЬ ПЕРСОНАЖА';choose.disabled=state.hero?.type===type;
-      choose.addEventListener('click',()=>window.selectHero(type));
+      choose.addEventListener('click',async event=>{event.preventDefault();event.stopPropagation();choose.disabled=true;choose.textContent='ПЕРЕКЛЮЧЕНИЕ…';try{await window.selectHero(type)}catch(error){console.error('Hero switch failed:',error);choose.disabled=false;choose.textContent='ПОВТОРИТЬ ВЫБОР';if(typeof ethShopFeedback==='function')ethShopFeedback('Не удалось переключить персонажа: '+(error?.message||error),true)}});
       card.append(model,name,level,stats,skills,choose);grid.appendChild(card);
     });
   }
@@ -8027,7 +8027,13 @@ body.dodge-open{overflow:hidden}
     '.eth-shop-character-case-stock{margin:10px 0;color:#f6dfba;font-size:12px;font-weight:800;}' +
     '.eth-shop-character-case-open{width:100%;margin-top:8px;}' +
     '.eth-shop-character-case-open:disabled{opacity:.45;filter:grayscale(.4);}' +
-    '#eth-switch-character-button{margin-top:12px;}';
+    '#eth-switch-character-button{margin-top:12px;}' +
+    '#screen-hero-select.active{position:fixed;inset:0;z-index:10000;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;overflow-y:auto;overflow-x:hidden;box-sizing:border-box;padding:30px 16px 48px;background:radial-gradient(circle at 50% 12%,#172554 0%,#020617 72%);}' +
+    '#screen-hero-select.active>h2{flex:0 0 auto;margin:8px 0 28px;text-align:center;font-size:clamp(26px,5vw,48px);}' +
+    '#screen-hero-select.active>.grid{flex:0 0 auto;width:100%;}' +
+    '#screen-hero-select.active>.eth-special-selection{flex:0 0 auto;width:min(1120px,100%);margin:28px auto 12px;}' +
+    '#screen-hero-select [hidden]{display:none!important;}' +
+    '@media(max-width:640px){#screen-hero-select.active{padding:22px 12px 36px}#screen-hero-select.active>.grid{grid-template-columns:minmax(0,1fr)}}';
   document.head.appendChild(ethSpecialStyle);
   ethRenderSpecialHeroCards();
   ethRenderHeroSwitchControl();
