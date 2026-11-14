@@ -7238,10 +7238,11 @@ body.dodge-open{overflow:hidden}
 
   const ETH_CHARACTER_VOICE_LINES={
     arthas:['Фростморн!','Лёд повинуется мне!','Сила Плети!','Падите перед Королём-личом!','Моя воля нерушима!'],
-    vergil:['Сила — это всё.','Я должен стать сильнее.','Посмотри на мою истинную силу.','Ты не сможешь меня остановить.'],
+    vergil:['I need more power.','You shall die.','Now I am motivated.','Might controls everything.'],
     illidan:['Ты осмелился заговорить со мной?','Ты не готов!','Я — Иллидан Ярость Бури!','Моя сила принадлежит мне!','Скверна подчиняется моей воле!'],
-    flawery:['Расцветай!','Лепестки, вперёд!','Природа меня защитит!','Почувствуй силу цветения!']
+    flawery:['Bloom!','Petals, attack!','Nature will protect me!','Feel the power of the bloom!']
   };
+  const ETH_CHARACTER_VOICE_LANG={arthas:'ru-RU',vergil:'en-US',illidan:'ru-RU',flawery:'en-US'};
   const ETH_CHARACTER_VOICE_STYLE={
     arthas:{rate:.88,pitch:.72},vergil:{rate:1.02,pitch:.82},illidan:{rate:.94,pitch:.76},flawery:{rate:1.08,pitch:1.2}
   };
@@ -7257,10 +7258,12 @@ body.dodge-open{overflow:hidden}
     ethLastHeroVoice=line;
     try{
       const utterance=new SpeechSynthesisUtterance(line);
-      utterance.lang='ru-RU';
+      const lang=ETH_CHARACTER_VOICE_LANG[type]||'ru-RU';
+      utterance.lang=lang;
       const voices=window.speechSynthesis.getVoices();
-      const russian=voices.find(v=>/^ru(-|$)/i.test(v.lang));
-      if(russian)utterance.voice=russian;
+      const preferred=voices.find(v=>v.lang.toLowerCase()===lang.toLowerCase())||
+        voices.find(v=>v.lang.toLowerCase().startsWith(lang.slice(0,2).toLowerCase()));
+      if(preferred)utterance.voice=preferred;
       const style=ETH_CHARACTER_VOICE_STYLE[type]||{rate:1,pitch:1};
       utterance.rate=style.rate;utterance.pitch=style.pitch;utterance.volume=.9;
       window.speechSynthesis.cancel();
