@@ -6858,7 +6858,7 @@ body.dodge-open{overflow:hidden}
     {id:'specialTitle',name:'Печать Верховной Ведьмы',icon:'♜',price:5,desc:'+15% ко всем итоговым характеристикам и +10% к золоту и опыту, пока титул выбран.',special:true},
     {id:'chance',name:'2× шансы',icon:'🎲',price:10,desc:'Повышает шанс получить предмет и смещает редкость наград вверх.',boost:'chanceMultiplier'},
     {id:'stats',name:'2× статистики',icon:'⚔️',price:15,desc:'Навсегда удваивает итоговые характеристики героя.',boost:'statsMultiplier'},
-    {id:'characterCase',name:'Особый кейс персонажа',icon:'🌌',price:30,desc:'Один из пяти особых персонажей. Шансы выпадения указаны в описании кейса.'}
+    {id:'characterCase',name:'Особый кейс персонажа',icon:'🌌',price:30,desc:'Артас — 20%, Вергилий — 20%, Иллидан — 20%, Флавери — 19,9%, Каламитас — 0,1%.'}
   ];
   const ETH_SHOP_TIPS = [
     'Не спеши тратить всё золото. Иногда лучшая покупка — та, которую ты ещё не сделал.',
@@ -6885,6 +6885,9 @@ body.dodge-open{overflow:hidden}
     state.shopDarkOwned=Array.isArray(state.shopDarkOwned)?state.shopDarkOwned:[];
     state.shopBoosts=state.shopBoosts&&typeof state.shopBoosts==='object'?state.shopBoosts:{};
     state.shopTitles=Array.isArray(state.shopTitles)?state.shopTitles:[];
+    state.characterProfiles=state.characterProfiles&&typeof state.characterProfiles==='object'?state.characterProfiles:{};
+    state.specialCharactersUnlocked=Array.isArray(state.specialCharactersUnlocked)?state.specialCharactersUnlocked:[];
+    state.specialCharacterCases=Math.max(0,Math.floor(Number(state.specialCharacterCases)||0));
     for(const tier of ETH_SHOP_CASES){
       state.shopCases[tier.id]=Math.max(0,Math.floor(Number(state.shopCases[tier.id])||0));
       state.shopKeys[tier.id]=Math.max(0,Math.floor(Number(state.shopKeys[tier.id])||0));
@@ -7539,8 +7542,12 @@ body.dodge-open{overflow:hidden}
       const counts=document.createElement('span');counts.textContent='Кейсы: '+(state.shopCases[tier.id]||0)+' · Ключи: '+(state.shopKeys[tier.id]||0);
       card.append(name,counts);grid.appendChild(card);
     });
+    const specialCard=document.createElement('article');specialCard.className='eth-shop-owned-card';
+    const specialName=document.createElement('b');specialName.textContent='🌌 Особый кейс персонажа';
+    const specialCount=document.createElement('span');specialCount.textContent='Кейсы: '+Math.max(0,Math.floor(Number(state.specialCharacterCases)||0));
+    specialCard.append(specialName,specialCount);grid.appendChild(specialCard);
     const empty=document.getElementById('empty-inventory');
-    const hasSupplies=ETH_SHOP_CASES.some(tier=>(state.shopCases[tier.id]||0)>0||(state.shopKeys[tier.id]||0)>0);
+    const hasSupplies=ETH_SHOP_CASES.some(tier=>(state.shopCases[tier.id]||0)>0||(state.shopKeys[tier.id]||0)>0)||Number(state.specialCharacterCases)>0;
     if(empty)empty.classList.toggle('hidden',(state.inventory||[]).length>0||hasSupplies);
   }
   const ethShopOriginalUpdateInventory=window.updateInventoryScreen;
