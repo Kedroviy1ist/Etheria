@@ -2025,6 +2025,59 @@ checkEtheriaConnection();
             }
         };
 
+        Object.assign(HERO_TEMPLATES, {
+            arthas: {
+                name: 'Артас', icon: '❄️', baseHp: 520, baseMp: 180, baseAtk: 68, baseDef: 46,
+                abilities: [
+                    { name: 'Фростморн', cost: 0, type: 'attack', power: 2.8, desc: 'Удар Ледяной Скорбью.' },
+                    { name: 'Ледяная вспышка', cost: 55, type: 'attack', power: 5.2, desc: 'Взрыв ледяной энергии.' },
+                    { name: 'Хватка смерти', cost: 75, type: 'attack', power: 6.4, desc: 'Сокрушительный удар силами Плети.' },
+                    { name: 'Пакт смерти', cost: 85, type: 'heal', power: 230, desc: 'Восстанавливает часть здоровья.' },
+                    { name: 'Воля Короля-лича', cost: 100, type: 'buff', buffType: 'atk', power: 95, duration: 3, desc: 'Усиливает атаку на несколько ходов.' }
+                ]
+            },
+            vergil: {
+                name: 'Вергилий', icon: '🔷', baseHp: 400, baseMp: 240, baseAtk: 96, baseDef: 34,
+                abilities: [
+                    { name: 'Ямато', cost: 0, type: 'attack', power: 3.0, desc: 'Точный разрез клинком Ямато.' },
+                    { name: 'Judgement Cut', cost: 65, type: 'attack', power: 6.2, desc: 'Серия стремительных разрезов.' },
+                    { name: 'Быстрый разрез', cost: 85, type: 'attack', power: 7.8, desc: 'Мощная атака на высокой скорости.' },
+                    { name: 'Сосредоточение', cost: 90, type: 'buff', buffType: 'atk', power: 120, duration: 2, desc: 'Резко увеличивает силу атак.' },
+                    { name: 'Восстановление', cost: 80, type: 'heal', power: 185, desc: 'Восстанавливает здоровье.' }
+                ]
+            },
+            illidan: {
+                name: 'Иллидан', icon: '🟢', baseHp: 470, baseMp: 190, baseAtk: 84, baseDef: 43,
+                abilities: [
+                    { name: 'Боевые клинки', cost: 0, type: 'attack', power: 2.8, desc: 'Комбинация ударов двумя клинками.' },
+                    { name: 'Рывок Скверны', cost: 60, type: 'attack', power: 5.6, desc: 'Атака энергией Скверны.' },
+                    { name: 'Луч Скверны', cost: 85, type: 'attack', power: 7.2, desc: 'Сильный поток демонической энергии.' },
+                    { name: 'Метаморфоза', cost: 100, type: 'buff', buffType: 'atk', power: 115, duration: 3, desc: 'Пробуждает демоническую мощь.' },
+                    { name: 'Поглощение энергии', cost: 80, type: 'heal', power: 205, desc: 'Восстанавливает здоровье.' }
+                ]
+            },
+            flawery: {
+                name: 'Флавери', icon: '🌼', baseHp: 500, baseMp: 220, baseAtk: 76, baseDef: 50,
+                abilities: [
+                    { name: 'Удар лепестков', cost: 0, type: 'attack', power: 2.8, desc: 'Атака острыми лепестками.' },
+                    { name: 'Цветочный вихрь', cost: 60, type: 'attack', power: 5.7, desc: 'Вихрь из сияющих лепестков.' },
+                    { name: 'Корни-защитники', cost: 70, type: 'buff', buffType: 'def', power: 95, duration: 3, desc: 'Создаёт защиту из корней.' },
+                    { name: 'Весеннее пробуждение', cost: 85, type: 'heal', power: 240, desc: 'Восстанавливает здоровье.' },
+                    { name: 'Цветочный шторм', cost: 105, type: 'attack', power: 7.6, desc: 'Мощная атака силами природы.' }
+                ]
+            },
+            calamitas: {
+                name: 'Каламитас', icon: '🔥', baseHp: 440, baseMp: 320, baseAtk: 112, baseDef: 32,
+                abilities: [
+                    { name: 'Серный снаряд', cost: 0, type: 'attack', power: 3.1, desc: 'Сгусток серного пламени.' },
+                    { name: 'Пепельный взрыв', cost: 75, type: 'attack', power: 6.8, desc: 'Взрыв алого пламени.' },
+                    { name: 'Адское пламя', cost: 115, type: 'attack', power: 9.2, desc: 'Сильнейшая огненная атака.' },
+                    { name: 'Пепельный покров', cost: 90, type: 'buff', buffType: 'def', power: 85, duration: 3, desc: 'Укрепляет защиту магическим покровом.' },
+                    { name: 'Угольное сердце', cost: 95, type: 'heal', power: 220, desc: 'Восстанавливает здоровье.' }
+                ]
+            }
+        });
+
         const CHESTS = {
             wooden: {
                 name: 'Деревянный Сундук',
@@ -2084,6 +2137,9 @@ checkEtheriaConnection();
             statPoints: 0,
             inventory: [],
             learnedAbilities: [],
+            characterProfiles: {},
+            specialCharactersUnlocked: [],
+            specialCharacterCases: 0,
             
             baseHp: 0, baseMp: 0, baseAtk: 0, baseDef: 0,
 
@@ -2697,7 +2753,8 @@ checkEtheriaConnection();
             
             const allAbilities = state.hero.abilities.concat(state.learnedAbilities);
             const ability = allAbilities[abilityIndex];
-            if (state.combat.mp < ability.cost) return; 
+            if (!ability || state.combat.mp < ability.cost) return;
+            window.ethPlayHeroAbilityVoice?.(ability); 
             
             getElement('combat-overlay').classList.remove('hidden');
             state.combat.mp -= ability.cost;
@@ -3283,6 +3340,7 @@ body.dodge-open{overflow:hidden}
   return bossByLevel[level]||'goblin';
  }
  function heroSVG(type='warrior'){
+  const specialModel=window.ethSpecialHeroSVG?.(type);if(specialModel)return specialModel;
   const id='hero'+(++spriteSerial);const cls=normalizeHeroType(type);
   const art={
    warrior:`<path d="M70 84 Q110 58 150 84 L164 154 Q110 181 56 154Z" fill="#2563eb" stroke="#bfdbfe" stroke-width="5"/><path d="M79 93 L110 119 L141 93 L146 151 L74 151Z" fill="#1e40af" stroke="#60a5fa" stroke-width="3"/><path d="M80 78 L58 115 L75 132 L94 100 M140 78 L162 115 L145 132 L126 100" fill="#93c5fd" stroke="#dbeafe" stroke-width="4"/><path d="M82 67 Q85 35 110 35 Q135 35 138 67 L126 61 L110 52 L94 61Z" fill="#1e3a8a" stroke="#bfdbfe" stroke-width="4"/><path d="M87 66 Q110 52 133 66 L130 96 Q110 112 90 96Z" fill="#f3c9a5" stroke="#7c2d12" stroke-width="2"/><path d="M95 81 L104 81 M117 81 L126 81" stroke="#0f172a" stroke-width="4"/><path d="M104 95 L116 95" stroke="#7c2d12" stroke-width="3"/><path d="M82 152 L75 198 L101 198 L110 164 L121 198 L147 198 L138 152Z" fill="#1e293b" stroke="#64748b" stroke-width="3"/><g class="model-weapon"><path d="M164 75 L195 31 L205 40 L177 89 L177 174 L164 174Z" fill="#dbeafe" stroke="#fff" stroke-width="3"/><path d="M153 91 L187 111" stroke="#92400e" stroke-width="9" stroke-linecap="round"/><path d="M165 76 L184 94" stroke="#fbbf24" stroke-width="5"/></g><path d="M71 117 Q52 130 57 155" stroke="#bfdbfe" stroke-width="9" stroke-linecap="round"/>`,
@@ -3525,7 +3583,7 @@ body.dodge-open{overflow:hidden}
  function afterSoloAction(){updateCombatUI();if(state.combat.enemy.hp<=0){window.endCombat(true);return}beginSoloEnemyPhase()}
  function soloBasicAttack(){if(!state.combat?.isActive||state.combat.phase!=='player')return;state.combat.phase='resolving';renderSoloBattleMenu();triggerAnim('player-sprite','anim-attack-player');const enemy=state.combat.enemy;const damage=Math.max(1,Math.floor(getActiveAttack()*1.35-enemy.def*.45));enemy.hp=Math.max(0,enemy.hp-damage);soloBattleLog(`Вы наносите обычный удар: ${damage} урона.`,'text-amber-300');triggerAnim('enemy-sprite','anim-damage');showFloatingText('combat-enemy',`-${damage}`,'dmg');afterSoloAction()}
  function soloUsePotion(){if(!state.combat?.isActive||state.combat.phase!=='player'||(state.combat.potions||0)<=0)return;const stats=getFinalStats();const amount=Math.max(1,Math.floor(stats.hp*.30));state.combat.hp=Math.min(stats.hp,state.combat.hp+amount);state.combat.potions--;state.combat.phase='resolving';soloBattleLog(`Вы выпили зелье и восстановили ${amount} HP.`,'text-green-300');triggerAnim('player-sprite','anim-heal');showFloatingText('combat-player',`+${amount}`,'heal');soloMenuMode='root';afterSoloAction()}
- function soloUseMagic(index){if(!state.combat?.isActive||state.combat.phase!=='player')return;const ability=soloMagicSkills()[index];if(!ability||state.combat.mp<ability.cost)return;state.combat.mp-=ability.cost;state.combat.phase='resolving';soloMenuMode='root';soloBattleLog(`Вы применяете умение «${ability.name}».`,'text-violet-300');const stats=getFinalStats();if(ability.type==='attack'){let dmg=Math.max(1,Math.floor(getActiveAttack()*ability.power-state.combat.enemy.def));state.combat.enemy.hp=Math.max(0,state.combat.enemy.hp-dmg);soloBattleLog(`Магия наносит ${dmg} урона.`,'text-red-300');triggerAnim('enemy-sprite','anim-damage');showFloatingText('combat-enemy',`-${dmg}`,'dmg')}else if(ability.type==='heal'){const heal=Math.min(ability.power,stats.hp-state.combat.hp);state.combat.hp+=heal;soloBattleLog(`Восстановлено ${Math.floor(heal)} HP.`,'text-green-300');triggerAnim('player-sprite','anim-heal');showFloatingText('combat-player',`+${Math.floor(heal)}`,'heal')}else if(ability.type==='buff'){state.combat.playerBuffs.push({type:ability.buffType,amount:ability.power,duration:(ability.duration||2)+1,name:ability.name});soloBattleLog(`${ability.buffType==='def'?'Защита':'Атака'} усилена на ${ability.power}.`,'text-cyan-300');triggerAnim('player-sprite','anim-heal')}afterSoloAction()}
+ function soloUseMagic(index){if(!state.combat?.isActive||state.combat.phase!=='player')return;const ability=soloMagicSkills()[index];if(!ability||state.combat.mp<ability.cost)return;window.ethPlayHeroAbilityVoice?.(ability);state.combat.mp-=ability.cost;state.combat.phase='resolving';soloMenuMode='root';soloBattleLog(`Вы применяете умение «${ability.name}».`,'text-violet-300');const stats=getFinalStats();if(ability.type==='attack'){let dmg=Math.max(1,Math.floor(getActiveAttack()*ability.power-state.combat.enemy.def));state.combat.enemy.hp=Math.max(0,state.combat.enemy.hp-dmg);soloBattleLog(`Магия наносит ${dmg} урона.`,'text-red-300');triggerAnim('enemy-sprite','anim-damage');showFloatingText('combat-enemy',`-${dmg}`,'dmg')}else if(ability.type==='heal'){const heal=Math.min(ability.power,stats.hp-state.combat.hp);state.combat.hp+=heal;soloBattleLog(`Восстановлено ${Math.floor(heal)} HP.`,'text-green-300');triggerAnim('player-sprite','anim-heal');showFloatingText('combat-player',`+${Math.floor(heal)}`,'heal')}else if(ability.type==='buff'){state.combat.playerBuffs.push({type:ability.buffType,amount:ability.power,duration:(ability.duration||2)+1,name:ability.name});soloBattleLog(`${ability.buffType==='def'?'Защита':'Атака'} усилена на ${ability.power}.`,'text-cyan-300');triggerAnim('player-sprite','anim-heal')}afterSoloAction()}
  function beginSoloEnemyPhase(){if(!state.combat?.isActive)return;state.combat.phase='dodge';renderSoloBattleMenu();const enemy=state.combat.enemy;startDodgeArena({enemy,level:state.level,mode:'solo',onComplete:result=>{if(!state.combat?.isActive)return;const stats=getFinalStats();const perHit=Math.max(3,Math.floor((enemy.atk||12)*.19-getActiveDefense()*.13));const damage=perHit*result.hits;state.combat.hp=Math.max(0,state.combat.hp-damage);if(result.hits){soloBattleLog(`${enemy.name} задел вас ${result.hits} раз. Получено ${damage} урона.`,'text-red-300');showFloatingText('combat-player',`-${damage}`,'dmg');triggerAnim('player-sprite','anim-damage')}else soloBattleLog(`Вы уклонились от атаки ${enemy.name}!`,'text-emerald-300');updateCombatUI();if(state.combat.hp<=0){window.endCombat(false);return}if(typeof processBuffs==='function')processBuffs();state.combat.phase='player';renderSoloBattleMenu()}})}
  const oldEndCombatV2=window.endCombat;
  window.endCombat=function(win){if(dodge.active)finishDodgeArena();if(state.combat)state.combat.phase='finished';oldEndCombatV2(win)};
@@ -4340,14 +4398,79 @@ body.dodge-open{overflow:hidden}
     return ethFallbackHash(pass,salt);
   }
   function ethNormName(name){return String(name||'').trim().toLocaleLowerCase('ru-RU')}
-  function ethProfileFromState(){return {heroType:state.hero?.type||null,level:state.level||1,newGamePlus:Math.max(0,Number(state.newGamePlus)||0),totalXpEarned:Math.max(0,Number(state.totalXpEarned)||0),campaignRecorded:!!state._etheriaCampaignRecorded,xp:state.xp||0,nextXp:state.nextXp||100,heroLvl:state.heroLvl||1,statPoints:state.statPoints||0,baseHp:state.baseHp||0,baseMp:state.baseMp||0,baseAtk:state.baseAtk||0,baseDef:state.baseDef||0,inventory:JSON.parse(JSON.stringify(state.inventory||[])),learnedAbilities:JSON.parse(JSON.stringify(state.learnedAbilities||[])),gold:state.gold||0,pickaxeLevel:state.pickaxeLevel||1,minerals:JSON.parse(JSON.stringify(state.minerals||{})),darkCoins:Math.max(0,Number(state.darkCoins)||0),autoMineUnlocked:!!state.autoMineUnlocked,autoMineLevel:Math.min(5,Math.max(0,Number(state.autoMineLevel)||0)),autoMineNextAt:Math.max(0,Number(state.autoMineNextAt)||0),mineRockHp:state.mineRockHp||5,mineRockMaxHp:state.mineRockMaxHp||5,evolved:!!state.evolved,evolutionPending:!!state.evolutionPending,shopStockCycle:Number(state.shopStockCycle)||0,shopPurchased:JSON.parse(JSON.stringify(state.shopPurchased||{})),shopCases:JSON.parse(JSON.stringify(state.shopCases||{})),shopKeys:JSON.parse(JSON.stringify(state.shopKeys||{})),shopDarkOwned:JSON.parse(JSON.stringify(state.shopDarkOwned||[])),shopBoosts:JSON.parse(JSON.stringify(state.shopBoosts||{})),shopTitles:JSON.parse(JSON.stringify(state.shopTitles||[]))};}
+  function ethProfileFromState(){
+    const profiles=state.characterProfiles&&typeof state.characterProfiles==='object'&&!Array.isArray(state.characterProfiles)?JSON.parse(JSON.stringify(state.characterProfiles)):{};
+    if(state.hero?.type){
+      profiles[state.hero.type]={
+        level:state.level||1,newGamePlus:Math.max(0,Number(state.newGamePlus)||0),
+        totalXpEarned:Math.max(0,Number(state.totalXpEarned)||0),campaignRecorded:!!state._etheriaCampaignRecorded,
+        xp:state.xp||0,nextXp:state.nextXp||100,heroLvl:state.heroLvl||1,statPoints:state.statPoints||0,
+        baseHp:state.baseHp||0,baseMp:state.baseMp||0,baseAtk:state.baseAtk||0,baseDef:state.baseDef||0,
+        inventory:JSON.parse(JSON.stringify(state.inventory||[])),
+        learnedAbilities:JSON.parse(JSON.stringify(state.learnedAbilities||[])),
+        evolved:!!state.evolved,evolutionPending:!!state.evolutionPending
+      };
+    }
+    state.characterProfiles=profiles;
+    return {
+      heroType:state.hero?.type||null,level:state.level||1,newGamePlus:Math.max(0,Number(state.newGamePlus)||0),
+      totalXpEarned:Math.max(0,Number(state.totalXpEarned)||0),campaignRecorded:!!state._etheriaCampaignRecorded,
+      xp:state.xp||0,nextXp:state.nextXp||100,heroLvl:state.heroLvl||1,statPoints:state.statPoints||0,
+      baseHp:state.baseHp||0,baseMp:state.baseMp||0,baseAtk:state.baseAtk||0,baseDef:state.baseDef||0,
+      inventory:JSON.parse(JSON.stringify(state.inventory||[])),learnedAbilities:JSON.parse(JSON.stringify(state.learnedAbilities||[])),
+      gold:state.gold||0,pickaxeLevel:state.pickaxeLevel||1,minerals:JSON.parse(JSON.stringify(state.minerals||{})),
+      darkCoins:Math.max(0,Number(state.darkCoins)||0),autoMineUnlocked:!!state.autoMineUnlocked,
+      autoMineLevel:Math.min(5,Math.max(0,Number(state.autoMineLevel)||0)),autoMineNextAt:Math.max(0,Number(state.autoMineNextAt)||0),
+      mineRockHp:state.mineRockHp||5,mineRockMaxHp:state.mineRockMaxHp||5,evolved:!!state.evolved,evolutionPending:!!state.evolutionPending,
+      shopStockCycle:Number(state.shopStockCycle)||0,shopPurchased:JSON.parse(JSON.stringify(state.shopPurchased||{})),
+      shopCases:JSON.parse(JSON.stringify(state.shopCases||{})),shopKeys:JSON.parse(JSON.stringify(state.shopKeys||{})),
+      shopDarkOwned:JSON.parse(JSON.stringify(state.shopDarkOwned||[])),shopBoosts:JSON.parse(JSON.stringify(state.shopBoosts||{})),
+      shopTitles:JSON.parse(JSON.stringify(state.shopTitles||[])),
+      characterProfiles:profiles,
+      specialCharactersUnlocked:Array.isArray(state.specialCharactersUnlocked)?[...new Set(state.specialCharactersUnlocked)]:[],
+      specialCharacterCases:Math.max(0,Math.floor(Number(state.specialCharacterCases)||0))
+    };
+  }
   function ethSaveCurrentAccount(){if(!ethV4.account)return;const record=ethV4.accounts[ethNormName(ethV4.account.username)];if(!record)return;record.profile=ethProfileFromState();record.stats=record.stats||{};record.stats.gold=record.profile.gold;record.stats.bestLevel=Math.max(record.stats.bestLevel||1,record.profile.level||1);record.lastPlayed=new Date().toISOString();ethV4.account=record;ethSaveAccounts();ethRefreshAccountUI()}
   function ethRestoreProfile(record){
     const p=record?.profile;if(!p?.heroType)return false;
     const template=HERO_TEMPLATES[p.heroType]||HERO_TEMPLATES.warrior;
-    state.hero={...template,type:p.heroType};state.level=Math.max(1,Math.min(50,Number(p.level)||1));state.newGamePlus=Math.max(0,Number(p.newGamePlus)||0);state.totalXpEarned=Math.max(0,Number(p.totalXpEarned)||0,Number(record?.stats?.totalXp)||0);state._etheriaCampaignRecorded=!!p.campaignRecorded;state.xp=Number(p.xp)||0;state.nextXp=Number(p.nextXp)||100;state.heroLvl=Number(p.heroLvl)||1;state.statPoints=Number(p.statPoints)||0;
-    state.baseHp=Number(p.baseHp)||template.baseHp;state.baseMp=Number(p.baseMp)||template.baseMp;state.baseAtk=Number(p.baseAtk)||template.baseAtk;state.baseDef=Number(p.baseDef)||template.baseDef;
-    state.inventory=Array.isArray(p.inventory)?p.inventory.map(prepareArtifact):[];state.learnedAbilities=Array.isArray(p.learnedAbilities)?p.learnedAbilities:[];state.gold=Number(p.gold)||0;state.pickaxeLevel=Number(p.pickaxeLevel)||1;state.minerals=p.minerals||{};state.darkCoins=Math.max(0,Math.floor(Number(p.darkCoins)||0));state.autoMineUnlocked=!!p.autoMineUnlocked;state.autoMineLevel=Math.min(5,Math.max(0,Number(p.autoMineLevel)||0));state.autoMineNextAt=Math.max(0,Number(p.autoMineNextAt)||0);state.mineRockHp=Number(p.mineRockHp)||5;state.mineRockMaxHp=Number(p.mineRockMaxHp)||5;state.evolved=!!p.evolved;state.evolutionPending=!!p.evolutionPending;state.shopStockCycle=Number(p.shopStockCycle)||0;state.shopPurchased=p.shopPurchased&&typeof p.shopPurchased==='object'?p.shopPurchased:{};state.shopCases=p.shopCases&&typeof p.shopCases==='object'?p.shopCases:{};state.shopKeys=p.shopKeys&&typeof p.shopKeys==='object'?p.shopKeys:{};state.shopDarkOwned=Array.isArray(p.shopDarkOwned)?p.shopDarkOwned:[];state.shopBoosts=p.shopBoosts&&typeof p.shopBoosts==='object'?p.shopBoosts:{};state.shopTitles=Array.isArray(p.shopTitles)?p.shopTitles:[];
+    const profiles=p.characterProfiles&&typeof p.characterProfiles==='object'&&!Array.isArray(p.characterProfiles)?JSON.parse(JSON.stringify(p.characterProfiles)):{};
+    const active=profiles[p.heroType]||p;
+    state.characterProfiles=profiles;
+    state.specialCharactersUnlocked=Array.isArray(p.specialCharactersUnlocked)?[...new Set(p.specialCharactersUnlocked.filter(id=>['arthas','vergil','illidan','flawery','calamitas'].includes(id)))]:[];
+    if(['arthas','vergil','illidan','flawery','calamitas'].includes(p.heroType)&&!state.specialCharactersUnlocked.includes(p.heroType))state.specialCharactersUnlocked.push(p.heroType);
+    state.specialCharacterCases=Math.max(0,Math.floor(Number(p.specialCharacterCases)||0));
+    state.hero={...template,type:p.heroType};
+    state.level=Math.max(1,Math.min(50,Number(active.level)||1));
+    state.newGamePlus=Math.max(0,Number(active.newGamePlus)||0);
+    state.totalXpEarned=Math.max(0,Number(active.totalXpEarned)||0,Number(record?.stats?.totalXp)||0);
+    state._etheriaCampaignRecorded=!!active.campaignRecorded;
+    state.xp=Number(active.xp)||0;state.nextXp=Number(active.nextXp)||100;
+    state.heroLvl=Number(active.heroLvl)||1;state.statPoints=Number(active.statPoints)||0;
+    state.baseHp=Number(active.baseHp)||template.baseHp;state.baseMp=Number(active.baseMp)||template.baseMp;
+    state.baseAtk=Number(active.baseAtk)||template.baseAtk;state.baseDef=Number(active.baseDef)||template.baseDef;
+    state.inventory=Array.isArray(active.inventory)?active.inventory.map(prepareArtifact):[];
+    state.learnedAbilities=Array.isArray(active.learnedAbilities)?active.learnedAbilities:[];
+    state.evolved=!!active.evolved;state.evolutionPending=!!active.evolutionPending;
+    state.gold=Number(p.gold)||0;state.pickaxeLevel=Number(p.pickaxeLevel)||1;state.minerals=p.minerals||{};
+    state.darkCoins=Math.max(0,Math.floor(Number(p.darkCoins)||0));
+    state.autoMineUnlocked=!!p.autoMineUnlocked;state.autoMineLevel=Math.min(5,Math.max(0,Number(p.autoMineLevel)||0));
+    state.autoMineNextAt=Math.max(0,Number(p.autoMineNextAt)||0);
+    state.mineRockHp=Number(p.mineRockHp)||5;state.mineRockMaxHp=Number(p.mineRockMaxHp)||5;
+    state.shopStockCycle=Number(p.shopStockCycle)||0;state.shopPurchased=p.shopPurchased&&typeof p.shopPurchased==='object'?p.shopPurchased:{};
+    state.shopCases=p.shopCases&&typeof p.shopCases==='object'?p.shopCases:{};
+    state.shopKeys=p.shopKeys&&typeof p.shopKeys==='object'?p.shopKeys:{};
+    state.shopDarkOwned=Array.isArray(p.shopDarkOwned)?p.shopDarkOwned:[];
+    state.shopBoosts=p.shopBoosts&&typeof p.shopBoosts==='object'?p.shopBoosts:{};
+    state.shopTitles=Array.isArray(p.shopTitles)?p.shopTitles:[];
+    state.characterProfiles[p.heroType]={
+      level:state.level,newGamePlus:state.newGamePlus,totalXpEarned:state.totalXpEarned,
+      campaignRecorded:state._etheriaCampaignRecorded,xp:state.xp,nextXp:state.nextXp,heroLvl:state.heroLvl,
+      statPoints:state.statPoints,baseHp:state.baseHp,baseMp:state.baseMp,baseAtk:state.baseAtk,baseDef:state.baseDef,
+      inventory:JSON.parse(JSON.stringify(state.inventory)),learnedAbilities:JSON.parse(JSON.stringify(state.learnedAbilities)),
+      evolved:state.evolved,evolutionPending:state.evolutionPending
+    };
     state.combat={isActive:false,hp:0,mp:0,enemy:null,playerBuffs:[]};updateMapScreen();return true;
   }
   function ethTitlesFor(record){const a=Array.isArray(record?.titles)?record.titles:['Путник'];const shop=Array.isArray(record?.profile?.shopTitles)?record.profile.shopTitles:[];if(record?.role==='developer')return ['DEVELOPER'];return [...new Set([...a,...shop])].filter(t=>t!=='DEVELOPER')}
@@ -6735,7 +6858,7 @@ body.dodge-open{overflow:hidden}
     {id:'specialTitle',name:'Печать Верховной Ведьмы',icon:'♜',price:5,desc:'+15% ко всем итоговым характеристикам и +10% к золоту и опыту, пока титул выбран.',special:true},
     {id:'chance',name:'2× шансы',icon:'🎲',price:10,desc:'Повышает шанс получить предмет и смещает редкость наград вверх.',boost:'chanceMultiplier'},
     {id:'stats',name:'2× статистики',icon:'⚔️',price:15,desc:'Навсегда удваивает итоговые характеристики героя.',boost:'statsMultiplier'},
-    {id:'characterCase',name:'Особый кейс персонажа',icon:'🌌',price:30,desc:'Особый персонаж будет подключён в будущем. Покупка пока закрыта.',disabled:true}
+    {id:'characterCase',name:'Особый кейс персонажа',icon:'🌌',price:30,desc:'Один из пяти особых персонажей. Шансы выпадения указаны в описании кейса.'}
   ];
   const ETH_SHOP_TIPS = [
     'Не спеши тратить всё золото. Иногда лучшая покупка — та, которую ты ещё не сделал.',
@@ -6902,6 +7025,15 @@ body.dodge-open{overflow:hidden}
     host.replaceChildren();
     ETH_SHOP_DARK_ITEMS.forEach(item=>{
       const card=ethShopMakeCard({...item,kind:'dark',rarity:item.special?'УНИКАЛЬНЫЙ ТИТУЛ':'DARK MARKET'},true);
+      if(item.id==='characterCase'){
+        const stock=document.createElement('p');stock.className='eth-shop-character-case-stock';
+        stock.textContent='В запасе: '+Math.max(0,Math.floor(Number(state.specialCharacterCases)||0))+' кейс(а)';
+        card.appendChild(stock);
+        const open=document.createElement('button');open.type='button';open.className='eth-shop-buy eth-shop-character-case-open';
+        open.textContent='ОТКРЫТЬ КЕЙС';open.disabled=Number(state.specialCharacterCases)<1;
+        open.addEventListener('click',ethShopOpenCharacterCase);
+        card.appendChild(open);
+      }
       host.appendChild(card);
     });
   }
@@ -6993,18 +7125,214 @@ body.dodge-open{overflow:hidden}
     if(ethShopBusy||!ethShopAccountGate())return;
     ethShopEnsureState();
     const item=ETH_SHOP_DARK_ITEMS.find(entry=>entry.id===id);if(!item||item.disabled)return;
-    if(state.shopDarkOwned.includes(id)){ethShopFeedback('Этот товар уже приобретён.',true);return}
+    const repeatableCase=item.id==='characterCase';
+    if(!repeatableCase&&state.shopDarkOwned.includes(id)){ethShopFeedback('Этот товар уже приобретён.',true);return}
     if(Number(state.darkCoins)<item.price){ethShopFeedback('Недостаточно DARK COIN. Нужно '+item.price+' ◆.',true);return}
     ethShopBusy=true;
     try{
       if(item.special)await window.ethShopUnlockProfileTitle('Печать Верховной Ведьмы',true);
       state.darkCoins=Math.max(0,Number(state.darkCoins)||0)-item.price;
-      state.shopDarkOwned.push(id);
-      if(item.boost)state.shopBoosts[item.boost]=2;
+      if(repeatableCase){
+        state.specialCharacterCases=Math.max(0,Math.floor(Number(state.specialCharacterCases)||0))+1;
+      }else{
+        state.shopDarkOwned.push(id);
+        if(item.boost)state.shopBoosts[item.boost]=2;
+      }
       await ethShopSave();
-      ethShopFeedback(item.special?'Титул получен и надет. Его эффекты действуют, пока он выбран.':item.name+' активировано навсегда.');
+      ethShopFeedback(repeatableCase?'Особый кейс куплен. В запасе: '+state.specialCharacterCases+'.':' '+item.name+' активировано навсегда.');
       ethShopRenderDark();
+      if(window.updateInventoryScreen)window.updateInventoryScreen();
     }catch(error){ethShopFeedback(error.message||'Не удалось приобрести товар.',true)}
+    finally{ethShopBusy=false;ethShopCurrency();}
+  }
+
+  const ETH_SPECIAL_CHARACTER_IDS=['arthas','vergil','illidan','flawery','calamitas'];
+  const ETH_SPECIAL_CHARACTER_WEIGHTS=[
+    {id:'arthas',weight:20},{id:'vergil',weight:20},{id:'illidan',weight:20},
+    {id:'flawery',weight:19.9},{id:'calamitas',weight:0.1}
+  ];
+  function ethSpecialCharacterMeta(id){
+    const names={
+      arthas:{name:'Артас',icon:'❄️',accent:'#70c7ff'},
+      vergil:{name:'Вергилий',icon:'🔷',accent:'#9bc8ff'},
+      illidan:{name:'Иллидан',icon:'🟢',accent:'#62e69a'},
+      flawery:{name:'Флавери',icon:'🌼',accent:'#eebf69'},
+      calamitas:{name:'Каламитас',icon:'🔥',accent:'#ff7777'}
+    };
+    return names[id]||null;
+  }
+  window.ethSpecialHeroMeta=Object.fromEntries(ETH_SPECIAL_CHARACTER_IDS.map(id=>[id,ethSpecialCharacterMeta(id)]));
+
+  function ethSpecialHeroSVG(type){
+    const models={
+      arthas:'<path d="M77 83 L61 36 L91 57 L110 12 L129 57 L159 36 L143 83Z" fill="#a8dcff" stroke="#e8f7ff" stroke-width="5"/><path d="M78 84 Q110 58 142 84 L154 166 Q110 192 66 166Z" fill="#18365e" stroke="#75bfff" stroke-width="6"/><path d="M85 105 L110 126 L135 105 L144 158 L76 158Z" fill="#244c7c" stroke="#9bd8ff" stroke-width="4"/><path d="M88 75 Q110 62 132 75 L128 108 L110 119 L92 108Z" fill="#e8c8b5" stroke="#9ccfff" stroke-width="3"/><path d="M93 91 L104 91 M116 91 L127 91" stroke="#17253c" stroke-width="5"/><path d="M163 70 L190 28 L200 39 L176 88 L176 187 L162 187Z" fill="#c8edff" stroke="#f4fbff" stroke-width="4"/><path d="M152 89 L188 111" stroke="#8b633f" stroke-width="9"/><path d="M110 137 L110 164" stroke="#80d7ff" stroke-width="6"/>',
+      vergil:'<path d="M82 78 Q110 18 138 78 L132 102 L88 102Z" fill="#e6e9f3" stroke="#ffffff" stroke-width="4"/><path d="M75 91 Q110 68 145 91 L159 191 Q110 208 61 191Z" fill="#315a91" stroke="#a8d3ff" stroke-width="6"/><path d="M85 101 L110 128 L135 101 L143 185 L77 185Z" fill="#203e70" stroke="#8bbcff" stroke-width="4"/><path d="M88 85 Q110 71 132 85 L128 111 L110 122 L92 111Z" fill="#f0d5bf" stroke="#c2dfff" stroke-width="3"/><path d="M162 63 L184 35 L191 44 L174 75 L174 194" fill="none" stroke="#dcecff" stroke-width="8"/><path d="M154 79 L183 97" stroke="#9ab7d8" stroke-width="8"/><path d="M70 101 L49 164 L69 179" fill="none" stroke="#b2d8ff" stroke-width="8"/>',
+      illidan:'<path d="M84 78 L40 20 L71 34 L96 66 M136 78 L180 20 L149 34 L124 66" fill="#2c493d" stroke="#85f2a8" stroke-width="8"/><path d="M82 78 Q110 61 138 78 L153 166 Q110 193 67 166Z" fill="#315e48" stroke="#8af5a9" stroke-width="6"/><path d="M84 78 L63 42 L92 54 L110 12 L128 54 L157 42 L136 78Z" fill="#263d35" stroke="#b8ffd0" stroke-width="5"/><path d="M88 88 L132 88 L127 113 L93 113Z" fill="#101b19" stroke="#8af5a9" stroke-width="3"/><path d="M91 96 L105 96 M115 96 L129 96" stroke="#b5ff80" stroke-width="5"/><path d="M165 80 L190 47 L198 55 L174 98 L174 173" stroke="#b8ffd0" stroke-width="9" fill="none"/><path d="M56 80 L31 47 L24 55 L49 98 L49 173" stroke="#b8ffd0" stroke-width="9" fill="none"/><path d="M78 138 L110 158 L142 138" fill="none" stroke="#b5ff80" stroke-width="5"/>',
+      flawery:'<g fill="#f2c84f" stroke="#fff0a6" stroke-width="4"><ellipse cx="110" cy="42" rx="19" ry="37"/><ellipse cx="110" cy="42" rx="19" ry="37" transform="rotate(45 110 78)"/><ellipse cx="110" cy="42" rx="19" ry="37" transform="rotate(90 110 78)"/><ellipse cx="110" cy="42" rx="19" ry="37" transform="rotate(135 110 78)"/></g><circle cx="110" cy="78" r="31" fill="#f7df70" stroke="#ffeaa0" stroke-width="5"/><path d="M96 77 L102 77 M118 77 L124 77" stroke="#332b1d" stroke-width="5"/><path d="M96 91 Q110 99 124 91" fill="none" stroke="#8c4c42" stroke-width="3"/><path d="M78 117 Q110 103 142 117 L158 187 Q110 209 62 187Z" fill="#a6294a" stroke="#ff9aaf" stroke-width="6"/><path d="M80 129 L52 155 L70 167 M140 129 L168 155 L150 167" fill="none" stroke="#62bcd8" stroke-width="9"/><path d="M88 187 L80 214 M132 187 L140 214" stroke="#397d50" stroke-width="9" stroke-linecap="round"/>',
+      calamitas:'<path d="M67 98 L48 42 L87 60 L110 14 L133 60 L172 42 L153 98Z" fill="#5c1d2b" stroke="#ff9b8b" stroke-width="6"/><path d="M73 85 Q110 55 147 85 L158 188 Q110 213 62 188Z" fill="#351b2b" stroke="#e76a66" stroke-width="6"/><path d="M84 98 Q110 77 136 98 L128 132 L92 132Z" fill="#120f1c" stroke="#ff8a79" stroke-width="4"/><path d="M95 112 L105 112 M115 112 L125 112" stroke="#ffb17e" stroke-width="5"/><path d="M82 145 L110 164 L138 145 L148 190 L72 190Z" fill="#702635" stroke="#ff987a" stroke-width="4"/><path d="M165 65 Q190 43 197 75 Q198 99 177 111 Q160 93 165 65Z" fill="#ff684f" stroke="#ffd09d" stroke-width="4"/><path d="M48 126 Q22 103 34 83 Q52 94 55 111" fill="#ff704f" stroke="#ffbf8a" stroke-width="4"/>'
+    };
+    const meta=ethSpecialCharacterMeta(type);if(!meta||!models[type])return '';
+    return '<svg class="character-model hero-model eth-special-hero-model '+type+'" viewBox="0 0 230 225" role="img" aria-label="'+meta.name+'" xmlns="http://www.w3.org/2000/svg"><ellipse cx="110" cy="211" rx="76" ry="10" fill="#020617" opacity=".55"/><path d="M110 9 L110 2" stroke="'+meta.accent+'" stroke-width="4"/>'+models[type]+'<path d="M85 190 L80 211 M135 190 L140 211" stroke="#172033" stroke-width="9" stroke-linecap="round"/></svg>';
+  }
+  window.ethSpecialHeroSVG=ethSpecialHeroSVG;
+
+  function ethCharacterSnapshot(){
+    return {
+      level:state.level||1,newGamePlus:Math.max(0,Number(state.newGamePlus)||0),
+      totalXpEarned:Math.max(0,Number(state.totalXpEarned)||0),campaignRecorded:!!state._etheriaCampaignRecorded,
+      xp:state.xp||0,nextXp:state.nextXp||100,heroLvl:state.heroLvl||1,statPoints:state.statPoints||0,
+      baseHp:state.baseHp||0,baseMp:state.baseMp||0,baseAtk:state.baseAtk||0,baseDef:state.baseDef||0,
+      inventory:JSON.parse(JSON.stringify(state.inventory||[])),
+      learnedAbilities:JSON.parse(JSON.stringify(state.learnedAbilities||[])),
+      evolved:!!state.evolved,evolutionPending:!!state.evolutionPending
+    };
+  }
+  function ethMakeFreshCharacterProfile(type){
+    const t=HERO_TEMPLATES[type];
+    return {level:1,newGamePlus:0,totalXpEarned:0,campaignRecorded:false,xp:0,nextXp:100,heroLvl:1,statPoints:0,
+      baseHp:t.baseHp,baseMp:t.baseMp,baseAtk:t.baseAtk,baseDef:t.baseDef,inventory:[],learnedAbilities:[],evolved:false,evolutionPending:false};
+  }
+  function ethRenderSpecialHeroCards(){
+    const screen=byId('screen-hero-select');if(!screen)return;
+    let section=byId('eth-special-hero-selection');
+    if(!section){
+      section=document.createElement('section');section.id='eth-special-hero-selection';section.className='eth-special-selection';
+      const heading=document.createElement('h3');heading.className='eth-special-selection-title';heading.textContent='ОТКРЫТЫЕ ОСОБЫЕ ПЕРСОНАЖИ';
+      const note=document.createElement('p');note.className='eth-special-selection-note';note.textContent='У каждого персонажа отдельный уровень, опыт, навыки, характеристики и инвентарь.';
+      const grid=document.createElement('div');grid.id='eth-special-hero-grid';grid.className='eth-special-hero-grid';
+      section.append(heading,note,grid);
+      const baseGrid=screen.querySelector('.grid');
+      if(baseGrid)baseGrid.insertAdjacentElement('afterend',section);else screen.appendChild(section);
+    }
+    const grid=byId('eth-special-hero-grid');if(!grid)return;
+    grid.replaceChildren();
+    const unlocked=Array.isArray(state.specialCharactersUnlocked)?state.specialCharactersUnlocked:[];
+    section.hidden=unlocked.length===0;
+    unlocked.forEach(type=>{
+      const meta=ethSpecialCharacterMeta(type),template=HERO_TEMPLATES[type];if(!meta||!template)return;
+      const profile=state.characterProfiles?.[type]||ethMakeFreshCharacterProfile(type);
+      const card=document.createElement('article');card.className='eth-special-hero-card'+(state.hero?.type===type?' active':'');
+      const model=document.createElement('div');model.className='eth-special-hero-model-holder';model.innerHTML=ethSpecialHeroSVG(type);
+      const name=document.createElement('h4');name.textContent=meta.name;
+      const level=document.createElement('div');level.className='eth-special-hero-level';level.textContent='Уровень героя: '+(profile.heroLvl||1)+' · Этап: '+(profile.level||1);
+      const stats=document.createElement('p');stats.textContent='❤️ '+template.baseHp+' · 🔵 '+template.baseMp+' · ⚔️ '+template.baseAtk+' · 🛡️ '+template.baseDef;
+      const skills=document.createElement('p');skills.className='eth-special-hero-skills';skills.textContent='Способности: '+template.abilities.map(a=>a.name).join(' · ');
+      const choose=document.createElement('button');choose.type='button';choose.className='eth-special-hero-select';choose.textContent=state.hero?.type===type?'ВЫБРАН':'ВЫБРАТЬ ПЕРСОНАЖА';choose.disabled=state.hero?.type===type;
+      choose.addEventListener('click',()=>window.selectHero(type));
+      card.append(model,name,level,stats,skills,choose);grid.appendChild(card);
+    });
+  }
+  function ethRenderHeroSwitchControl(){
+    const host=byId('screen-map')?.querySelector('.eth-game-side .eth-side-actions');if(!host)return;
+    let button=byId('eth-switch-character-button');
+    if(!button){
+      button=document.createElement('button');button.id='eth-switch-character-button';button.type='button';
+      button.className='eth-ng-reset-button';button.textContent='СМЕНИТЬ ПЕРСОНАЖА';
+      button.addEventListener('click',()=>{ethRenderSpecialHeroCards();window.showScreen('hero-select')});
+      host.appendChild(button);
+    }
+  }
+
+  const ETH_CHARACTER_VOICE_LINES={
+    arthas:['Фростморн!','Лёд повинуется мне!','Сила Плети!','Падите перед Королём-личом!','Моя воля нерушима!'],
+    vergil:['Сила — это всё.','Я должен стать сильнее.','Посмотри на мою истинную силу.','Ты не сможешь меня остановить.'],
+    illidan:['Ты осмелился заговорить со мной?','Ты не готов!','Я — Иллидан Ярость Бури!','Моя сила принадлежит мне!','Скверна подчиняется моей воле!'],
+    flawery:['Расцветай!','Лепестки, вперёд!','Природа меня защитит!','Почувствуй силу цветения!']
+  };
+  const ETH_CHARACTER_VOICE_STYLE={
+    arthas:{rate:.88,pitch:.72},vergil:{rate:1.02,pitch:.82},illidan:{rate:.94,pitch:.76},flawery:{rate:1.08,pitch:1.2}
+  };
+  let ethLastHeroVoice='';
+  window.ethPlayHeroAbilityVoice=function(){
+    const type=state.hero?.type;
+    const lines=ETH_CHARACTER_VOICE_LINES[type];
+    if(!lines||!('speechSynthesis' in window)||!window.SpeechSynthesisUtterance)return false;
+    const audioSettings=window.ethGameAccountSnapshot?.();
+    if(audioSettings&&audioSettings.ambientEnabled===false)return false;
+    const available=lines.filter(line=>line!==ethLastHeroVoice);
+    const line=available[Math.floor(Math.random()*available.length)]||lines[0];
+    ethLastHeroVoice=line;
+    try{
+      const utterance=new SpeechSynthesisUtterance(line);
+      utterance.lang='ru-RU';
+      const voices=window.speechSynthesis.getVoices();
+      const russian=voices.find(v=>/^ru(-|$)/i.test(v.lang));
+      if(russian)utterance.voice=russian;
+      const style=ETH_CHARACTER_VOICE_STYLE[type]||{rate:1,pitch:1};
+      utterance.rate=style.rate;utterance.pitch=style.pitch;utterance.volume=.9;
+      window.speechSynthesis.cancel();
+      window.speechSynthesis.speak(utterance);
+      return true;
+    }catch(error){return false}
+  };
+
+  async function ethShopPlayCharacterRoulette(prizeType){
+    return new Promise(resolve=>{
+      const overlay=document.createElement('div');overlay.className='eth-shop-roulette-backdrop';
+      overlay.setAttribute('role','dialog');overlay.setAttribute('aria-modal','true');overlay.setAttribute('aria-label','Открытие особого кейса персонажа');
+      const modal=document.createElement('section');modal.className='eth-shop-roulette-modal';
+      const kicker=document.createElement('div');kicker.className='eth-shop-roulette-kicker';kicker.textContent='ЭТЕРИЯ · ОСОБЫЙ КЕЙС';
+      const title=document.createElement('h2');title.className='eth-shop-roulette-title';title.textContent='КЕЙС ПЕРСОНАЖА';
+      const sub=document.createElement('p');sub.className='eth-shop-roulette-sub';sub.textContent='Смотри, кто присоединится к твоей коллекции…';
+      const viewport=document.createElement('div');viewport.className='eth-shop-roulette-window';
+      const marker=document.createElement('div');marker.className='eth-shop-roulette-marker';marker.setAttribute('aria-hidden','true');
+      const track=document.createElement('div');track.className='eth-shop-roulette-track';
+      const total=37,winnerIndex=31;let winner=null;
+      for(let i=0;i<total;i++){
+        let type=ETH_SPECIAL_CHARACTER_IDS[Math.floor(Math.random()*ETH_SPECIAL_CHARACTER_IDS.length)];
+        if(i===winnerIndex)type=prizeType;
+        const meta=ethSpecialCharacterMeta(type);
+        const card=document.createElement('div');card.className='eth-shop-roulette-card rarity-legendary'+(i===winnerIndex?' is-winner':'');
+        const icon=document.createElement('div');icon.className='eth-shop-roulette-icon';icon.textContent=meta.icon;
+        const rarity=document.createElement('small');rarity.textContent='ОСОБЫЙ ПЕРСОНАЖ';
+        const name=document.createElement('b');name.textContent=meta.name;
+        card.append(icon,rarity,name);track.appendChild(card);
+        if(i===winnerIndex)winner=card;
+      }
+      viewport.append(track,marker);
+      const result=document.createElement('div');result.className='eth-shop-roulette-result';result.textContent=' ';
+      const close=document.createElement('button');close.type='button';close.className='eth-shop-roulette-close';close.disabled=true;close.textContent='РУЛЕТКА КРУТИТСЯ…';
+      modal.append(kicker,title,sub,viewport,result,close);overlay.appendChild(modal);document.body.appendChild(overlay);
+      close.addEventListener('click',()=>{overlay.remove();resolve()});
+      const reduced=!!(window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+      requestAnimationFrame(()=>requestAnimationFrame(()=>{
+        const delta=winner.offsetLeft+winner.offsetWidth/2-viewport.clientWidth/2;
+        track.style.transform='translate3d('+(-delta)+'px,0,0)';
+      }));
+      window.setTimeout(()=>{
+        const meta=ethSpecialCharacterMeta(prizeType);
+        result.textContent='ВЫПАЛ: '+meta.name;
+        close.disabled=false;close.textContent='ЗАБРАТЬ ПЕРСОНАЖА';
+        sub.textContent='Персонаж уже добавлен в меню выбора.';
+      },reduced?120:5000);
+    });
+  }
+  async function ethShopOpenCharacterCase(){
+    if(ethShopBusy||!ethShopAccountGate())return;
+    ethShopEnsureState();
+    state.specialCharacterCases=Math.max(0,Math.floor(Number(state.specialCharacterCases)||0));
+    if(state.specialCharacterCases<1){ethShopFeedback('Сначала приобрети особый кейс за 30 DARK COIN.',true);return}
+    ethShopBusy=true;
+    try{
+      const roll=Math.random()*100;let cursor=0;let prize='arthas';
+      for(const entry of ETH_SPECIAL_CHARACTER_WEIGHTS){cursor+=entry.weight;if(roll<cursor){prize=entry.id;break}}
+      state.specialCharacterCases--;
+      state.specialCharactersUnlocked=Array.isArray(state.specialCharactersUnlocked)?state.specialCharactersUnlocked:[];
+      state.characterProfiles=state.characterProfiles&&typeof state.characterProfiles==='object'?state.characterProfiles:{};
+      const duplicate=state.specialCharactersUnlocked.includes(prize);
+      if(duplicate){
+        state.darkCoins=Math.max(0,Number(state.darkCoins)||0)+5;
+      }else{
+        state.specialCharactersUnlocked.push(prize);
+        state.characterProfiles[prize]=ethMakeFreshCharacterProfile(prize);
+      }
+      await ethShopSave();
+      ethRenderSpecialHeroCards();
+      ethShopRenderDark();
+      await ethShopPlayCharacterRoulette(prize);
+      const meta=ethSpecialCharacterMeta(prize);
+      ethShopFeedback(duplicate?meta.name+' уже открыт. Компенсация: 5 DARK COIN.':meta.name+' открыт! Теперь он доступен в меню выбора персонажа.');
+    }catch(error){ethShopFeedback(error.message||'Не удалось открыть особый кейс.',true)}
     finally{ethShopBusy=false;ethShopCurrency();}
   }
   function ethShopRewardMultiplier(kind){
@@ -7287,6 +7615,7 @@ body.dodge-open{overflow:hidden}
   updateMapScreen=function(){
     ethPreviousUpdateMapForBalance.apply(this,arguments);
     ethRenderNgResetControl();
+    ethRenderHeroSwitchControl();
   };
   window.updateUpgradeScreen=updateUpgradeScreen;
   window.upgradeStat=function(stat){
@@ -7312,6 +7641,68 @@ body.dodge-open{overflow:hidden}
   };
   ethRenderNgResetControl();
 
+
+  window.selectHero=async function(type){
+    if(!HERO_TEMPLATES[type])return;
+    const special=ETH_SPECIAL_CHARACTER_IDS.includes(type);
+    state.specialCharactersUnlocked=Array.isArray(state.specialCharactersUnlocked)?state.specialCharactersUnlocked:[];
+    if(special&&!state.specialCharactersUnlocked.includes(type)){
+      ethShopFeedback('Этот персонаж ещё не открыт. Получи его из особого кейса.',true);
+      return;
+    }
+    state.characterProfiles=state.characterProfiles&&typeof state.characterProfiles==='object'?state.characterProfiles:{};
+    if(state.hero?.type){
+      state.characterProfiles[state.hero.type]=ethCharacterSnapshot();
+    }
+    const saved=state.characterProfiles[type]||ethMakeFreshCharacterProfile(type);
+    const template=HERO_TEMPLATES[type];
+    state.hero={...template,type:type};
+    state.level=Math.max(1,Math.min(50,Number(saved.level)||1));
+    state.newGamePlus=Math.max(0,Number(saved.newGamePlus)||0);
+    state.totalXpEarned=Math.max(0,Number(saved.totalXpEarned)||0);
+    state._etheriaCampaignRecorded=!!saved.campaignRecorded;
+    state.xp=Math.max(0,Number(saved.xp)||0);
+    state.nextXp=Math.max(100,Number(saved.nextXp)||100);
+    state.heroLvl=Math.max(1,Number(saved.heroLvl)||1);
+    state.statPoints=Math.max(0,Number(saved.statPoints)||0);
+    state.baseHp=Number(saved.baseHp)||template.baseHp;
+    state.baseMp=Number(saved.baseMp)||template.baseMp;
+    state.baseAtk=Number(saved.baseAtk)||template.baseAtk;
+    state.baseDef=Number(saved.baseDef)||template.baseDef;
+    state.inventory=Array.isArray(saved.inventory)?saved.inventory.map(prepareArtifact):[];
+    state.learnedAbilities=Array.isArray(saved.learnedAbilities)?JSON.parse(JSON.stringify(saved.learnedAbilities)):[];
+    state.evolved=!!saved.evolved;
+    state.evolutionPending=!!saved.evolutionPending;
+    state.characterProfiles[type]=ethCharacterSnapshot();
+    state.combat={isActive:false,hp:0,mp:0,enemy:null,playerBuffs:[]};
+    ethRenderSpecialHeroCards();
+    window.showScreen('map');
+    try{await window.ethCloudSaveCurrentAccount?.()}catch(error){console.warn('Character profile save failed:',error)}
+  };
+
+  const ethSpecialStyle=document.createElement('style');
+  ethSpecialStyle.textContent=
+    '.eth-special-selection{width:min(1120px,100%);margin:28px auto 12px;padding:0 12px 22px;}' +
+    '.eth-special-selection-title{text-align:center;color:#ffe4b5;font-weight:950;font-size:clamp(20px,3vw,28px);letter-spacing:.08em;text-shadow:0 3px 14px #24180f;}' +
+    '.eth-special-selection-note{text-align:center;color:#e5d2bb;font-size:12px;margin:7px 0 16px;}' +
+    '.eth-special-hero-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,220px),1fr));gap:14px;}' +
+    '.eth-special-hero-card{padding:16px;border:1px solid rgba(255,222,177,.42);border-radius:22px 30px 22px 30px;background:linear-gradient(145deg,rgba(30,31,47,.96),rgba(54,38,46,.94));color:#fff1d4;box-shadow:0 14px 35px rgba(0,0,0,.24);}' +
+    '.eth-special-hero-card.active{border-color:#ffd58e;box-shadow:0 0 0 2px rgba(255,213,142,.25),0 14px 35px rgba(0,0,0,.24);}' +
+    '.eth-special-hero-model-holder{height:145px;display:flex;align-items:center;justify-content:center;margin-bottom:6px;}' +
+    '.eth-special-hero-model-holder svg{height:145px;width:100%;max-width:180px;filter:drop-shadow(0 8px 12px rgba(0,0,0,.45));}' +
+    '.eth-special-hero-card h4{text-align:center;font-weight:950;font-size:20px;color:#ffe0aa;}' +
+    '.eth-special-hero-level{text-align:center;font-size:11px;color:#d8c2a9;margin:5px 0;}' +
+    '.eth-special-hero-card p{font-size:11px;line-height:1.5;color:#e9dbc8;margin:8px 0;}' +
+    '.eth-special-hero-card .eth-special-hero-skills{min-height:48px;color:#c9d7ec;}' +
+    '.eth-special-hero-select{width:100%;margin-top:8px;padding:11px;border:1px solid #ffd28e;border-radius:12px;background:linear-gradient(120deg,#f5d9a9,#df9d70);color:#382316;font-size:11px;font-weight:950;}' +
+    '.eth-special-hero-select:disabled{opacity:.55;filter:grayscale(.3);}' +
+    '.eth-shop-character-case-stock{margin:10px 0;color:#f6dfba;font-size:12px;font-weight:800;}' +
+    '.eth-shop-character-case-open{width:100%;margin-top:8px;}' +
+    '.eth-shop-character-case-open:disabled{opacity:.45;filter:grayscale(.4);}' +
+    '#eth-switch-character-button{margin-top:12px;}';
+  document.head.appendChild(ethSpecialStyle);
+  ethRenderSpecialHeroCards();
+  ethRenderHeroSwitchControl();
   window.ethGameTab('main');
   ethRefreshProfileChrome();
 })();
