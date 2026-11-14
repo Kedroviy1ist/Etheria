@@ -4668,7 +4668,6 @@ body.dodge-open{overflow:hidden}
           <label>Очки характеристик<input id="eth-admin-statpoints" class="eth-admin-input" type="number" min="0" value="0"></label>
           <label>Текущий XP<input id="eth-admin-xp" class="eth-admin-input" type="number" min="0" value="0"></label>
           <label>Всего заработано XP<input id="eth-admin-totalxp" class="eth-admin-input" type="number" min="0" value="0"></label>
-          <label>NG+ цикл<input id="eth-admin-ngplus" class="eth-admin-input" type="number" min="0" value="0"></label>
         </div>
         <button class="eth-admin-btn gold w-full mt-4" onclick="ethAdminStats()">⇧ Поставить в очередь / применить параметры</button>
       </div>
@@ -5093,7 +5092,6 @@ body.dodge-open{overflow:hidden}
       if(p.statPoints!==undefined)state.statPoints=Math.max(0,Math.floor(Number(p.statPoints)||0));
       if(p.xp!==undefined)state.xp=Math.max(0,Number(p.xp)||0);
       if(p.totalXpEarned!==undefined)state.totalXpEarned=Math.max(0,Number(p.totalXpEarned)||0);
-      if(p.newGamePlus!==undefined)state.newGamePlus=Math.max(0,Math.floor(Number(p.newGamePlus)||0));
       updateMapScreen();
       if(typeof updateUpgradeScreen==='function')updateUpgradeScreen();
       if(typeof updateInventoryScreen==='function')updateInventoryScreen();
@@ -5425,7 +5423,7 @@ body.dodge-open{overflow:hidden}
       const values={
         level:profile.level??1,herolvl:profile.heroLvl??1,runs:result.stats?.completed_runs??0,
         gold:profile.gold??0,hp:profile.baseHp??100,mp:profile.baseMp??50,atk:profile.baseAtk??10,def:profile.baseDef??5,
-        darkcoins:profile.darkCoins??0,statpoints:profile.statPoints??0,xp:profile.xp??0,totalxp:profile.totalXpEarned??0,ngplus:profile.newGamePlus??0
+        darkcoins:profile.darkCoins??0,statpoints:profile.statPoints??0,xp:profile.xp??0,totalxp:profile.totalXpEarned??0
       };
       Object.entries(values).forEach(([key,value])=>{const input=byId('eth-admin-'+key);if(input)input.value=value;});
       const status=byId('eth-admin-player-status');
@@ -5443,7 +5441,7 @@ body.dodge-open{overflow:hidden}
       if(!username) throw new Error('Сначала выбери игрока.');
       const fields={
         level:'level',heroLvl:'herolvl',completedRuns:'runs',gold:'gold',baseHp:'hp',baseMp:'mp',baseAtk:'atk',baseDef:'def',
-        darkCoins:'darkcoins',statPoints:'statpoints',xp:'xp',totalXpEarned:'totalxp',newGamePlus:'ngplus'
+        darkCoins:'darkcoins',statPoints:'statpoints',xp:'xp',totalXpEarned:'totalxp'
       };
       const patch={};
       Object.entries(fields).forEach(([key,id])=>{
@@ -5504,8 +5502,8 @@ body.dodge-open{overflow:hidden}
 
   window.ethAdminPreset = function(kind) {
     const presets={
-      starter:{level:1,herolvl:5,runs:0,gold:1500,hp:120,mp:60,atk:14,def:7,darkcoins:1,statpoints:8,xp:0,totalxp:0,ngplus:0},
-      veteran:{level:25,herolvl:50,runs:5,gold:25000,hp:950,mp:450,atk:180,def:90,darkcoins:15,statpoints:30,xp:0,totalxp:120000,ngplus:1}
+      starter:{level:1,herolvl:5,runs:0,gold:1500,hp:120,mp:60,atk:14,def:7,darkcoins:1,statpoints:8,xp:0,totalxp:0},
+      veteran:{level:25,herolvl:50,runs:5,gold:25000,hp:950,mp:450,atk:180,def:90,darkcoins:15,statpoints:30,xp:0,totalxp:120000}
     };
     const preset=presets[kind];if(!preset)return;
     Object.entries(preset).forEach(([key,value])=>{const input=byId('eth-admin-'+key);if(input)input.value=value;});
