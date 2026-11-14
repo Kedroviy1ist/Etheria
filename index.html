@@ -4643,6 +4643,27 @@ body.dodge-open{overflow:hidden}
     <div id="eth-auth-signed" class="eth-v4-panel hidden"><div class="flex items-center justify-between"><div><div class="text-xs text-slate-400">Выполнен вход</div><div id="eth-auth-name" class="text-2xl font-black"></div><div id="eth-auth-title" class="text-amber-300 font-bold"></div></div><div class="text-4xl">🛡️</div></div><div class="eth-v4-stat-grid mt-4"><div class="eth-v4-card"><small>Пройдено кампаний</small><b id="eth-auth-runs">0</b></div><div class="eth-v4-card"><small>Золото</small><b id="eth-auth-gold">0</b></div></div><div class="eth-v4-divider"></div><label class="text-sm block mb-1">Активный титул</label><select id="eth-title-select" class="eth-v4-select mb-3" onchange="ethChooseTitle()"></select><p class="eth-v4-muted mb-3">DEVELOPER — уникальный титул разработчика, другим аккаунтам выдать его нельзя.</p><div id="eth-developer-claim-box" class="eth-v4-panel mb-3"><label class="text-sm block mb-1">Одноразовый код разработчика</label><input id="eth-developer-claim-code" type="password" class="eth-v4-input mb-2" autocomplete="off" placeholder="Введи личный одноразовый код"><button class="eth-v4-btn gold w-full" onclick="ethClaimDeveloper()">Активировать DEVELOPER</button><p id="eth-developer-claim-message" class="eth-v4-muted mt-2"></p></div><div class="flex flex-wrap gap-2"><button id="eth-admin-open" class="eth-v4-btn gold hidden" onclick="ethOpenAdmin()">⚙ Панель разработчика</button><button class="eth-v4-btn" onclick="ethOpenLeaderboard()">Таблица лидеров</button><button class="eth-v4-btn" onclick="ethLogout()">Выйти из аккаунта</button></div></div>
     <p class="eth-v4-muted mt-3">Облачное сохранение синхронизирует прогресс между устройствами. Используется защищённая авторизация Supabase; пароль не хранится в игровом файле.</p>
   </div></div>
+  <style id="eth-leaderboard-polish">
+    #eth-leaderboard-modal .eth-v4-modal-inner{width:min(1040px,calc(100vw - 24px));max-height:min(88vh,900px);overflow:auto;padding:clamp(16px,2.4vw,26px)}
+    #eth-leaderboard-modal .overflow-x-auto{overflow-x:auto;border:1px solid #a77a554d;border-radius:16px;background:#fff8eacc}
+    #eth-leaderboard-modal .eth-v4-table{width:100%;min-width:720px;border-collapse:separate;border-spacing:0;font-size:13px;color:#50331f}
+    #eth-leaderboard-modal .eth-v4-table th{position:sticky;top:0;z-index:2;padding:13px 12px;background:linear-gradient(180deg,#f4d6ad,#e8bd8e);color:#674127;font-size:10px;font-weight:1000;letter-spacing:.1em;text-transform:uppercase;border-bottom:1px solid #9b704c}
+    #eth-leaderboard-modal .eth-v4-table td{padding:12px;border-bottom:1px solid #a77a5533;vertical-align:middle;background:#fffaf1a8}
+    #eth-leaderboard-modal .eth-v4-table tbody tr:nth-child(even) td{background:#f4e3c9a8}
+    #eth-leaderboard-modal .eth-v4-table tbody tr:hover td{background:#f7dfb9}
+    #eth-leaderboard-modal .eth-v4-table tbody tr:last-child td{border-bottom:0}
+    #eth-leaderboard-modal .eth-v4-table th:first-child,#eth-leaderboard-modal .eth-v4-table td:first-child{text-align:center;width:54px;font-weight:1000}
+    #eth-leaderboard-modal .eth-v4-table td:nth-child(4),#eth-leaderboard-modal .eth-v4-table td:nth-child(5),#eth-leaderboard-modal .eth-v4-table td:nth-child(7){text-align:center;font-variant-numeric:tabular-nums;font-weight:900;white-space:nowrap}
+    #eth-leaderboard-modal .eth-lb-player{display:flex;align-items:center;gap:11px;min-width:180px}
+    #eth-leaderboard-modal .eth-lb-avatar{display:block!important;flex:0 0 42px;width:42px!important;height:42px!important;min-width:42px;max-width:42px;aspect-ratio:1;border-radius:50%;object-fit:cover;object-position:center;border:2px solid #a9784d;box-shadow:0 2px 8px #55331f33;background:#ead1ad}
+    #eth-leaderboard-modal .eth-lb-player b{font-size:13px;font-weight:950;overflow-wrap:anywhere;color:#4d301e}
+    #eth-leaderboard-modal .eth-lb-chars{display:flex;align-items:center;flex-wrap:wrap;gap:6px;min-width:160px;max-width:280px}
+    #eth-leaderboard-modal .eth-lb-char{display:inline-flex;align-items:center;padding:5px 9px;border:1px solid #b98a5c;border-radius:999px;background:linear-gradient(135deg,#fff1d6,#e9c99d);color:#694326;font-size:11px;font-weight:900;line-height:1.2;white-space:nowrap;box-shadow:inset 0 1px #fff8}
+    #eth-leaderboard-modal .eth-v4-table tbody tr:nth-child(1) td:first-child{color:#9b681b}
+    #eth-leaderboard-modal .eth-v4-table tbody tr:nth-child(2) td:first-child{color:#68727a}
+    #eth-leaderboard-modal .eth-v4-table tbody tr:nth-child(3) td:first-child{color:#986044}
+    @media(max-width:600px){#eth-leaderboard-modal .eth-v4-modal-inner{padding:14px;border-radius:18px}#eth-leaderboard-modal .eth-lb-avatar{flex-basis:40px;width:40px!important;height:40px!important;min-width:40px;max-width:40px}#eth-leaderboard-modal .eth-v4-table th,#eth-leaderboard-modal .eth-v4-table td{padding:10px 9px}}
+  </style>
   <div id="eth-leaderboard-modal" class="eth-v4-modal"><div class="eth-v4-modal-inner"><div class="flex justify-between items-center gap-3 mb-3"><div><div class="text-xs uppercase tracking-widest text-amber-300">Облачный рейтинг</div><h2 class="text-3xl font-black">Таблица лидеров</h2></div><button class="eth-v4-btn" onclick="document.getElementById('eth-leaderboard-modal').classList.remove('open')">Закрыть</button></div><p class="eth-v4-muted mb-3">Сортировка: завершённые прохождения → золото → уровень героя. Показываются игроки из общей базы Этерии.</p><div class="overflow-x-auto"><table class="eth-v4-table"><thead><tr><th>#</th><th>Игрок</th><th>Титул</th><th>Прохождения</th><th>Золото</th></tr></thead><tbody id="eth-leaderboard-body"></tbody></table></div></div></div>
   <div id="eth-admin-modal" class="eth-v4-modal"><div class="eth-admin-shell">
   <style id="eth-admin-theme">
@@ -5384,7 +5405,7 @@ body.dodge-open{overflow:hidden}
     if(error){const row=document.createElement('tr'),cell=document.createElement('td');cell.colSpan=7;cell.textContent='Ошибка рейтинга: '+error.message;row.appendChild(cell);body.appendChild(row);return;}
     const names={arthas:'Артас',vergil:'Вергилий',illidan:'Иллидан',flawery:'Флавери',calamitas:'Каламитас'};
     (data||[]).forEach((entry,index)=>{
-      const row=document.createElement('tr');
+      const row=document.createElement('tr');row.className=index<3?'eth-lb-top-rank eth-lb-rank-'+(index+1):'eth-lb-rank';
       const rank=document.createElement('td');rank.textContent=String(index+1);row.appendChild(rank);
       const playerCell=document.createElement('td'),player=document.createElement('div');player.className='eth-lb-player';
       const avatar=document.createElement('img');avatar.className='eth-lb-avatar';avatar.alt='';
