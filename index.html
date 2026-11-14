@@ -8007,7 +8007,18 @@ body.dodge-open{overflow:hidden}
     state.combat={isActive:false,hp:0,mp:0,enemy:null,playerBuffs:[]};
     ethRenderSpecialHeroCards();
     window.showScreen('map');
-    try{await window.ethCloudSaveCurrentAccount?.()}catch(error){console.warn('Character profile save failed:',error)}
+    if(typeof updateMapScreen==='function')updateMapScreen();
+    if(typeof mountHeroModels==='function')mountHeroModels();
+    try{
+      const savedToCloud=await window.ethCloudSaveCurrentAccount?.();
+      if(savedToCloud===true){
+        const notice=byId('eth-admin-player-notice');
+        if(notice){notice.textContent='Персонаж переключён. Обновляю игру…';notice.classList.add('show');}
+        window.setTimeout(()=>window.location.reload(),350);
+      }else if(savedToCloud===false){
+        console.warn('Character switch applied locally; cloud save was not confirmed.');
+      }
+    }catch(error){console.warn('Character profile save failed:',error)}
   };
 
   const ethSpecialStyle=document.createElement('style');
