@@ -5339,8 +5339,9 @@ body.dodge-open{overflow:hidden}
       state.darkCoins=Math.max(0,Number(data.dark_coins)||0);
       state.specialCharacterCases=Math.max(0,Math.floor(Number(data.special_character_cases)||0));
       ethSaveCurrentAccount();
-      if(typeof ethShopCurrency==='function')ethShopCurrency();
-      if(typeof ethShopRenderDark==='function')ethShopRenderDark();
+      const darkCounter=byId('eth-shop-dark-coins');if(darkCounter)darkCounter.textContent=String(state.darkCoins);
+      document.querySelectorAll('.eth-shop-character-case-stock').forEach(node=>node.textContent='В запасе: '+state.specialCharacterCases+' кейс(а)');
+      document.querySelectorAll('.eth-shop-character-case-open').forEach(node=>node.disabled=state.specialCharacterCases<1);
       const extra=data.character_case_awarded?' Также выпал кейс особого персонажа!':'';
       status.textContent='Промокод '+code+' активирован: +'+data.dark_coins_awarded+' DARK COIN.'+extra;input.value='';
       await window.ethCloudSaveCurrentAccount?.();
