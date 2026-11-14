@@ -4744,7 +4744,7 @@ body.dodge-open{overflow:hidden}
           <option value="flawery">🌼 Флавери</option>
           <option value="calamitas">🔥 Каламитас</option>
         </select>
-        <button class="eth-admin-btn gold w-full" onclick="ethAdminGrantCharacter()">♜ Выдать выбранного персонажа</button>
+        <button id="eth-admin-character-grant-button" class="eth-admin-btn gold w-full" onclick="ethAdminGrantCharacter()">♜ Выдать выбранного персонажа</button>
       </div>
     </section>
     <section data-admin-panel="queue" class="eth-admin-hidden">
@@ -5494,18 +5494,19 @@ body.dodge-open{overflow:hidden}
     await window.ethAdminRefreshDashboard();
   };
 
-  window.ethAdminCharacterTargetState={username:'',unlocked:[]};
-  function ethAdminRenderCharacterOwnership(username,unlocked){
+  window.ethAdminCharacterTargetState={username:'',unlocked:[],pending:[]};
+  function ethAdminRenderCharacterOwnership(username,unlocked,pending){
     const labels={arthas:'Артас',vergil:'Вергилий',illidan:'Иллидан',flawery:'Флавери',calamitas:'Каламитас'};
     const ids=Object.keys(labels);
     const owned=ids.filter(id=>Array.isArray(unlocked)&&unlocked.includes(id));
+    const waiting=ids.filter(id=>Array.isArray(pending)&&pending.includes(id));
     const host=byId('eth-admin-character-target');
-    if(host)host.textContent='Игрок: '+username+' · открыто '+owned.length+'/'+ids.length+': '+(owned.length?owned.map(id=>labels[id]).join(', '):'пока нет');
+    if(host)host.textContent='Игрок: '+username+' · открыто '+owned.length+'/'+ids.length+': '+(owned.length?owned.map(id=>labels[id]).join(', '):'пока нет')+(waiting.length?' · ожидают выдачи: '+waiting.map(id=>labels[id]).join(', '):'');
     const select=byId('eth-admin-character-id');
     if(select){
       Array.from(select.options).forEach(option=>{
         const id=option.value;
-        if(labels[id])option.textContent=option.textContent.replace(/ — уже открыт$/,'')+(owned.includes(id)?' — уже открыт':'');
+        if(labels[id])option.textContent=option.textContent.replace(/ — (уже открыт|в очереди)$/,'')+(owned.includes(id)?' — уже открыт':waiting.includes(id)?' — в очереди':'');
       });
     }
   }
@@ -5517,7 +5518,7 @@ body.dodge-open{overflow:hidden}
       const result=await ethCloudAdminGet(username);
       const profile=result.save_data||{};
       const unlocked=Array.isArray(profile.specialCharactersUnlocked)?[...new Set(profile.specialCharactersUnlocked.filter(id=>['arthas','vergil','illidan','flawery','calamitas'].includes(id)))]:[];
-      window.ethAdminCharacterTargetState={username:result.username,unlocked};
+      window.ethAdminCharacterTargetState={username:result.username,unlocked,pending:[]};
       ethAdminRenderCharacterOwnership(result.username,unlocked);
       const values={
         level:profile.level??1,herolvl:profile.heroLvl??1,runs:result.stats?.completed_runs??0,
@@ -5600,6 +5601,10 @@ body.dodge-open{overflow:hidden}
   };
 
   window.ethAdminGrantCharacter = async function() {
+    if(window.ethAdminCharacterGrantBusy)return;
+    window.ethAdminCharacterGrantBusy=true;
+    const button=byId('eth-admin-character-grant-button');
+    if(button)button.disabled=true;
     try {
       if(ethV4.account?.role!=='developer') throw new Error('Нет доступа разработчика.');
       const username=String(byId('eth-admin-target')?.value||'').trim();
@@ -5607,20 +5612,23 @@ body.dodge-open{overflow:hidden}
       const labels={arthas:'Артас',vergil:'Вергилий',illidan:'Иллидан',flawery:'Флавери',calamitas:'Каламитас'};
       if(!username) throw new Error('Сначала выбери игрока во вкладке «Игрок».');
       if(!Object.prototype.hasOwnProperty.call(labels,characterId)) throw new Error('Неизвестный особый персонаж.');
-      const current=window.ethAdminCharacterTargetState||{username:'',unlocked:[]};
+      const current=window.ethAdminCharacterTargetState||{username:'',unlocked:[],pending:[]};
       if(!current.username||current.username.toLowerCase()!==username.toLowerCase()) throw new Error('Сначала загрузи профиль этого игрока во вкладке «Игрок».');
       if(!Array.isArray(current.unlocked))current.unlocked=[];
-      if(current.unlocked.includes(characterId)){
-        throw new Error('У этого игрока персонаж уже открыт.');
-      }
+      if(!Array.isArray(current.pending))current.pending=[];
+      if(current.unlocked.includes(characterId))throw new Error('У этого игрока персонаж уже открыт.');
+      if(current.pending.includes(characterId))throw new Error('Выдача этого персонажа уже ожидает доставки.');
       const {data,error}=await ethSupabaseClient.rpc('admin_grant_character',{p_username:username,p_character_id:characterId});
       if(error) throw error;
       if(data?.status==='applied'){
-        if(!Array.isArray(current.unlocked))current.unlocked=[];
         if(!current.unlocked.includes(characterId))current.unlocked.push(characterId);
-        window.ethAdminCharacterTargetState={username,unlocked:current.unlocked};
-        ethAdminRenderCharacterOwnership(username,current.unlocked);
+        current.pending=current.pending.filter(id=>id!==characterId);
+        window.ethAdminCharacterTargetState={username,unlocked:current.unlocked,pending:current.pending};
+      }else if(data?.status==='queued'){
+        if(!current.pending.includes(characterId))current.pending.push(characterId);
+        window.ethAdminCharacterTargetState={username,unlocked:current.unlocked,pending:current.pending};
       }
+      ethAdminRenderCharacterOwnership(username,current.unlocked,current.pending);
       const message=byId('eth-admin-message');
       if(message)message.textContent=data?.status==='queued'
         ? 'Персонаж «'+labels[characterId]+'» поставлен в очередь. Он откроется игроку после безопасного момента в игре.'
@@ -5629,6 +5637,9 @@ body.dodge-open{overflow:hidden}
     } catch(error) {
       const message=byId('eth-admin-message');
       if(message)message.textContent='Ошибка: '+(error.message||error);
+    } finally {
+      window.ethAdminCharacterGrantBusy=false;
+      if(button)button.disabled=false;
     }
   };
 
