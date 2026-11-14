@@ -1422,9 +1422,9 @@ checkEtheriaConnection();
                 <div class="eth-setting-icon">✦</div>
                 <div class="eth-setting-content">
                   <h3>Промокод</h3>
-                  <p>Здесь можно будет активировать промокоды будущих событий Этерии.</p>
-                  <div class="eth-settings-promo-row"><input id="eth-promo-input" class="eth-game-input" maxlength="40" placeholder="Промокоды скоро появятся" disabled><button class="eth-game-side-button" disabled type="button">СКОРО</button></div>
-                  <p id="eth-promo-status" class="eth-settings-status">Система активации подключится после запуска промокодов.</p>
+                  <p>Введи код обновления, чтобы получить награду.</p>
+                  <div class="eth-settings-promo-row"><input id="eth-promo-input" class="eth-game-input" maxlength="40" autocomplete="off" placeholder="Введи промокод"><button class="eth-game-side-button" onclick="ethRedeemPromo()" type="button">АКТИВИРОВАТЬ</button></div>
+                  <p id="eth-promo-status" class="eth-settings-status">Доступны: BIGUPDATE, ETHERIA, BUGFIXES. Каждый код действует один раз на аккаунт.</p>
                 </div>
               </div>
               <div class="eth-game-setting-row">
