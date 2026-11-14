@@ -2754,7 +2754,6 @@ checkEtheriaConnection();
             const allAbilities = state.hero.abilities.concat(state.learnedAbilities);
             const ability = allAbilities[abilityIndex];
             if (!ability || state.combat.mp < ability.cost) return;
-            window.ethPlayHeroAbilityVoice?.(ability); 
             
             getElement('combat-overlay').classList.remove('hidden');
             state.combat.mp -= ability.cost;
@@ -3583,7 +3582,7 @@ body.dodge-open{overflow:hidden}
  function afterSoloAction(){updateCombatUI();if(state.combat.enemy.hp<=0){window.endCombat(true);return}beginSoloEnemyPhase()}
  function soloBasicAttack(){if(!state.combat?.isActive||state.combat.phase!=='player')return;state.combat.phase='resolving';renderSoloBattleMenu();triggerAnim('player-sprite','anim-attack-player');const enemy=state.combat.enemy;const damage=Math.max(1,Math.floor(getActiveAttack()*1.35-enemy.def*.45));enemy.hp=Math.max(0,enemy.hp-damage);soloBattleLog(`Вы наносите обычный удар: ${damage} урона.`,'text-amber-300');triggerAnim('enemy-sprite','anim-damage');showFloatingText('combat-enemy',`-${damage}`,'dmg');afterSoloAction()}
  function soloUsePotion(){if(!state.combat?.isActive||state.combat.phase!=='player'||(state.combat.potions||0)<=0)return;const stats=getFinalStats();const amount=Math.max(1,Math.floor(stats.hp*.30));state.combat.hp=Math.min(stats.hp,state.combat.hp+amount);state.combat.potions--;state.combat.phase='resolving';soloBattleLog(`Вы выпили зелье и восстановили ${amount} HP.`,'text-green-300');triggerAnim('player-sprite','anim-heal');showFloatingText('combat-player',`+${amount}`,'heal');soloMenuMode='root';afterSoloAction()}
- function soloUseMagic(index){if(!state.combat?.isActive||state.combat.phase!=='player')return;const ability=soloMagicSkills()[index];if(!ability||state.combat.mp<ability.cost)return;window.ethPlayHeroAbilityVoice?.(ability);state.combat.mp-=ability.cost;state.combat.phase='resolving';soloMenuMode='root';soloBattleLog(`Вы применяете умение «${ability.name}».`,'text-violet-300');const stats=getFinalStats();if(ability.type==='attack'){let dmg=Math.max(1,Math.floor(getActiveAttack()*ability.power-state.combat.enemy.def));state.combat.enemy.hp=Math.max(0,state.combat.enemy.hp-dmg);soloBattleLog(`Магия наносит ${dmg} урона.`,'text-red-300');triggerAnim('enemy-sprite','anim-damage');showFloatingText('combat-enemy',`-${dmg}`,'dmg')}else if(ability.type==='heal'){const heal=Math.min(ability.power,stats.hp-state.combat.hp);state.combat.hp+=heal;soloBattleLog(`Восстановлено ${Math.floor(heal)} HP.`,'text-green-300');triggerAnim('player-sprite','anim-heal');showFloatingText('combat-player',`+${Math.floor(heal)}`,'heal')}else if(ability.type==='buff'){state.combat.playerBuffs.push({type:ability.buffType,amount:ability.power,duration:(ability.duration||2)+1,name:ability.name});soloBattleLog(`${ability.buffType==='def'?'Защита':'Атака'} усилена на ${ability.power}.`,'text-cyan-300');triggerAnim('player-sprite','anim-heal')}afterSoloAction()}
+ function soloUseMagic(index){if(!state.combat?.isActive||state.combat.phase!=='player')return;const ability=soloMagicSkills()[index];if(!ability||state.combat.mp<ability.cost)return;state.combat.mp-=ability.cost;state.combat.phase='resolving';soloMenuMode='root';soloBattleLog(`Вы применяете умение «${ability.name}».`,'text-violet-300');const stats=getFinalStats();if(ability.type==='attack'){let dmg=Math.max(1,Math.floor(getActiveAttack()*ability.power-state.combat.enemy.def));state.combat.enemy.hp=Math.max(0,state.combat.enemy.hp-dmg);soloBattleLog(`Магия наносит ${dmg} урона.`,'text-red-300');triggerAnim('enemy-sprite','anim-damage');showFloatingText('combat-enemy',`-${dmg}`,'dmg')}else if(ability.type==='heal'){const heal=Math.min(ability.power,stats.hp-state.combat.hp);state.combat.hp+=heal;soloBattleLog(`Восстановлено ${Math.floor(heal)} HP.`,'text-green-300');triggerAnim('player-sprite','anim-heal');showFloatingText('combat-player',`+${Math.floor(heal)}`,'heal')}else if(ability.type==='buff'){state.combat.playerBuffs.push({type:ability.buffType,amount:ability.power,duration:(ability.duration||2)+1,name:ability.name});soloBattleLog(`${ability.buffType==='def'?'Защита':'Атака'} усилена на ${ability.power}.`,'text-cyan-300');triggerAnim('player-sprite','anim-heal')}afterSoloAction()}
  function beginSoloEnemyPhase(){if(!state.combat?.isActive)return;state.combat.phase='dodge';renderSoloBattleMenu();const enemy=state.combat.enemy;startDodgeArena({enemy,level:state.level,mode:'solo',onComplete:result=>{if(!state.combat?.isActive)return;const stats=getFinalStats();const perHit=Math.max(3,Math.floor((enemy.atk||12)*.19-getActiveDefense()*.13));const damage=perHit*result.hits;state.combat.hp=Math.max(0,state.combat.hp-damage);if(result.hits){soloBattleLog(`${enemy.name} задел вас ${result.hits} раз. Получено ${damage} урона.`,'text-red-300');showFloatingText('combat-player',`-${damage}`,'dmg');triggerAnim('player-sprite','anim-damage')}else soloBattleLog(`Вы уклонились от атаки ${enemy.name}!`,'text-emerald-300');updateCombatUI();if(state.combat.hp<=0){window.endCombat(false);return}if(typeof processBuffs==='function')processBuffs();state.combat.phase='player';renderSoloBattleMenu()}})}
  const oldEndCombatV2=window.endCombat;
  window.endCombat=function(win){if(dodge.active)finishDodgeArena();if(state.combat)state.combat.phase='finished';oldEndCombatV2(win)};
@@ -7235,42 +7234,6 @@ body.dodge-open{overflow:hidden}
       host.appendChild(button);
     }
   }
-
-  const ETH_CHARACTER_VOICE_LINES={
-    arthas:['Фростморн!','Лёд повинуется мне!','Сила Плети!','Падите перед Королём-личом!','Моя воля нерушима!'],
-    vergil:['I need more power.','You shall die.','Now I am motivated.','Might controls everything.'],
-    illidan:['Ты осмелился заговорить со мной?','Ты не готов!','Я — Иллидан Ярость Бури!','Моя сила принадлежит мне!','Скверна подчиняется моей воле!'],
-    flawery:['Bloom!','Petals, attack!','Nature will protect me!','Feel the power of the bloom!']
-  };
-  const ETH_CHARACTER_VOICE_LANG={arthas:'ru-RU',vergil:'en-US',illidan:'ru-RU',flawery:'en-US'};
-  const ETH_CHARACTER_VOICE_STYLE={
-    arthas:{rate:.88,pitch:.72},vergil:{rate:1.02,pitch:.82},illidan:{rate:.94,pitch:.76},flawery:{rate:1.08,pitch:1.2}
-  };
-  let ethLastHeroVoice='';
-  window.ethPlayHeroAbilityVoice=function(){
-    const type=state.hero?.type;
-    const lines=ETH_CHARACTER_VOICE_LINES[type];
-    if(!lines||!('speechSynthesis' in window)||!window.SpeechSynthesisUtterance)return false;
-    const audioSettings=window.ethGameAccountSnapshot?.();
-    if(audioSettings&&audioSettings.ambientEnabled===false)return false;
-    const available=lines.filter(line=>line!==ethLastHeroVoice);
-    const line=available[Math.floor(Math.random()*available.length)]||lines[0];
-    ethLastHeroVoice=line;
-    try{
-      const utterance=new SpeechSynthesisUtterance(line);
-      const lang=ETH_CHARACTER_VOICE_LANG[type]||'ru-RU';
-      utterance.lang=lang;
-      const voices=window.speechSynthesis.getVoices();
-      const preferred=voices.find(v=>v.lang.toLowerCase()===lang.toLowerCase())||
-        voices.find(v=>v.lang.toLowerCase().startsWith(lang.slice(0,2).toLowerCase()));
-      if(preferred)utterance.voice=preferred;
-      const style=ETH_CHARACTER_VOICE_STYLE[type]||{rate:1,pitch:1};
-      utterance.rate=style.rate;utterance.pitch=style.pitch;utterance.volume=.9;
-      window.speechSynthesis.cancel();
-      window.speechSynthesis.speak(utterance);
-      return true;
-    }catch(error){return false}
-  };
 
   async function ethShopPlayCharacterRoulette(prizeType){
     return new Promise(resolve=>{
