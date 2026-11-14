@@ -4681,7 +4681,7 @@ body.dodge-open{overflow:hidden}
     #eth-admin-modal .eth-admin-hidden{display:none!important}
     #eth-admin-modal .eth-admin-notice{width:100%;min-height:110px;resize:vertical}
     @media(max-width:850px){#eth-admin-modal .eth-admin-shell{grid-template-columns:1fr;max-height:calc(100vh - 12px);min-height:0}#eth-admin-modal .eth-admin-side{padding:10px;border-right:0;border-bottom:1px solid #94a3b833}#eth-admin-modal .eth-admin-brand{display:none}#eth-admin-modal .eth-admin-nav{grid-template-columns:repeat(6,minmax(0,1fr));gap:4px}#eth-admin-modal .eth-admin-nav button{text-align:center;padding:9px 3px;font-size:10px}#eth-admin-modal .eth-admin-live{display:none}#eth-admin-modal .eth-admin-main{padding:12px;max-height:calc(100vh - 116px)}#eth-admin-modal .eth-admin-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}#eth-admin-modal .eth-admin-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
-    @media(max-width:420px){#eth-admin-modal .eth-admin-head{align-items:flex-start;flex-direction:column}#eth-admin-modal .eth-admin-queue-row{grid-template-columns:1fr}#eth-admin-modal .eth-admin-player{grid-template-columns:1fr}}
+    @media(max-width:420px){#eth-admin-modal .eth-admin-head{align-items:flex-start;flex-direction:column}#eth-admin-modal .eth-admin-nav{grid-template-columns:repeat(3,minmax(0,1fr))}#eth-admin-modal .eth-admin-queue-row{grid-template-columns:1fr}#eth-admin-modal .eth-admin-player{grid-template-columns:1fr}}
   </style>
   <aside class="eth-admin-side">
     <div><div class="eth-admin-brand">ETHERIA / CONTROL</div><div class="text-2xl font-black mt-2">DEVELOPER</div><div class="eth-admin-muted mt-1">Центр управления миром</div></div>
@@ -5214,7 +5214,7 @@ body.dodge-open{overflow:hidden}
         const id=String(command.command_id||'');
         const kind=command.command_type;
         const already=ethAdminAppliedCommandIds.includes(id);
-        let needsSave=(kind==='player_patch'||kind==='grant_item');
+        let needsSave=(kind==='player_patch'||kind==='grant_item'||kind==='grant_character');
         try{
           if(!already){
             const changed=ethAdminApplyCommand(command);
@@ -5608,7 +5608,9 @@ body.dodge-open{overflow:hidden}
       if(!username) throw new Error('Сначала выбери игрока во вкладке «Игрок».');
       if(!Object.prototype.hasOwnProperty.call(labels,characterId)) throw new Error('Неизвестный особый персонаж.');
       const current=window.ethAdminCharacterTargetState||{username:'',unlocked:[]};
-      if(current.username&&current.username.toLowerCase()===username.toLowerCase()&&current.unlocked.includes(characterId)){
+      if(!current.username||current.username.toLowerCase()!==username.toLowerCase()) throw new Error('Сначала загрузи профиль этого игрока во вкладке «Игрок».');
+      if(!Array.isArray(current.unlocked))current.unlocked=[];
+      if(current.unlocked.includes(characterId)){
         throw new Error('У этого игрока персонаж уже открыт.');
       }
       const {data,error}=await ethSupabaseClient.rpc('admin_grant_character',{p_username:username,p_character_id:characterId});
@@ -5616,7 +5618,7 @@ body.dodge-open{overflow:hidden}
       if(data?.status==='applied'){
         if(!Array.isArray(current.unlocked))current.unlocked=[];
         if(!current.unlocked.includes(characterId))current.unlocked.push(characterId);
-        window.ethAdminCharacterTargetState={username:current.username||username,unlocked:current.unlocked};
+        window.ethAdminCharacterTargetState={username,unlocked:current.unlocked};
         ethAdminRenderCharacterOwnership(username,current.unlocked);
       }
       const message=byId('eth-admin-message');
