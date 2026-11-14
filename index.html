@@ -4427,7 +4427,8 @@ body.dodge-open{overflow:hidden}
       shopTitles:JSON.parse(JSON.stringify(state.shopTitles||[])),
       characterProfiles:profiles,
       specialCharactersUnlocked:Array.isArray(state.specialCharactersUnlocked)?[...new Set(state.specialCharactersUnlocked)]:[],
-      specialCharacterCases:Math.max(0,Math.floor(Number(state.specialCharacterCases)||0))
+      specialCharacterCases:Math.max(0,Math.floor(Number(state.specialCharacterCases)||0)),
+      adminCommandReceipts:Array.isArray(ethAdminAppliedCommandIds)?ethAdminAppliedCommandIds.slice(-80):[]
     };
   }
   function ethSaveCurrentAccount(){if(!ethV4.account)return;const record=ethV4.accounts[ethNormName(ethV4.account.username)];if(!record)return;record.profile=ethProfileFromState();record.stats=record.stats||{};record.stats.gold=record.profile.gold;record.stats.bestLevel=Math.max(record.stats.bestLevel||1,record.profile.level||1);record.lastPlayed=new Date().toISOString();ethV4.account=record;ethSaveAccounts();ethRefreshAccountUI()}
@@ -4588,14 +4589,104 @@ body.dodge-open{overflow:hidden}
     <p class="eth-v4-muted mt-3">Облачное сохранение синхронизирует прогресс между устройствами. Используется защищённая авторизация Supabase; пароль не хранится в игровом файле.</p>
   </div></div>
   <div id="eth-leaderboard-modal" class="eth-v4-modal"><div class="eth-v4-modal-inner"><div class="flex justify-between items-center gap-3 mb-3"><div><div class="text-xs uppercase tracking-widest text-amber-300">Облачный рейтинг</div><h2 class="text-3xl font-black">Таблица лидеров</h2></div><button class="eth-v4-btn" onclick="document.getElementById('eth-leaderboard-modal').classList.remove('open')">Закрыть</button></div><p class="eth-v4-muted mb-3">Сортировка: завершённые прохождения → золото → уровень героя. Показываются игроки из общей базы Этерии.</p><div class="overflow-x-auto"><table class="eth-v4-table"><thead><tr><th>#</th><th>Игрок</th><th>Титул</th><th>Прохождения</th><th>Золото</th></tr></thead><tbody id="eth-leaderboard-body"></tbody></table></div></div></div>
-  <div id="eth-admin-modal" class="eth-v4-modal"><div class="eth-v4-modal-inner"><div class="flex items-center justify-between gap-3 mb-3"><div><div class="text-xs uppercase tracking-widest text-rose-300">Доступ разработчика</div><h2 class="text-3xl font-black">Панель DEVELOPER</h2></div><button class="eth-v4-btn" onclick="document.getElementById('eth-admin-modal').classList.remove('open')">Закрыть</button></div>
-    <div class="eth-v4-panel mb-3"><label class="text-sm block mb-1">Ник игрока (логин аккаунта)</label><div class="flex gap-2"><input id="eth-admin-target" class="eth-v4-input" placeholder="Точный логин игрока"><button class="eth-v4-btn" onclick="ethAdminSetTarget()">Загрузить</button></div></div>
-    <div class="eth-v4-panel mb-3"><h3 class="font-black text-lg mb-2">Накрутка характеристик</h3><div class="eth-v4-stat-grid"><label class="text-xs">Уровень кампании<input id="eth-admin-level" class="eth-v4-input" type="number" min="1" max="50" value="1"></label><label class="text-xs">Уровень героя<input id="eth-admin-herolvl" class="eth-v4-input" type="number" min="1" value="1"></label><label class="text-xs">Пройдено кампаний<input id="eth-admin-runs" class="eth-v4-input" type="number" min="0" value="0"></label><label class="text-xs">Золото<input id="eth-admin-gold" class="eth-v4-input" type="number" min="0" value="0"></label><label class="text-xs">Здоровье<input id="eth-admin-hp" class="eth-v4-input" type="number" min="1" value="100"></label><label class="text-xs">Мана<input id="eth-admin-mp" class="eth-v4-input" type="number" min="0" value="50"></label><label class="text-xs">Атака<input id="eth-admin-atk" class="eth-v4-input" type="number" min="1" value="10"></label><label class="text-xs">Защита<input id="eth-admin-def" class="eth-v4-input" type="number" min="0" value="5"></label></div><button class="eth-v4-btn gold w-full mt-3" onclick="ethAdminStats()">Применить характеристики</button></div>
-    <div class="eth-v4-panel mb-3"><h3 class="font-black text-lg mb-2">Выдать предмет</h3><select id="eth-admin-item" class="eth-v4-select mb-2"></select><button class="eth-v4-btn purple w-full" onclick="ethAdminItem()">Выдать выбранный предмет</button></div>
-    <div class="eth-v4-panel"><h3 class="font-black text-lg mb-2">Выдать титул</h3><select id="eth-admin-title" class="eth-v4-select mb-2"></select><button class="eth-v4-btn green w-full" onclick="ethAdminTitle()">Выдать титул игроку</button></div>
-    <p id="eth-admin-message" class="text-sm text-amber-200 mt-3 min-h-5"></p><p class="eth-v4-muted mt-2">Изменения выполняются серверными RPC-функциями. Доступ выдаётся только пользователю, внесённому в private.etheria_developer.</p>
-  </div></div>
-  <div id="eth-practice-result" class="eth-v4-modal"><div class="eth-v4-modal-inner text-center"><div id="eth-practice-result-icon" class="text-6xl mb-3">🏆</div><h2 id="eth-practice-result-title" class="text-3xl font-black mb-2">Испытание завершено</h2><p id="eth-practice-result-text" class="text-slate-300 mb-5"></p><div class="flex gap-2 justify-center flex-wrap"><button class="eth-v4-btn gold" onclick="ethPracticeRetry()">Повторить бой</button><button class="eth-v4-btn" onclick="ethPracticeReturn()">Вернуться в зал</button></div></div></div>`;
+  <div id="eth-admin-modal" class="eth-v4-modal"><div class="eth-admin-shell">
+  <style id="eth-admin-theme">
+    #eth-admin-modal .eth-admin-shell{width:min(1280px,calc(100vw - 22px));max-height:calc(100vh - 22px);min-height:min(720px,calc(100vh - 22px));display:grid;grid-template-columns:220px minmax(0,1fr);overflow:hidden;padding:0;border:1px solid #a78bfa55;border-radius:24px;background:radial-gradient(circle at 80% 0,#34265f 0,transparent 34%),linear-gradient(145deg,#0b1020,#141a2d 58%,#1c1730);color:#f8fafc;box-shadow:0 28px 90px #020617bb}
+    #eth-admin-modal .eth-admin-side{display:flex;flex-direction:column;gap:12px;padding:20px 14px;background:#080d19dd;border-right:1px solid #94a3b833}
+    #eth-admin-modal .eth-admin-brand{font-size:11px;letter-spacing:.2em;color:#c4b5fd;font-weight:900}
+    #eth-admin-modal .eth-admin-nav{display:grid;gap:7px}
+    #eth-admin-modal .eth-admin-nav button{width:100%;text-align:left;padding:11px 12px;border:1px solid transparent;border-radius:12px;background:transparent;color:#aebbd0;font-size:13px;font-weight:800}
+    #eth-admin-modal .eth-admin-nav button.active{background:linear-gradient(120deg,#31265a,#242849);border-color:#a78bfa77;color:#fff;box-shadow:inset 3px 0 #c4b5fd}
+    #eth-admin-modal .eth-admin-live{margin-top:auto;padding:12px;border:1px solid #64748b55;border-radius:14px;background:#0f172acc;font-size:11px;color:#94a3b8}
+    #eth-admin-modal .eth-admin-live b{display:block;color:#86efac;font-size:12px;margin-bottom:4px}
+    #eth-admin-modal .eth-admin-main{min-width:0;overflow:auto;padding:22px}
+    #eth-admin-modal .eth-admin-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:18px}
+    #eth-admin-modal .eth-admin-kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-bottom:18px}
+    #eth-admin-modal .eth-admin-kpi{padding:13px;border:1px solid #94a3b833;border-radius:15px;background:linear-gradient(145deg,#1e293b,#111827)}
+    #eth-admin-modal .eth-admin-kpi small{display:block;color:#94a3b8;font-size:10px;text-transform:uppercase;letter-spacing:.1em}
+    #eth-admin-modal .eth-admin-kpi b{display:block;font-size:25px;line-height:1.25;margin-top:5px;color:#f8fafc}
+    #eth-admin-modal .eth-admin-panel{padding:16px;border:1px solid #64748b55;border-radius:17px;background:#111827bb;margin-bottom:13px}
+    #eth-admin-modal .eth-admin-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+    #eth-admin-modal .eth-admin-grid label{display:block;color:#aebbd0;font-size:11px}
+    #eth-admin-modal .eth-admin-grid input{margin-top:5px}
+    #eth-admin-modal .eth-admin-input{width:100%;min-width:0;padding:10px 12px;border:1px solid #64748b99;border-radius:11px;background:#090f1d;color:#f8fafc;outline:none}
+    #eth-admin-modal .eth-admin-input:focus{border-color:#c4b5fd;box-shadow:0 0 0 3px #a78bfa22}
+    #eth-admin-modal .eth-admin-btn{padding:10px 13px;border:1px solid #a78bfa77;border-radius:11px;background:linear-gradient(120deg,#55418b,#342b63);color:#fff;font-size:12px;font-weight:900}
+    #eth-admin-modal .eth-admin-btn.secondary{background:#1f2937;border-color:#64748b;color:#dbeafe}
+    #eth-admin-modal .eth-admin-btn.gold{background:linear-gradient(120deg,#8a5b1c,#59401f);border-color:#fbbf2488}
+    #eth-admin-modal .eth-admin-btn.green{background:linear-gradient(120deg,#166534,#14532d);border-color:#4ade8088}
+    #eth-admin-modal .eth-admin-player-list,#eth-admin-modal .eth-admin-queue-list{display:grid;gap:8px}
+    #eth-admin-modal .eth-admin-player{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:12px;width:100%;padding:12px;text-align:left;border:1px solid #64748b55;border-radius:13px;background:#0b1220;color:#e2e8f0}
+    #eth-admin-modal .eth-admin-player:hover{border-color:#a78bfa;background:#171b32}
+    #eth-admin-modal .eth-admin-muted{font-size:11px;color:#94a3b8}
+    #eth-admin-modal .eth-admin-state{font-size:10px;padding:5px 8px;border-radius:999px;border:1px solid #64748b66;color:#cbd5e1;white-space:nowrap}
+    #eth-admin-modal .eth-admin-state.online{color:#86efac;border-color:#22c55e66;background:#14532d33}
+    #eth-admin-modal .eth-admin-state.busy{color:#fcd34d;border-color:#f59e0b66;background:#78350f33}
+    #eth-admin-modal .eth-admin-state.failed{color:#fda4af;border-color:#f43f5e66;background:#88133733}
+    #eth-admin-modal .eth-admin-queue-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;align-items:center;padding:12px;border:1px solid #64748b55;border-radius:13px;background:#0b1220}
+    #eth-admin-modal .eth-admin-hidden{display:none!important}
+    #eth-admin-modal .eth-admin-notice{width:100%;min-height:110px;resize:vertical}
+    @media(max-width:850px){#eth-admin-modal .eth-admin-shell{grid-template-columns:1fr;max-height:calc(100vh - 12px);min-height:0}#eth-admin-modal .eth-admin-side{padding:10px;border-right:0;border-bottom:1px solid #94a3b833}#eth-admin-modal .eth-admin-brand{display:none}#eth-admin-modal .eth-admin-nav{grid-template-columns:repeat(5,minmax(0,1fr));gap:4px}#eth-admin-modal .eth-admin-nav button{text-align:center;padding:9px 3px;font-size:10px}#eth-admin-modal .eth-admin-live{display:none}#eth-admin-modal .eth-admin-main{padding:12px;max-height:calc(100vh - 116px)}#eth-admin-modal .eth-admin-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}#eth-admin-modal .eth-admin-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+    @media(max-width:420px){#eth-admin-modal .eth-admin-head{align-items:flex-start;flex-direction:column}#eth-admin-modal .eth-admin-queue-row{grid-template-columns:1fr}#eth-admin-modal .eth-admin-player{grid-template-columns:1fr}}
+  </style>
+  <aside class="eth-admin-side">
+    <div><div class="eth-admin-brand">ETHERIA / CONTROL</div><div class="text-2xl font-black mt-2">DEVELOPER</div><div class="eth-admin-muted mt-1">Центр управления миром</div></div>
+    <nav class="eth-admin-nav">
+      <button data-admin-tab="overview" class="active" onclick="ethAdminTab('overview')">◈ Обзор</button>
+      <button data-admin-tab="player" onclick="ethAdminTab('player')">♙ Игрок</button>
+      <button data-admin-tab="rewards" onclick="ethAdminTab('rewards')">✦ Награды</button>
+      <button data-admin-tab="queue" onclick="ethAdminTab('queue')">⇄ Доставка</button>
+      <button data-admin-tab="broadcast" onclick="ethAdminTab('broadcast')">✉ Объявления</button>
+    </nav>
+    <div class="eth-admin-live"><b>● Защищённый доступ</b><span id="eth-admin-connection">Права проверяются сервером</span><div class="mt-2">Команды игроку применяются в безопасный момент и подтверждаются после облачного сохранения.</div></div>
+  </aside>
+  <main class="eth-admin-main">
+    <div class="eth-admin-head"><div><div class="text-xs uppercase tracking-widest text-violet-300">Панель управления</div><h2 class="text-3xl font-black">Администрирование</h2><p class="eth-admin-muted mt-1">Игроки, награды, очередь команд и системные сообщения</p></div><div class="flex gap-2"><button class="eth-admin-btn secondary" onclick="ethAdminRefreshDashboard()">↻ Обновить</button><button class="eth-admin-btn secondary" onclick="document.getElementById('eth-admin-modal').classList.remove('open')">Закрыть</button></div></div>
+    <div class="eth-admin-kpis">
+      <div class="eth-admin-kpi"><small>Игроки онлайн</small><b id="eth-admin-kpi-online">—</b></div>
+      <div class="eth-admin-kpi"><small>В бою / заняты</small><b id="eth-admin-kpi-busy">—</b></div>
+      <div class="eth-admin-kpi"><small>Ожидают доставки</small><b id="eth-admin-kpi-pending">—</b></div>
+      <div class="eth-admin-kpi"><small>Ошибки доставки</small><b id="eth-admin-kpi-failed">—</b></div>
+    </div>
+    <section data-admin-panel="overview">
+      <div class="eth-admin-panel"><div class="flex flex-wrap items-center justify-between gap-3 mb-3"><div><h3 class="text-lg font-black">Игроки Этерии</h3><p class="eth-admin-muted">Нажми на игрока, чтобы открыть его профиль и команды</p></div><div class="flex gap-2"><input id="eth-admin-player-search" class="eth-admin-input" style="max-width:230px" placeholder="Поиск по нику" oninput="ethAdminRefreshPlayers()"><button class="eth-admin-btn secondary" onclick="ethAdminRefreshPlayers()">Найти</button></div></div><div id="eth-admin-players" class="eth-admin-player-list"><div class="eth-admin-muted">Загрузка списка игроков…</div></div></div>
+      <div class="eth-admin-panel"><h3 class="text-lg font-black mb-1">Как применяются изменения</h3><p class="eth-admin-muted">Если игрок активен, изменения попадут в очередь. Во время боя клиент не забирает команды. После боя он применит их к текущему сохранению, отправит облачный снимок и только затем подтвердит доставку. Для офлайн-игрока изменения записываются сразу.</p></div>
+    </section>
+    <section data-admin-panel="player" class="eth-admin-hidden">
+      <div class="eth-admin-panel"><div class="flex flex-wrap gap-2"><input id="eth-admin-target" class="eth-admin-input" placeholder="Игровой логин игрока"><button class="eth-admin-btn" onclick="ethAdminSetTarget()">Загрузить профиль</button></div><div id="eth-admin-player-status" class="eth-admin-muted mt-2">Игрок не выбран</div></div>
+      <div class="eth-admin-panel"><h3 class="text-lg font-black mb-1">Параметры персонажа</h3><p class="eth-admin-muted mb-3">Значения задаются как новые абсолютные значения, не как прибавка</p>
+        <div class="eth-admin-grid">
+          <label>Уровень кампании<input id="eth-admin-level" class="eth-admin-input" type="number" min="1" max="50" value="1"></label>
+          <label>Уровень героя<input id="eth-admin-herolvl" class="eth-admin-input" type="number" min="1" value="1"></label>
+          <label>Пройдено кампаний<input id="eth-admin-runs" class="eth-admin-input" type="number" min="0" value="0"></label>
+          <label>Золото<input id="eth-admin-gold" class="eth-admin-input" type="number" min="0" value="0"></label>
+          <label>Здоровье<input id="eth-admin-hp" class="eth-admin-input" type="number" min="1" value="100"></label>
+          <label>Мана<input id="eth-admin-mp" class="eth-admin-input" type="number" min="0" value="50"></label>
+          <label>Атака<input id="eth-admin-atk" class="eth-admin-input" type="number" min="1" value="10"></label>
+          <label>Защита<input id="eth-admin-def" class="eth-admin-input" type="number" min="0" value="5"></label>
+          <label>DARK COIN<input id="eth-admin-darkcoins" class="eth-admin-input" type="number" min="0" value="0"></label>
+          <label>Очки характеристик<input id="eth-admin-statpoints" class="eth-admin-input" type="number" min="0" value="0"></label>
+          <label>Текущий XP<input id="eth-admin-xp" class="eth-admin-input" type="number" min="0" value="0"></label>
+          <label>Всего заработано XP<input id="eth-admin-totalxp" class="eth-admin-input" type="number" min="0" value="0"></label>
+          <label>NG+ цикл<input id="eth-admin-ngplus" class="eth-admin-input" type="number" min="0" value="0"></label>
+        </div>
+        <button class="eth-admin-btn gold w-full mt-4" onclick="ethAdminStats()">⇧ Поставить в очередь / применить параметры</button>
+      </div>
+    </section>
+    <section data-admin-panel="rewards" class="eth-admin-hidden">
+      <div class="eth-admin-panel"><h3 class="text-lg font-black mb-1">Выдать артефакт</h3><p class="eth-admin-muted mb-3">Предмет будет добавлен в инвентарь выбранного игрока</p><select id="eth-admin-item" class="eth-admin-input mb-3"></select><button class="eth-admin-btn w-full" onclick="ethAdminItem()">✦ Выдать выбранный предмет</button></div>
+      <div class="eth-admin-panel"><h3 class="text-lg font-black mb-1">Выдать титул</h3><p class="eth-admin-muted mb-3">DEVELOPER зарезервирован и не может быть выдан этим способом</p><select id="eth-admin-title" class="eth-admin-input mb-3"></select><button class="eth-admin-btn green w-full" onclick="ethAdminTitle()">♛ Выдать титул</button></div>
+      <div class="eth-admin-panel"><h3 class="text-lg font-black mb-2">Наборы параметров</h3><div class="grid grid-cols-2 gap-2"><button class="eth-admin-btn secondary" onclick="ethAdminPreset('starter')">Стартовый набор</button><button class="eth-admin-btn secondary" onclick="ethAdminPreset('veteran')">Набор ветерана</button></div><p class="eth-admin-muted mt-2">Набор заполняет поля характеристик. Проверь значения и нажми «Поставить в очередь / применить» на вкладке «Игрок».</p></div>
+    </section>
+    <section data-admin-panel="queue" class="eth-admin-hidden">
+      <div class="eth-admin-panel"><div class="flex justify-between items-center gap-3 mb-3"><div><h3 class="text-lg font-black">Очередь доставки</h3><p class="eth-admin-muted">Выполненные и ожидающие команды за последнее время</p></div><button class="eth-admin-btn secondary" onclick="ethAdminRefreshQueue()">↻</button></div><div id="eth-admin-queue" class="eth-admin-queue-list"><div class="eth-admin-muted">Загрузка очереди…</div></div></div>
+    </section>
+    <section data-admin-panel="broadcast" class="eth-admin-hidden">
+      <div class="eth-admin-panel"><h3 class="text-lg font-black mb-1">Объявление всем игрокам</h3><p class="eth-admin-muted mb-3">Сообщение будет добавлено в очередь каждого зарегистрированного игрока и появится у него при ближайшем безопасном моменте в игре.</p><textarea id="eth-admin-broadcast-text" class="eth-admin-input eth-admin-notice" maxlength="320" placeholder="Напиши объявление для мира Этерии…"></textarea><div class="flex justify-between items-center gap-3 mt-3"><span id="eth-admin-broadcast-count" class="eth-admin-muted">0 / 320</span><button class="eth-admin-btn gold" onclick="ethAdminSendBroadcast()">Отправить объявление</button></div><p class="eth-admin-muted mt-3">Объявление не изменяет сохранения и не прерывает бой.</p></div>
+    </section>
+    <p id="eth-admin-message" class="text-sm text-amber-200 mt-3 min-h-5" aria-live="polite"></p>
+  </main>
+</div></div><div id="eth-practice-result" class="eth-v4-modal"><div class="eth-v4-modal-inner text-center"><div id="eth-practice-result-icon" class="text-6xl mb-3">🏆</div><h2 id="eth-practice-result-title" class="text-3xl font-black mb-2">Испытание завершено</h2><p id="eth-practice-result-text" class="text-slate-300 mb-5"></p><div class="flex gap-2 justify-center flex-wrap"><button class="eth-v4-btn gold" onclick="ethPracticeRetry()">Повторить бой</button><button class="eth-v4-btn" onclick="ethPracticeReturn()">Вернуться в зал</button></div></div></div>`;
   if(!byId('eth-account-modal'))document.body.insertAdjacentHTML('beforeend',ethV4Markup);
   // Duplicate practice result markup above is guarded; keep a single modal in the document.
   const practiceResultNodes=document.querySelectorAll('#eth-practice-result');if(practiceResultNodes.length>1)practiceResultNodes.forEach((n,i)=>{if(i>0)n.remove()});
@@ -4670,6 +4761,10 @@ body.dodge-open{overflow:hidden}
   let ethCloudUser = null;
   let ethCloudSaveQueue = Promise.resolve();
   let ethCloudLoadedUserId = null;
+  let ethAdminAppliedCommandIds = [];
+  let ethAdminClientKey = '';
+  let ethAdminPresenceTimer = null;
+  let ethAdminQueueProcessing = false;
 
   function ethCloudStatus(message, isError = false) {
     const el = byId('eth-cloud-status');
@@ -4798,6 +4893,8 @@ body.dodge-open{overflow:hidden}
     ethV4.localOnly = false;
 
     if (account.profile?.heroType) ethRestoreProfile(account);
+    ethAdminAppliedCommandIds = Array.isArray(account.profile?.adminCommandReceipts) ? [...new Set(account.profile.adminCommandReceipts)].slice(-80) : [];
+    ethAdminStartPresence();
     if (importLegacy) {
       ethCloudStatus('Найдено локальное сохранение старой версии. Переношу его в облако…');
       await ethCloudSaveCurrentAccount();
@@ -4957,6 +5054,153 @@ body.dodge-open{overflow:hidden}
   ethSaveCurrentAccount = ethCloudSaveCurrentAccount;
   window.ethCloudSaveCurrentAccount = ethCloudSaveCurrentAccount;
 
+  function ethAdminBusyNow() {
+    return !!(state.combat?.isActive || ethV4.practice?.active || (typeof dodge !== 'undefined' && dodge?.active));
+  }
+
+  function ethAdminSafeToApply() {
+    return !!(ethCloudUser && ethV4.account && state.hero?.type &&
+      document.visibilityState !== 'hidden' &&
+      !ethAdminBusyNow());
+  }
+
+  function ethAdminShowNotice(message) {
+    let toast=byId('eth-admin-player-notice');
+    if(!toast){
+      toast=document.createElement('div');toast.id='eth-admin-player-notice';
+      toast.style.cssText='position:fixed;z-index:100050;left:14px;right:14px;top:14px;max-width:620px;margin:auto;padding:15px 18px;border:1px solid #a78bfa;border-radius:15px;background:linear-gradient(120deg,#211a3d,#101827);color:#f8fafc;font:700 14px/1.5 system-ui;box-shadow:0 14px 42px #000b';
+      document.body.appendChild(toast);
+    }
+    toast.textContent='✉ Объявление Этерии: '+String(message||'').slice(0,320);
+    toast.style.display='block';
+    if(toast._hideTimer)clearTimeout(toast._hideTimer);
+    toast._hideTimer=setTimeout(()=>{toast.style.display='none'},9000);
+  }
+
+  function ethAdminApplyCommand(command) {
+    const payload=command.payload||{};
+    if(command.command_type==='player_patch'){
+      const p=payload;
+      if(p.level!==undefined)state.level=Math.max(1,Math.min(50,Number(p.level)||1));
+      if(p.heroLvl!==undefined)state.heroLvl=Math.max(1,Math.floor(Number(p.heroLvl)||1));
+      if(p.completedRuns!==undefined){ethV4.account.stats=ethV4.account.stats||{};ethV4.account.stats.completedRuns=Math.max(0,Math.floor(Number(p.completedRuns)||0));}
+      if(p.gold!==undefined)state.gold=Math.max(0,Number(p.gold)||0);
+      if(p.baseHp!==undefined)state.baseHp=Math.max(1,Number(p.baseHp)||1);
+      if(p.baseMp!==undefined)state.baseMp=Math.max(0,Number(p.baseMp)||0);
+      if(p.baseAtk!==undefined)state.baseAtk=Math.max(1,Number(p.baseAtk)||1);
+      if(p.baseDef!==undefined)state.baseDef=Math.max(0,Number(p.baseDef)||0);
+      if(p.darkCoins!==undefined)state.darkCoins=Math.max(0,Math.floor(Number(p.darkCoins)||0));
+      if(p.statPoints!==undefined)state.statPoints=Math.max(0,Math.floor(Number(p.statPoints)||0));
+      if(p.xp!==undefined)state.xp=Math.max(0,Number(p.xp)||0);
+      if(p.totalXpEarned!==undefined)state.totalXpEarned=Math.max(0,Number(p.totalXpEarned)||0);
+      if(p.newGamePlus!==undefined)state.newGamePlus=Math.max(0,Math.floor(Number(p.newGamePlus)||0));
+      updateMapScreen();
+      if(typeof updateUpgradeScreen==='function')updateUpgradeScreen();
+      if(typeof updateInventoryScreen==='function')updateInventoryScreen();
+      ethRefreshAccountUI();
+      return true;
+    }
+    if(command.command_type==='grant_item'){
+      if(!payload.item||typeof payload.item!=='object')throw new Error('В команде отсутствует предмет.');
+      state.inventory=Array.isArray(state.inventory)?state.inventory:[];
+      state.inventory.push(prepareArtifact(payload.item));
+      if(typeof updateInventoryScreen==='function')updateInventoryScreen();
+      if(typeof refreshEquippedHeroModels==='function')refreshEquippedHeroModels();
+      return true;
+    }
+    if(command.command_type==='title_sync'){
+      const title=String(payload.title||'').trim();
+      if(title){
+        ethV4.account.titles=Array.isArray(ethV4.account.titles)?ethV4.account.titles:[];
+        if(!ethV4.account.titles.includes(title))ethV4.account.titles.push(title);
+        if(!ethV4.account.currentTitle||ethV4.account.currentTitle==='Путник')ethV4.account.currentTitle=title;
+        ethRefreshAccountUI();
+      }
+      return false;
+    }
+    if(command.command_type==='notice'){
+      ethAdminShowNotice(payload.message);
+      return false;
+    }
+    throw new Error('Неизвестный тип команды: '+String(command.command_type));
+  }
+
+  async function ethAdminProcessQueue() {
+    if(ethAdminQueueProcessing||!ethAdminSafeToApply()||!ethSupabaseClient) return;
+    ethAdminQueueProcessing=true;
+    try {
+      if(!ethAdminClientKey)ethAdminClientKey='etheria-'+(window.crypto?.randomUUID?.()||Date.now().toString(36)+'-'+Math.random().toString(36).slice(2));
+      const {data,error}=await ethSupabaseClient.rpc('player_claim_admin_commands',{p_client_key:ethAdminClientKey});
+      if(error)throw error;
+      for(const command of (Array.isArray(data)?data:[])){
+        const id=String(command.command_id||'');
+        const kind=command.command_type;
+        const already=ethAdminAppliedCommandIds.includes(id);
+        let needsSave=(kind==='player_patch'||kind==='grant_item');
+        try{
+          if(!already){
+            const changed=ethAdminApplyCommand(command);
+            needsSave=!!changed;
+            ethAdminAppliedCommandIds=[...ethAdminAppliedCommandIds.filter(x=>x!==id),id].slice(-80);
+          }
+          if(needsSave){
+            const saved=await ethCloudSaveCurrentAccount();
+            if(!saved)throw new Error('Облачное сохранение не подтвердило запись. Команда останется в очереди.');
+          }
+          const ack=await ethSupabaseClient.rpc('player_ack_admin_command',{
+            p_command_id:command.command_id,p_client_key:ethAdminClientKey,p_success:true,p_error:null
+          });
+          if(ack.error)throw ack.error;
+          if(ack.data!==true)throw new Error('Сервер не подтвердил завершение команды.');
+        }catch(commandError){
+          await ethSupabaseClient.rpc('player_ack_admin_command',{
+            p_command_id:command.command_id,p_client_key:ethAdminClientKey,p_success:false,p_error:commandError.message||String(commandError)
+          });
+          console.warn('Etheria admin command delivery failed:',commandError);
+          break;
+        }
+      }
+    }catch(error){
+      console.warn('Etheria admin queue check failed:',error);
+    }finally{
+      ethAdminQueueProcessing=false;
+    }
+  }
+
+  async function ethAdminSendHeartbeat() {
+    if(!ethSupabaseClient||!ethCloudUser||!ethV4.account)return;
+    if(!ethAdminClientKey)ethAdminClientKey='etheria-'+(window.crypto?.randomUUID?.()||Date.now().toString(36)+'-'+Math.random().toString(36).slice(2));
+    const screen=document.querySelector('.screen.active')?.id||'unknown';
+    try{
+      const {error}=await ethSupabaseClient.rpc('player_heartbeat',{
+        p_client_key:ethAdminClientKey,p_screen:screen,p_is_busy:ethAdminBusyNow()
+      });
+      if(error)throw error;
+      await ethAdminProcessQueue();
+    }catch(error){
+      console.warn('Etheria player presence update failed:',error);
+    }
+  }
+
+  function ethAdminStartPresence() {
+    if(ethAdminPresenceTimer)clearInterval(ethAdminPresenceTimer);
+    if(!ethAdminClientKey)ethAdminClientKey='etheria-'+(window.crypto?.randomUUID?.()||Date.now().toString(36)+'-'+Math.random().toString(36).slice(2));
+    ethAdminSendHeartbeat();
+    ethAdminPresenceTimer=setInterval(ethAdminSendHeartbeat,20000);
+  }
+
+  function ethAdminStopPresence() {
+    if(ethAdminPresenceTimer){clearInterval(ethAdminPresenceTimer);ethAdminPresenceTimer=null;}
+  }
+
+  document.addEventListener('visibilitychange',()=>{
+    if(document.visibilityState==='visible'&&ethCloudUser)ethAdminSendHeartbeat();
+  });
+  const ethAdminBroadcastInput=byId('eth-admin-broadcast-text');
+  if(ethAdminBroadcastInput)ethAdminBroadcastInput.addEventListener('input',()=>{
+    const count=byId('eth-admin-broadcast-count');if(count)count.textContent=ethAdminBroadcastInput.value.length+' / 320';
+  });
+
   window.ethCampaignCompleted = async function () {
     if (!ethCloudUser || !ethV4.account || state._etheriaCampaignRecorded) return false;
     state._etheriaCampaignRecorded = true;
@@ -4993,8 +5237,10 @@ body.dodge-open{overflow:hidden}
       ethCloudStatus('Ошибка выхода: ' + (error.message || error), true);
       return;
     }
+    ethAdminStopPresence();
     ethCloudUser = null;
     ethCloudLoadedUserId = null;
+    ethAdminAppliedCommandIds = [];
     ethV4.account = null;
     ethRefreshAccountUI();
     byId('eth-account-modal').classList.remove('open');
@@ -5066,122 +5312,232 @@ body.dodge-open{overflow:hidden}
   };
 
   async function ethCloudAdminGet(username) {
-    if (!ethSupabaseClient || ethV4.account?.role !== 'developer') {
-      throw new Error('Нет доступа разработчика.');
-    }
+    if (!ethSupabaseClient || ethV4.account?.role !== 'developer') throw new Error('Нет доступа разработчика.');
     const { data, error } = await ethSupabaseClient.rpc('admin_get_player', { p_username: username });
     if (error) throw error;
     if (!data) throw new Error('Игрок не найден.');
     return data;
   }
 
-  window.ethOpenAdmin = function () {
-    if (ethV4.account?.role !== 'developer') {
-      alert('Панель доступна только назначенному разработчику Supabase.');
-      return;
-    }
-    ethRefreshAdminItems();
-    ethRefreshAdminTitles();
+  window.ethAdminTab = function(name) {
+    document.querySelectorAll('#eth-admin-modal [data-admin-panel]').forEach(panel => panel.classList.toggle('eth-admin-hidden', panel.dataset.adminPanel !== name));
+    document.querySelectorAll('#eth-admin-modal [data-admin-tab]').forEach(button => button.classList.toggle('active', button.dataset.adminTab === name));
+  };
+
+  function ethAdminSetKpi(id,value) {
+    const el=byId(id); if(el) el.textContent=String(value);
+  }
+
+  function ethAdminFormatTime(value) {
+    if(!value) return 'ещё не заходил';
+    const date=new Date(value);
+    if(Number.isNaN(date.getTime())) return 'время неизвестно';
+    return date.toLocaleString('ru-RU',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'});
+  }
+
+  window.ethAdminRefreshPlayers = async function() {
+    if(!ethSupabaseClient || ethV4.account?.role!=='developer') return;
+    const host=byId('eth-admin-players'); if(!host) return;
+    host.innerHTML='<div class="eth-admin-muted">Обновляю список…</div>';
+    const search=String(byId('eth-admin-player-search')?.value||'').trim();
+    const {data,error}=await ethSupabaseClient.rpc('admin_list_players',{p_search:search||null,p_limit:60});
+    if(error){host.textContent='Не удалось загрузить игроков: '+error.message;return;}
+    const players=Array.isArray(data)?data:[];
+    const online=players.filter(p=>p.is_online).length;
+    const busy=players.filter(p=>p.is_online&&p.is_busy).length;
+    ethAdminSetKpi('eth-admin-kpi-online',online);
+    ethAdminSetKpi('eth-admin-kpi-busy',busy);
+    host.innerHTML='';
+    players.forEach(player=>{
+      const button=document.createElement('button');
+      button.type='button';button.className='eth-admin-player';
+      const left=document.createElement('span');
+      const name=document.createElement('b');name.textContent=player.username||'Игрок';
+      const meta=document.createElement('span');meta.className='eth-admin-muted';meta.textContent=(player.current_title||'Путник')+' · уровень '+(player.best_level||1)+' · золото '+(player.gold||0)+' · '+(player.is_online?'активность: '+(player.screen_name||'игра'):'последний вход: '+ethAdminFormatTime(player.last_seen_at));
+      left.append(name,document.createElement('br'),meta);
+      const status=document.createElement('span');
+      status.className='eth-admin-state '+(player.is_online?(player.is_busy?'busy':'online'):'');
+      status.textContent=player.is_online?(player.is_busy?'ЗАНЯТ / БОЙ':'В ИГРЕ'):'ОФЛАЙН';
+      button.append(left,status);
+      button.addEventListener('click',()=>{
+        byId('eth-admin-target').value=player.username||'';
+        ethAdminTab('player');
+        window.ethAdminSetTarget();
+      });
+      host.appendChild(button);
+    });
+    if(!players.length) host.innerHTML='<div class="eth-admin-muted">Игроки не найдены.</div>';
+  };
+
+  window.ethAdminRefreshQueue = async function() {
+    if(!ethSupabaseClient || ethV4.account?.role!=='developer') return;
+    const host=byId('eth-admin-queue'); if(!host) return;
+    host.innerHTML='<div class="eth-admin-muted">Обновляю очередь…</div>';
+    const {data,error}=await ethSupabaseClient.rpc('admin_get_command_queue',{p_limit:100});
+    if(error){host.textContent='Ошибка очереди: '+error.message;return;}
+    const rows=Array.isArray(data)?data:[];
+    const pending=rows.filter(x=>x.status==='pending'||x.status==='processing').length;
+    const failed=rows.filter(x=>x.status==='failed').length;
+    ethAdminSetKpi('eth-admin-kpi-pending',pending);
+    ethAdminSetKpi('eth-admin-kpi-failed',failed);
+    host.innerHTML='';
+    const labels={player_patch:'Изменение характеристик',grant_item:'Выдача предмета',title_sync:'Синхронизация титула',notice:'Объявление'};
+    const statuses={pending:'Ожидает',processing:'Передаётся',applied:'Выполнено',failed:'Ошибка'};
+    rows.forEach(item=>{
+      const row=document.createElement('div');row.className='eth-admin-queue-row';
+      const info=document.createElement('div');
+      const title=document.createElement('b');title.textContent=(labels[item.command_type]||item.command_type)+' · '+(item.username||'игрок');
+      const detail=document.createElement('div');detail.className='eth-admin-muted';
+      detail.textContent=(statuses[item.status]||item.status)+' · '+ethAdminFormatTime(item.created_at)+' · попыток: '+(item.attempt_count||0)+(item.last_error?' · '+item.last_error:'');
+      info.append(title,detail);
+      const side=document.createElement('div');side.className='flex items-center gap-2';
+      const badge=document.createElement('span');badge.className='eth-admin-state '+(item.status==='failed'?'failed':item.status==='applied'?'online':'');badge.textContent=statuses[item.status]||item.status;side.appendChild(badge);
+      if(item.status==='failed'){
+        const retry=document.createElement('button');retry.type='button';retry.className='eth-admin-btn secondary';retry.textContent='Повторить';
+        retry.addEventListener('click',()=>window.ethAdminRetryCommand(item.id));side.appendChild(retry);
+      }
+      row.append(info,side);host.appendChild(row);
+    });
+    if(!rows.length) host.innerHTML='<div class="eth-admin-muted">Команд пока нет.</div>';
+  };
+
+  window.ethAdminRefreshDashboard = async function() {
+    if(ethV4.account?.role!=='developer') return;
+    const label=byId('eth-admin-connection');if(label)label.textContent='Связь с Supabase активна · обновлено '+new Date().toLocaleTimeString('ru-RU');
+    await Promise.all([window.ethAdminRefreshPlayers(),window.ethAdminRefreshQueue()]);
+  };
+
+  window.ethOpenAdmin = async function() {
+    if(ethV4.account?.role!=='developer'){alert('Панель доступна только назначенному разработчику Supabase.');return;}
+    ethRefreshAdminItems();ethRefreshAdminTitles();
     byId('eth-admin-modal').classList.add('open');
-    byId('eth-admin-message').textContent = 'Права подтверждены сервером Supabase.';
+    window.ethAdminTab('overview');
+    const message=byId('eth-admin-message');if(message)message.textContent='Права разработчика подтверждены сервером.';
+    await window.ethAdminRefreshDashboard();
   };
 
-  window.ethAdminSetTarget = async function () {
+  window.ethAdminSetTarget = async function() {
     try {
-      const result = await ethCloudAdminGet(String(byId('eth-admin-target').value || '').trim());
-      const profile = result.save_data || {};
-      const values = {
-        level: profile.level ?? 1,
-        herolvl: profile.heroLvl ?? 1,
-        runs: result.stats?.completed_runs ?? 0,
-        gold: profile.gold ?? 0,
-        hp: profile.baseHp ?? 100,
-        mp: profile.baseMp ?? 50,
-        atk: profile.baseAtk ?? 10,
-        def: profile.baseDef ?? 5
+      const username=String(byId('eth-admin-target').value||'').trim();
+      if(!username) throw new Error('Введи игровой логин.');
+      const result=await ethCloudAdminGet(username);
+      const profile=result.save_data||{};
+      const values={
+        level:profile.level??1,herolvl:profile.heroLvl??1,runs:result.stats?.completed_runs??0,
+        gold:profile.gold??0,hp:profile.baseHp??100,mp:profile.baseMp??50,atk:profile.baseAtk??10,def:profile.baseDef??5,
+        darkcoins:profile.darkCoins??0,statpoints:profile.statPoints??0,xp:profile.xp??0,totalxp:profile.totalXpEarned??0,ngplus:profile.newGamePlus??0
       };
-      Object.entries(values).forEach(([key, value]) => {
-        const input = byId('eth-admin-' + key);
-        if (input) input.value = value;
-      });
-      byId('eth-admin-message').textContent = 'Аккаунт загружен: ' + result.username;
-    } catch (error) {
-      byId('eth-admin-message').textContent = error.message || String(error);
+      Object.entries(values).forEach(([key,value])=>{const input=byId('eth-admin-'+key);if(input)input.value=value;});
+      const status=byId('eth-admin-player-status');
+      if(status)status.textContent='Профиль загружен: '+result.username+' · титул: '+(result.current_title||'Путник');
+      const message=byId('eth-admin-message');if(message)message.textContent='Аккаунт загружен: '+result.username;
+      window.ethAdminTab('player');
+    } catch(error) {
+      const message=byId('eth-admin-message');if(message)message.textContent=error.message||String(error);
     }
   };
 
-  window.ethAdminStats = async function () {
+  window.ethAdminStats = async function() {
     try {
-      const username = String(byId('eth-admin-target').value || '').trim();
-      const patch = {
-        level: Number(byId('eth-admin-level').value),
-        heroLvl: Number(byId('eth-admin-herolvl').value),
-        completedRuns: Number(byId('eth-admin-runs').value),
-        gold: Number(byId('eth-admin-gold').value),
-        baseHp: Number(byId('eth-admin-hp').value),
-        baseMp: Number(byId('eth-admin-mp').value),
-        baseAtk: Number(byId('eth-admin-atk').value),
-        baseDef: Number(byId('eth-admin-def').value)
+      const username=String(byId('eth-admin-target').value||'').trim();
+      if(!username) throw new Error('Сначала выбери игрока.');
+      const fields={
+        level:'level',heroLvl:'herolvl',completedRuns:'runs',gold:'gold',baseHp:'hp',baseMp:'mp',baseAtk:'atk',baseDef:'def',
+        darkCoins:'darkcoins',statPoints:'statpoints',xp:'xp',totalXpEarned:'totalxp',newGamePlus:'ngplus'
       };
-      Object.entries(patch).forEach(([key, value]) => {
-        if (!Number.isFinite(value) || value < 0) throw new Error('Все значения должны быть неотрицательными числами.');
+      const patch={};
+      Object.entries(fields).forEach(([key,id])=>{
+        const value=Number(byId('eth-admin-'+id).value);
+        if(!Number.isFinite(value)||value<0) throw new Error('Проверь числовые значения параметров.');
+        patch[key]=Math.floor(value);
       });
-      const { error } = await ethSupabaseClient.rpc('admin_update_player', { p_username: username, p_patch: patch });
-      if (error) throw error;
-      byId('eth-admin-message').textContent = 'Статистика обновлена на сервере для ' + username;
-      await ethRenderLeaderboard();
-      if (ethCloudUser && ethV4.account?.username.toLowerCase() === username.toLowerCase()) {
-        ethCloudLoadedUserId = null;
-        await ethCloudLoadUser(ethCloudUser);
-      }
-    } catch (error) {
-      byId('eth-admin-message').textContent = 'Ошибка: ' + (error.message || error);
+      if(patch.level<1||patch.level>50||patch.baseHp<1||patch.baseAtk<1) throw new Error('Уровень кампании: 1–50. Здоровье и атака должны быть не меньше 1.');
+      const {data,error}=await ethSupabaseClient.rpc('admin_update_player',{p_username:username,p_patch:patch});
+      if(error) throw error;
+      const message=byId('eth-admin-message');
+      if(message)message.textContent=data?.status==='queued'
+        ? 'Игрок сейчас онлайн: команда сохранена в очереди и применится после безопасного момента в игре.'
+        : 'Игрок офлайн: изменения сразу записаны в облачное сохранение.';
+      await window.ethAdminRefreshDashboard();
+    } catch(error) {
+      const message=byId('eth-admin-message');if(message)message.textContent='Ошибка: '+(error.message||error);
     }
   };
 
-  window.ethAdminItem = async function () {
+  window.ethAdminItem = async function() {
     try {
-      const username = String(byId('eth-admin-target').value || '').trim();
-      const [rarity, index] = byId('eth-admin-item').value.split(':');
-      const pool = ARTIFACT_POOLS[rarity];
-      const base = pool?.items[Number(index)];
-      if (!base) throw new Error('Предмет не найден.');
-      const item = prepareArtifact({
-        ...base,
-        rarity,
-        rarityName: rarity.toUpperCase(),
-        color: pool.color
-      });
-      const { error } = await ethSupabaseClient.rpc('admin_grant_item', {
-        p_username: username,
-        p_item: item
-      });
-      if (error) throw error;
-      byId('eth-admin-message').textContent = 'Предмет «' + item.name + '» выдан игроку ' + username + '.';
-      await ethRenderLeaderboard();
-      if (ethCloudUser && ethV4.account?.username.toLowerCase() === username.toLowerCase()) {
-        ethCloudLoadedUserId = null;
-        await ethCloudLoadUser(ethCloudUser);
-      }
-    } catch (error) {
-      byId('eth-admin-message').textContent = 'Ошибка: ' + (error.message || error);
+      const username=String(byId('eth-admin-target').value||'').trim();
+      if(!username) throw new Error('Сначала выбери игрока.');
+      const [rarity,index]=byId('eth-admin-item').value.split(':');
+      const pool=ARTIFACT_POOLS[rarity];const base=pool?.items[Number(index)];
+      if(!base) throw new Error('Предмет не найден.');
+      const item=prepareArtifact({...base,rarity,rarityName:rarity.toUpperCase(),color:pool.color});
+      const {data,error}=await ethSupabaseClient.rpc('admin_grant_item',{p_username:username,p_item:item});
+      if(error) throw error;
+      const message=byId('eth-admin-message');
+      if(message)message.textContent=data?.status==='queued'
+        ? 'Предмет добавлен в очередь. Он появится у игрока после безопасного момента в игре.'
+        : 'Игрок офлайн: предмет добавлен в облачный инвентарь.';
+      await window.ethAdminRefreshDashboard();
+    } catch(error) {
+      const message=byId('eth-admin-message');if(message)message.textContent='Ошибка: '+(error.message||error);
     }
   };
 
-  window.ethAdminTitle = async function () {
+  window.ethAdminTitle = async function() {
     try {
-      const username = String(byId('eth-admin-target').value || '').trim();
-      const title = String(byId('eth-admin-title').value || '');
-      if (!title || title === 'DEVELOPER') throw new Error('Титул DEVELOPER зарезервирован.');
-      const { error } = await ethSupabaseClient.rpc('admin_grant_title', {
-        p_username: username,
-        p_title: title
-      });
-      if (error) throw error;
-      byId('eth-admin-message').textContent = 'Титул «' + title + '» выдан игроку ' + username + '.';
-      await ethRenderLeaderboard();
-    } catch (error) {
-      byId('eth-admin-message').textContent = 'Ошибка: ' + (error.message || error);
+      const username=String(byId('eth-admin-target').value||'').trim();
+      const title=String(byId('eth-admin-title').value||'');
+      if(!username) throw new Error('Сначала выбери игрока.');
+      if(!title||title==='DEVELOPER') throw new Error('Титул DEVELOPER зарезервирован.');
+      const {data,error}=await ethSupabaseClient.rpc('admin_grant_title',{p_username:username,p_title:title});
+      if(error) throw error;
+      const message=byId('eth-admin-message');
+      if(message)message.textContent=data?.status==='queued'
+        ? 'Титул сохранён на сервере; активная игра синхронизирует его через очередь.'
+        : 'Титул выдан и сохранён в профиле офлайн-игрока.';
+      await window.ethAdminRefreshDashboard();
+    } catch(error) {
+      const message=byId('eth-admin-message');if(message)message.textContent='Ошибка: '+(error.message||error);
+    }
+  };
+
+  window.ethAdminPreset = function(kind) {
+    const presets={
+      starter:{level:1,herolvl:5,runs:0,gold:1500,hp:120,mp:60,atk:14,def:7,darkcoins:1,statpoints:8,xp:0,totalxp:0,ngplus:0},
+      veteran:{level:25,herolvl:50,runs:5,gold:25000,hp:950,mp:450,atk:180,def:90,darkcoins:15,statpoints:30,xp:0,totalxp:120000,ngplus:1}
+    };
+    const preset=presets[kind];if(!preset)return;
+    Object.entries(preset).forEach(([key,value])=>{const input=byId('eth-admin-'+key);if(input)input.value=value;});
+    window.ethAdminTab('player');
+    const message=byId('eth-admin-message');if(message)message.textContent='Набор загружен в поля. Проверь значения и примени.';
+  };
+
+  window.ethAdminSendBroadcast = async function() {
+    try {
+      const text=String(byId('eth-admin-broadcast-text')?.value||'').trim();
+      if(text.length<3||text.length>320) throw new Error('Сообщение должно содержать от 3 до 320 символов.');
+      const {data,error}=await ethSupabaseClient.rpc('admin_broadcast_message',{p_message:text});
+      if(error) throw error;
+      byId('eth-admin-broadcast-text').value='';
+      const count=byId('eth-admin-broadcast-count');if(count)count.textContent='0 / 320';
+      const message=byId('eth-admin-message');if(message)message.textContent='Объявление поставлено в очередь для '+(data?.queued_for_players||0)+' игроков.';
+      await window.ethAdminRefreshDashboard();
+      window.ethAdminTab('queue');
+    } catch(error) {
+      const message=byId('eth-admin-message');if(message)message.textContent='Ошибка: '+(error.message||error);
+    }
+  };
+
+  window.ethAdminRetryCommand = async function(commandId) {
+    try {
+      const {data,error}=await ethSupabaseClient.rpc('admin_retry_command',{p_command_id:commandId});
+      if(error) throw error;
+      if(data!==true) throw new Error('Команда не найдена или не находится в статусе ошибки.');
+      const message=byId('eth-admin-message');if(message)message.textContent='Команда возвращена в очередь.';
+      await window.ethAdminRefreshDashboard();
+    } catch(error) {
+      const message=byId('eth-admin-message');if(message)message.textContent='Ошибка: '+(error.message||error);
     }
   };
 
