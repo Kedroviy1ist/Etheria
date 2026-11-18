@@ -1,0 +1,502 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="theme-color" content="#080b12">
+<title>LABORATORY — Secret Game Prototype</title>
+<style>
+:root{color-scheme:dark;--bg:#080b12;--panel:#111824;--line:#344052;--muted:#8b98a8;--text:#e8edf5;--cyan:#83d7e5;--gold:#e8c66f}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%;background:radial-gradient(ellipse at 50% 0%,#182232 0%,#0a0e16 55%,#06080d 100%);color:var(--text);font-family:ui-monospace,SFMono-Regular,Consolas,monospace}
+body{padding:22px 14px 32px}
+.page{max-width:1180px;margin:0 auto}
+.top{display:flex;align-items:center;justify-content:space-between;gap:16px;margin:0 0 14px}
+.brand{display:flex;align-items:center;gap:12px}
+.mark{width:42px;height:42px;border:1px solid #526176;background:#172131;display:grid;place-items:center;box-shadow:inset 0 0 0 4px #111a27;color:var(--cyan);font-size:20px}
+h1{font-size:16px;letter-spacing:.14em;margin:0 0 4px;font-weight:800}
+.sub{font-size:10px;color:var(--muted);letter-spacing:.16em}
+.tag{border:1px solid #47566a;color:#b6c3d3;background:#131d2b;padding:7px 10px;font-size:10px;letter-spacing:.12em;white-space:nowrap}
+.layout{display:grid;grid-template-columns:minmax(0,1fr) 256px;gap:14px;align-items:stretch}
+.game-panel,.side{border:1px solid #344052;background:linear-gradient(180deg,#141d2a,#0d141f);box-shadow:0 18px 48px #0008}
+.view-head{height:38px;padding:0 13px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #303d4e;background:#131d2a;color:#a9b8c9;font-size:10px;letter-spacing:.12em}
+.live{color:#8bd6a9}
+.canvas-wrap{position:relative;background:#02040a;line-height:0;overflow:hidden}
+canvas{display:block;width:100%;height:auto;aspect-ratio:3/2;image-rendering:pixelated;image-rendering:crisp-edges;outline:none}
+.dialogue{min-height:83px;padding:12px 15px 14px;background:#090e17;border-top:1px solid #354255;display:flex;flex-direction:column;justify-content:center;gap:8px}
+.speaker{font-size:10px;color:var(--cyan);letter-spacing:.14em}
+.message{font-size:13px;line-height:1.55;color:#e5e9ef;min-height:20px}
+.hint{font-size:10px;color:#8190a2;line-height:1.5}
+.side{padding:15px;display:flex;flex-direction:column;gap:14px}
+.side-title{display:flex;align-items:center;justify-content:space-between;padding-bottom:11px;border-bottom:1px solid #303d4e}
+.side-title strong{font-size:12px;letter-spacing:.15em}
+.side-title span{font-size:9px;color:var(--muted)}
+.section-label{font-size:9px;letter-spacing:.13em;color:#91a0b2;margin-bottom:8px}
+.slot{min-height:94px;border:1px dashed #46556a;background:#0a111b;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:7px;color:#657386;text-align:center;padding:10px}
+.slot.filled{border-style:solid;border-color:#8a7547;background:linear-gradient(145deg,#171d27,#151a22);color:#e8d39a}
+.item-icon{font-size:26px;line-height:1}
+.item-name{font-size:11px;color:#f0e2bc}
+.item-desc{font-size:9px;color:#a5afbd;line-height:1.4}
+.action{width:100%;border:1px solid #56667b;background:#1a2939;color:#d8e5f0;padding:10px 9px;font:inherit;font-size:10px;letter-spacing:.08em;cursor:pointer;transition:.15s}
+.action:hover{background:#263c51;border-color:#8acbd8}
+.action:disabled{opacity:.35;cursor:not-allowed}
+.status{font-size:10px;color:#91a0b2;line-height:1.6;padding:10px;border-left:2px solid #526b84;background:#0b121c}
+.controls{display:flex;gap:8px;flex-wrap:wrap}
+.keycap{border:1px solid #526075;background:#0a111b;color:#e0e7ef;padding:3px 7px;font-size:9px;box-shadow:0 2px 0 #02050a}
+.control-line{font-size:10px;color:#9ba8b7;line-height:1.9}
+.footer{display:flex;justify-content:space-between;gap:12px;margin-top:13px;color:#637184;font-size:9px;letter-spacing:.06em}
+.mobile-controls{display:none;justify-content:space-between;align-items:end;gap:16px;margin-top:12px}
+.dpad{display:grid;grid-template-columns:36px 36px 36px;grid-template-rows:34px 34px 34px;gap:4px}
+.padbtn,.interact{border:1px solid #526176;background:#172332;color:#dbe8f2;font:inherit;font-size:12px;touch-action:none;user-select:none}
+.padbtn:active,.interact:active{background:#31516a}
+.pad-up{grid-column:2}.pad-left{grid-column:1;grid-row:2}.pad-down{grid-column:2;grid-row:2}.pad-right{grid-column:3;grid-row:2}
+.interact{height:72px;min-width:72px;border-radius:50%;color:var(--gold);font-weight:bold}
+@media(max-width:850px){.layout{grid-template-columns:1fr}.side{display:grid;grid-template-columns:1fr 1fr;gap:12px}.side-title{grid-column:1/-1}.status{align-self:stretch}.controls{align-content:start}}
+@media(max-width:560px){body{padding:12px 8px 22px}.top{align-items:flex-start}.tag{font-size:8px;padding:6px}.brand{gap:8px}.mark{width:35px;height:35px}h1{font-size:12px}.sub{font-size:8px}.side{grid-template-columns:1fr 1fr;padding:11px}.mobile-controls{display:flex}.footer{font-size:8px;flex-direction:column}}
+</style>
+</head>
+<body>
+<div class="page">
+  <header class="top">
+    <div class="brand">
+      <div class="mark">◇</div>
+      <div><h1>LABORATORY</h1><div class="sub">UNKNOWN FACILITY / PLAYABLE TEST</div></div>
+    </div>
+    <div class="tag">PROTOTYPE BUILD 0.1</div>
+  </header>
+
+  <main class="layout">
+    <section class="game-panel">
+      <div class="view-head"><span>SECTOR 01 <span style="color:#56677c">/</span> CONTAINMENT ROOM</span><span class="live" id="stateLabel">● INITIALIZING</span></div>
+      <div class="canvas-wrap"><canvas id="game" width="768" height="512" tabindex="0" aria-label="Игровая лаборатория"></canvas></div>
+      <div class="dialogue">
+        <div class="speaker" id="speaker">—</div>
+        <div class="message" id="message">...</div>
+        <div class="hint" id="hint">Ожидание...</div>
+      </div>
+    </section>
+
+    <aside class="side">
+      <div class="side-title"><strong>ИНВЕНТАРЬ</strong><span id="itemCount">0 / 8</span></div>
+      <div>
+        <div class="section-label">ПРЕДМЕТ</div>
+        <div class="slot" id="itemSlot"><div class="item-icon">□</div><div>Пусто</div><div class="item-desc">Здесь появятся найденные предметы</div></div>
+        <div style="height:8px"></div>
+        <button class="action" id="equipBtn" disabled>НЕТ ПРЕДМЕТОВ</button>
+      </div>
+      <div>
+        <div class="section-label">СОСТОЯНИЕ</div>
+        <div class="status" id="objective">Очнитесь и осмотритесь.</div>
+      </div>
+      <div>
+        <div class="section-label">УПРАВЛЕНИЕ</div>
+        <div class="control-line"><span class="keycap">WASD</span> / <span class="keycap">↑↓←→</span> — движение</div>
+        <div class="control-line"><span class="keycap">E</span> — взаимодействие</div>
+        <div class="control-line">Нажмите на предмет в инвентаре, чтобы взять его в руку.</div>
+      </div>
+    </aside>
+  </main>
+
+  <div class="mobile-controls" aria-label="Сенсорное управление">
+    <div class="dpad">
+      <button class="padbtn pad-up" data-key="ArrowUp">▲</button>
+      <button class="padbtn pad-left" data-key="ArrowLeft">◀</button>
+      <button class="padbtn pad-down" data-key="ArrowDown">▼</button>
+      <button class="padbtn pad-right" data-key="ArrowRight">▶</button>
+    </div>
+    <button class="interact" id="touchInteract">E</button>
+  </div>
+  <div class="footer"><span>LOCAL TEST ONLY · NO ACCOUNT · NO CLOUD SAVE</span><span>Прогресс сбрасывается при перезагрузке страницы</span></div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+  const canvas = document.getElementById("game");
+  const ctx = canvas.getContext("2d");
+  const $ = (id) => document.getElementById(id);
+  const message = $("message"), speaker = $("speaker"), hint = $("hint");
+  const stateLabel = $("stateLabel"), objective = $("objective");
+  const itemSlot = $("itemSlot"), itemCount = $("itemCount"), equipBtn = $("equipBtn");
+
+  const W = canvas.width, H = canvas.height;
+  const keys = Object.create(null);
+  const player = {x:178,y:337,r:10,speed:154,dir:"up",moving:false};
+  const keyItem = {x:286,y:190,found:false};
+  let equipped = false, doorOpen = false, escaped = false;
+  let mode = "intro", startTime = performance.now(), lastTime = startTime;
+  let dialogueTimer = 0, flicker = 0, frame = 0;
+  let currentMessage = "Вы медленно приходите в себя...";
+  let currentHint = "Сначала нужно открыть глаза.";
+  let touchInteract = false;
+
+  const obstacles = [
+    {x:82,y:138,w:130,h:70},
+    {x:252,y:216,w:76,h:34},
+    {x:425,y:118,w:142,h:64},
+    {x:462,y:300,w:118,h:66},
+    {x:618,y:112,w:58,h:100},
+    {x:622,y:346,w:76,h:52}
+  ];
+  function setText(title, body, help){
+    speaker.textContent = title || "—";
+    message.textContent = body || "";
+    hint.textContent = help || "";
+  }
+  function updateUI(){
+    itemCount.textContent = keyItem.found ? "1 / 8" : "0 / 8";
+    if(!keyItem.found){
+      itemSlot.className = "slot";
+      itemSlot.innerHTML = '<div class="item-icon">□</div><div>Пусто</div><div class="item-desc">Здесь появятся найденные предметы</div>';
+      equipBtn.disabled = true;
+      equipBtn.textContent = "НЕТ ПРЕДМЕТОВ";
+      objective.textContent = "Найдите ключ в комнате. Осматривайте предметы и подходите к ним.";
+    }else{
+      itemSlot.className = "slot filled";
+      itemSlot.innerHTML = '<div class="item-icon">⚿</div><div class="item-name">Старый ключ</div><div class="item-desc">Небольшой металлический ключ. Подходит к замку клетки.</div>';
+      equipBtn.disabled = false;
+      equipBtn.textContent = equipped ? "УБРАТЬ ИЗ РУКИ" : "ВЗЯТЬ В РУКУ";
+      objective.textContent = doorOpen ? "Клетка открыта. Можно выйти наружу." : "Ключ найден. Подойдите к двери клетки и нажмите E.";
+    }
+  }
+  equipBtn.addEventListener("click",function(){
+    if(!keyItem.found) return;
+    equipped = !equipped;
+    updateUI();
+    if(equipped) setText("ИНВЕНТАРЬ","Вы взяли ключ в руку.","Ключ теперь виден у героя.");
+    else setText("ИНВЕНТАРЬ","Вы убрали ключ в инвентарь.","Предмет можно снова взять в руку.");
+  });
+
+  function rectHit(x,y,r,box){
+    const nx = Math.max(box.x,Math.min(x,box.x+box.w));
+    const ny = Math.max(box.y,Math.min(y,box.y+box.h));
+    const dx=x-nx,dy=y-ny;
+    return dx*dx+dy*dy<r*r;
+  }
+  function blocked(x,y){
+    if(x<32||x>W-32||y<32||y>H-32) return true;
+    for(const b of obstacles) if(rectHit(x,y,player.r,b)) return true;
+    // Bars around the starting containment cell.
+    if(x<76 && y>76 && y<434) return true;
+    if(y<86 && x>70 && x<356) return true;
+    if(y>425 && x>70 && x<356) return true;
+    if(x>340 && x<358 && y>76 && y<434){
+      if(!doorOpen || y<251 || y>330) return true;
+    }
+    return false;
+  }
+  function move(dt){
+    let dx=0,dy=0;
+    if(keys.ArrowLeft||keys.KeyA) dx--;
+    if(keys.ArrowRight||keys.KeyD) dx++;
+    if(keys.ArrowUp||keys.KeyW) dy--;
+    if(keys.ArrowDown||keys.KeyS) dy++;
+    if(dx&&dy){dx*=.7071;dy*=.7071}
+    player.moving=!!(dx||dy);
+    if(!player.moving)return;
+    if(Math.abs(dx)>Math.abs(dy)) player.dir=dx<0?"left":"right";
+    else player.dir=dy<0?"up":"down";
+    const nx=player.x+dx*player.speed*dt;
+    const ny=player.y+dy*player.speed*dt;
+    if(!blocked(nx,player.y)) player.x=nx;
+    if(!blocked(player.x,ny)) player.y=ny;
+  }
+  function distance(a,b){return Math.hypot(a.x-b.x,a.y-b.y)}
+  function interact(){
+    if(mode!=="playing"||escaped)return;
+    if(!keyItem.found && distance(player,keyItem)<47){
+      keyItem.found=true;
+      updateUI();
+      setText("НАХОДКА","Вы нашли старый ключ.","Он добавлен в инвентарь. Подойдите к двери клетки.");
+      return;
+    }
+    const gate={x:348,y:288};
+    if(distance(player,gate)<62){
+      if(keyItem.found){
+        doorOpen=true;
+        updateUI();
+        setText("ДВЕРЬ","Замок щёлкнул. Дверь клетки открылась.","Пройдите через открытый проход.");
+      }else{
+        setText("ДВЕРЬ","Клетка заперта. Нужен ключ.","Осмотрите комнату внимательнее.");
+      }
+      return;
+    }
+    setText("—","Здесь пока нечего использовать.","Подойдите ближе к предмету или двери и нажмите E.");
+  }
+  function drawFloor(){
+    ctx.fillStyle="#262d35";ctx.fillRect(0,0,W,H);
+    for(let y=28;y<H-24;y+=32){
+      for(let x=28;x<W-24;x+=32){
+        const v=((x/32|0)+(y/32|0))%2;
+        ctx.fillStyle=v?"#2a323a":"#303840";
+        ctx.fillRect(x,y,32,32);
+        ctx.fillStyle="#39424a";ctx.fillRect(x+2,y+2,1,1);
+        ctx.fillStyle="#202830";ctx.fillRect(x+31,y+1,1,30);
+        ctx.fillRect(x+1,y+31,30,1);
+      }
+    }
+    // small scuffs in the tiled floor
+    for(let i=0;i<30;i++){
+      const x=(i*83+37)%W,y=(i*47+61)%H;
+      ctx.fillStyle="rgba(8,13,19,.18)";ctx.fillRect(x,y,5+(i%4),1);
+    }
+  }
+  function wall(x,y,w,h){
+    ctx.fillStyle="#151c26";ctx.fillRect(x,y,w,h);
+    ctx.fillStyle="#354252";ctx.fillRect(x,y,w,5);
+    ctx.fillStyle="#0a1019";ctx.fillRect(x,y+h-4,w,4);
+    for(let px=x+12;px<x+w-5;px+=28){
+      ctx.fillStyle="#465365";ctx.fillRect(px,y+8,2,Math.max(5,h-16));
+    }
+  }
+  function drawBed(){
+    ctx.fillStyle="#111923";ctx.fillRect(82,138,132,74);
+    ctx.fillStyle="#667481";ctx.fillRect(92,148,112,52);
+    ctx.fillStyle="#c0c7c9";ctx.fillRect(99,153,42,22);
+    ctx.fillStyle="#7c8993";ctx.fillRect(145,153,52,42);
+    ctx.fillStyle="#4c5965";ctx.fillRect(92,202,112,8);
+    ctx.fillStyle="#111720";ctx.fillRect(86,210,10,8);ctx.fillRect(198,210,10,8);
+    ctx.fillStyle="#d6d9d2";ctx.fillRect(104,157,28,2);
+  }
+  function drawTable(){
+    ctx.fillStyle="#161c23";ctx.fillRect(252,216,76,34);
+    ctx.fillStyle="#68737a";ctx.fillRect(248,210,84,10);
+    ctx.fillStyle="#98a0a0";ctx.fillRect(254,220,72,23);
+    ctx.fillStyle="#46515a";ctx.fillRect(258,244,5,10);ctx.fillRect(317,244,5,10);
+  }
+  function drawKey(){
+    if(keyItem.found)return;
+    const pulse=1+Math.sin(frame*.09)*.12;
+    ctx.save();ctx.translate(keyItem.x,keyItem.y);ctx.scale(pulse,pulse);
+    ctx.fillStyle="rgba(236,196,99,.18)";ctx.fillRect(-12,-12,24,24);
+    ctx.fillStyle="#f0d078";ctx.fillRect(-5,-2,17,4);ctx.fillRect(-8,-5,7,10);
+    ctx.fillStyle="#a98439";ctx.fillRect(7,1,3,6);ctx.fillRect(12,1,3,4);
+    ctx.fillStyle="#fff0b0";ctx.fillRect(-5,-2,13,1);
+    ctx.restore();
+  }
+  function drawWorkbench(){
+    ctx.fillStyle="#151c25";ctx.fillRect(425,118,142,64);
+    ctx.fillStyle="#667887";ctx.fillRect(420,111,152,10);
+    ctx.fillStyle="#34495a";ctx.fillRect(445,92,62,20);
+    ctx.fillStyle="#83bac2";ctx.fillRect(450,96,52,12);
+    ctx.fillStyle="#172e3c";ctx.fillRect(454,99,44,6);
+    ctx.fillStyle="#97c6ce";ctx.fillRect(456,100,12,2);
+    ctx.fillStyle="#88939a";ctx.fillRect(438,183,7,12);ctx.fillRect(548,183,7,12);
+    ctx.fillStyle="#c6b17b";ctx.fillRect(526,136,22,13);
+    ctx.fillStyle="#705d3c";ctx.fillRect(530,129,14,7);
+  }
+  function drawCabinet(x,y,w,h){
+    ctx.fillStyle="#18232d";ctx.fillRect(x,y,w,h);
+    ctx.fillStyle="#71808b";ctx.fillRect(x,y,w,5);
+    ctx.fillStyle="#293945";ctx.fillRect(x+5,y+9,w-10,h-14);
+    for(let yy=y+17;yy<y+h-8;yy+=25){
+      ctx.fillStyle="#53616c";ctx.fillRect(x+9,yy,w-18,2);
+      ctx.fillStyle="#93a0a5";ctx.fillRect(x+w-15,yy+5,3,8);
+    }
+  }
+  function drawConsole(){
+    ctx.fillStyle="#141d28";ctx.fillRect(462,300,118,66);
+    ctx.fillStyle="#657984";ctx.fillRect(456,294,130,9);
+    ctx.fillStyle="#1c3844";ctx.fillRect(478,310,44,30);
+    ctx.fillStyle="#69b8bd";ctx.fillRect(482,314,36,22);
+    ctx.fillStyle="#244b52";ctx.fillRect(485,318,27,2);ctx.fillRect(485,324,18,2);
+    ctx.fillStyle="#b0a16a";ctx.fillRect(536,311,28,6);
+    ctx.fillStyle="#3f4d59";ctx.fillRect(536,324,28,3);
+    ctx.fillStyle="#1a222b";ctx.fillRect(471,366,8,10);ctx.fillRect(562,366,8,10);
+  }
+  function drawTank(){
+    ctx.fillStyle="#18232e";ctx.fillRect(618,112,58,100);
+    ctx.fillStyle="#6e8995";ctx.fillRect(624,116,46,92);
+    ctx.fillStyle="#263e4d";ctx.fillRect(628,128,38,72);
+    ctx.fillStyle="#719a9e";ctx.fillRect(630,155,34,42);
+    ctx.fillStyle="rgba(117,205,209,.22)";ctx.fillRect(632,139,8,47);
+    ctx.fillStyle="#a8cbd0";ctx.fillRect(636,119,20,3);
+    ctx.fillStyle="#0a111a";ctx.fillRect(640,209,12,7);
+  }
+  function drawCell(){
+    // containment frame and bars
+    wall(68,72,288,14);
+    wall(68,426,288,10);
+    ctx.fillStyle="#1b2731";ctx.fillRect(68,86,9,340);
+    ctx.fillStyle="#82929a";ctx.fillRect(77,86,2,340);
+    for(let x=82;x<348;x+=24){
+      ctx.fillStyle="#73838e";ctx.fillRect(x,78,3,8);
+      ctx.fillRect(x,426,3,8);
+    }
+    // right-side cage bars with a central gate opening
+    ctx.fillStyle="#778894";
+    for(let y=82;y<430;y+=20){
+      if(doorOpen && y>=258 && y<324) continue;
+      ctx.fillRect(349,y,4,13);
+    }
+    ctx.fillStyle="#a0adb3";ctx.fillRect(345,76,3,176);ctx.fillRect(345,330,3,100);
+    if(!doorOpen){
+      ctx.fillStyle="#a6b5b9";ctx.fillRect(344,252,8,78);
+      ctx.fillStyle="#5e727d";ctx.fillRect(341,256,4,70);
+      ctx.fillStyle="#d5bb72";ctx.fillRect(343,283,9,10);
+      ctx.fillStyle="#66552f";ctx.fillRect(346,285,3,6);
+    }else{
+      ctx.fillStyle="#788b93";ctx.fillRect(345,252,5,78);
+      ctx.fillStyle="#202b33";ctx.fillRect(350,252,4,78);
+    }
+  }
+  function drawLight(){
+    const alpha=.035+Math.sin(frame*.035)*.012+(Math.random()<.008?.035:0);
+    const g=ctx.createRadialGradient(486,250,20,486,250,360);
+    g.addColorStop(0,"rgba(127,194,202,"+(alpha+.08)+")");
+    g.addColorStop(1,"rgba(80,150,180,0)");
+    ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
+    ctx.fillStyle="rgba(200,224,224,.05)";
+    ctx.fillRect(420,26,250,2);ctx.fillRect(440,30,210,1);
+  }
+  function drawPlayer(){
+    const x=Math.round(player.x),y=Math.round(player.y);
+    const bob=player.moving?Math.sin(frame*.42)*1.8:0;
+    ctx.fillStyle="rgba(0,0,0,.34)";ctx.fillRect(x-11,y+10,22,5);
+    // legs
+    ctx.fillStyle="#202b3b";ctx.fillRect(x-7,y+3+bob,6,9);ctx.fillRect(x+1,y+3-bob,6,9);
+    ctx.fillStyle="#566172";ctx.fillRect(x-8,y+10+bob,8,3);ctx.fillRect(x,y+10-bob,8,3);
+    // coat / torso
+    ctx.fillStyle="#426a78";ctx.fillRect(x-10,y-9+bob,20,16);
+    ctx.fillStyle="#8ab6bb";ctx.fillRect(x-7,y-8+bob,14,3);
+    ctx.fillStyle="#233c4b";ctx.fillRect(x-2,y-6+bob,4,12);
+    // arms, key hand changes silhouette
+    ctx.fillStyle="#d5b69d";
+    if(equipped){
+      ctx.fillRect(x+8,y-5+bob,5,7);
+      ctx.fillStyle="#e6c66e";ctx.fillRect(x+11,y-7+bob,11,3);
+      ctx.fillRect(x+19,y-9+bob,3,7);ctx.fillRect(x+21,y-8+bob,4,3);
+      ctx.fillStyle="#fff0b0";ctx.fillRect(x+13,y-7+bob,6,1);
+    }else{
+      ctx.fillRect(x-12,y-5+bob,4,7);ctx.fillRect(x+8,y-5+bob,4,7);
+    }
+    // head and hair
+    ctx.fillStyle="#d9b99c";ctx.fillRect(x-7,y-21+bob,14,13);
+    ctx.fillStyle="#4b3a36";ctx.fillRect(x-8,y-23+bob,16,6);
+    ctx.fillRect(x-8,y-19+bob,3,5);ctx.fillRect(x+5,y-19+bob,3,5);
+    ctx.fillStyle="#17212b";
+    if(player.dir==="left")ctx.fillRect(x-5,y-16+bob,2,2);
+    else if(player.dir==="right")ctx.fillRect(x+3,y-16+bob,2,2);
+    else {ctx.fillRect(x-4,y-16+bob,2,2);ctx.fillRect(x+2,y-16+bob,2,2)}
+    ctx.fillStyle="#f1d8bd";ctx.fillRect(x-1,y-12+bob,2,1);
+  }
+  function drawRoom(){
+    drawFloor();
+    // far walls and room trim
+    wall(28,28,712,20);
+    wall(28,28,18,456);
+    wall(722,28,18,456);
+    wall(28,466,712,18);
+    // lights
+    for(let x=120;x<700;x+=190){
+      ctx.fillStyle="#536570";ctx.fillRect(x,49,58,4);
+      ctx.fillStyle="#b6d0c9";ctx.fillRect(x+7,53,44,2);
+    }
+    // distant laboratory fixtures
+    drawCabinet(618,346,76,52);
+    drawCabinet(650,82,50,25);
+    drawBed();drawTable();drawKey();drawWorkbench();drawConsole();drawTank();
+    // pipes and wall details
+    ctx.fillStyle="#4c5d66";ctx.fillRect(382,76,8,2);ctx.fillRect(390,76,2,48);
+    ctx.fillStyle="#788d91";ctx.fillRect(387,120,9,3);
+    ctx.fillStyle="#8f9b9a";ctx.fillRect(594,74,3,22);ctx.fillRect(590,92,11,3);
+    drawCell();
+    drawLight();
+    drawPlayer();
+    // room identification
+    ctx.fillStyle="rgba(3,7,12,.7)";ctx.fillRect(48,48,166,19);
+    ctx.fillStyle="#9baeb7";ctx.font="10px monospace";ctx.fillText("CONTAINMENT // 01",56,61);
+    if(!keyItem.found && distance(player,keyItem)<75){
+      ctx.fillStyle="#f0d078";ctx.font="10px monospace";ctx.fillText("E  /  ОСМОТРЕТЬ",keyItem.x-40,keyItem.y-20);
+    }
+    if(keyItem.found && !doorOpen && distance(player,{x:348,y:288})<88){
+      ctx.fillStyle="#f0d078";ctx.font="10px monospace";ctx.fillText("E  /  ЗАМОК",309,240);
+    }
+  }
+  function drawIntro(now){
+    const t=now-startTime;
+    ctx.fillStyle="#020309";ctx.fillRect(0,0,W,H);
+    const open=Math.max(0,Math.min(1,(t-1250)/1150));
+    if(t>850){
+      const eyeY=247,eyeW=48,eyeH=2+open*18;
+      for(const ex of [W/2-47,W/2+47]){
+        ctx.fillStyle="#252b34";ctx.fillRect(ex-eyeW/2-4,eyeY-3,eyeW+8,eyeH+9);
+        ctx.fillStyle="#d6dfde";ctx.fillRect(ex-eyeW/2,eyeY,eyeW,eyeH);
+        if(open>.25){
+          ctx.fillStyle="#90b7bd";ctx.fillRect(ex-5,eyeY+3,10,Math.max(3,eyeH-6));
+          ctx.fillStyle="#101823";ctx.fillRect(ex-2,eyeY+4,5,Math.max(3,eyeH-7));
+        }
+        ctx.fillStyle="#080b12";ctx.fillRect(ex-eyeW/2-2,eyeY-4,eyeW+4,Math.max(0,5-open*5));
+        ctx.fillRect(ex-eyeW/2-2,eyeY+eyeH,eyeW+4,Math.max(0,5-open*5));
+      }
+    }
+    ctx.fillStyle="rgba(175,195,205,"+(0.25+Math.sin(t*.004)*.1)+")";
+    ctx.font="11px monospace";ctx.textAlign="center";
+    ctx.fillText(t<1250?"...":"ОТКРЫВАЕТЕ ГЛАЗА",W/2,337);
+    ctx.textAlign="left";
+    if(t>3100){
+      ctx.save();ctx.globalAlpha=Math.min(1,(t-3100)/950);drawRoom();ctx.restore();
+    }
+    if(t>4100){
+      mode="playing";
+      stateLabel.textContent="● ACTIVE";
+      setText("—","Вы очнулись в лабораторной клетке.","WASD / стрелки — движение · E — взаимодействие");
+      updateUI();
+    }
+  }
+  function drawExitOverlay(){
+    ctx.fillStyle="rgba(3,7,12,.78)";ctx.fillRect(0,0,W,H);
+    ctx.strokeStyle="#9ac4ca";ctx.lineWidth=2;ctx.strokeRect(176,184,416,142);
+    ctx.fillStyle="#e5edf0";ctx.font="bold 18px monospace";ctx.textAlign="center";
+    ctx.fillText("КЛЕТКА ОТКРЫТА",W/2,228);
+    ctx.fillStyle="#a8b9c3";ctx.font="11px monospace";
+    ctx.fillText("Вы вышли из камеры. Прототип первой комнаты завершён.",W/2,257);
+    ctx.fillStyle="#e5c875";ctx.fillText("TEST BUILD 0.1",W/2,290);
+    ctx.textAlign="left";
+  }
+  function loop(now){
+    const dt=Math.min(.04,(now-lastTime)/1000);lastTime=now;frame++;
+    if(mode==="intro"){
+      drawIntro(now);
+    }else{
+      if(mode==="playing"){
+        move(dt);
+        if(doorOpen && player.x>382 && player.y>244 && player.y<342){
+          escaped=true;mode="escaped";
+          setText("—","Вы покинули клетку.","Первый тестовый эпизод завершён.");
+          objective.textContent="Вы вышли из клетки. Прототип первой комнаты завершён.";
+          stateLabel.textContent="● ROOM CLEARED";
+        }
+      }
+      drawRoom();
+      if(mode==="escaped")drawExitOverlay();
+    }
+    requestAnimationFrame(loop);
+  }
+
+  window.addEventListener("keydown",function(e){
+    const code=e.code;
+    if(["ArrowUp","ArrowDown","ArrowLeft","ArrowRight","Space"].includes(code))e.preventDefault();
+    keys[code]=true;
+    if((code==="KeyE"||code==="Enter")&&!e.repeat)interact();
+  });
+  window.addEventListener("keyup",function(e){keys[e.code]=false});
+  window.addEventListener("blur",function(){for(const k in keys)keys[k]=false});
+  document.querySelectorAll("[data-key]").forEach(function(btn){
+    const k=btn.getAttribute("data-key");
+    const down=function(e){e.preventDefault();keys[k]=true};
+    const up=function(e){e.preventDefault();keys[k]=false};
+    btn.addEventListener("pointerdown",down);
+    btn.addEventListener("pointerup",up);
+    btn.addEventListener("pointerleave",up);
+    btn.addEventListener("pointercancel",up);
+  });
+  $("touchInteract").addEventListener("pointerdown",function(e){e.preventDefault();interact()});
+  canvas.addEventListener("pointerdown",function(){canvas.focus()});
+
+  updateUI();
+  requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>
