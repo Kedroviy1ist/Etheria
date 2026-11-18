@@ -51,6 +51,10 @@ canvas{display:block;width:100%;height:auto;aspect-ratio:3/2;image-rendering:pix
 .padbtn:active,.interact:active{background:#31516a}
 .pad-up{grid-column:2}.pad-left{grid-column:1;grid-row:2}.pad-down{grid-column:2;grid-row:2}.pad-right{grid-column:3;grid-row:2}
 .interact{height:72px;min-width:72px;border-radius:50%;color:var(--gold);font-weight:bold}
+.action-controls{display:flex;align-items:center;gap:8px}
+.attack-touch{height:58px;min-width:58px;border-radius:50%;border:1px solid #78919d;background:#1d2a34;color:#e4d09a;font:inherit;font-size:22px;touch-action:none;user-select:none}
+.attack-touch:active{background:#385268}
+
 
 /* RETRO OBSERVATION TERMINAL — applies outside the playable room */
 html,body{background:#020704!important;color:#a8d6a8;}
@@ -170,6 +174,7 @@ h1{color:#d4e2e4;text-shadow:0 0 12px #76c7d422}
         <div class="section-label">УПРАВЛЕНИЕ</div>
         <div class="control-line"><span class="keycap">WASD</span> / <span class="keycap">↑↓←→</span> — движение</div>
         <div class="control-line"><span class="keycap">E</span> — взаимодействие</div>
+        <div class="control-line"><span class="keycap">Z / SPACE</span> — удар мечом (в бою)</div>
         <div class="control-line">Нажмите на предмет в инвентаре, чтобы взять его в руку.</div>
       </div>
     </aside>
@@ -182,7 +187,7 @@ h1{color:#d4e2e4;text-shadow:0 0 12px #76c7d422}
       <button class="padbtn pad-down" data-key="ArrowDown">▼</button>
       <button class="padbtn pad-right" data-key="ArrowRight">▶</button>
     </div>
-    <button class="interact" id="touchInteract">E</button>
+    <div class="action-controls"><button class="interact" id="touchInteract">E</button><button class="attack-touch" id="touchAttack" aria-label="Удар мечом">⚔</button></div>
   </div>
   <div class="footer"><span>LOCAL TEST ONLY · NO ACCOUNT · NO CLOUD SAVE</span><span>Прогресс сбрасывается при перезагрузке страницы</span></div>
 </div>
@@ -199,10 +204,18 @@ h1{color:#d4e2e4;text-shadow:0 0 12px #76c7d422}
 
   const W = canvas.width, H = canvas.height;
   const keys = Object.create(null);
+  const cell = {x:68,y:72,w:288,h:358};
   const player = {x:178,y:337,r:12,speed:154,dir:"up",moving:false};
-  const keyItem = {x:286,y:190,found:false};
+  const keyItem = {x:cell.x+218,y:cell.y+118,found:false};
+  const loopLayouts = [
+    {x:68,y:72},{x:410,y:72},{x:220,y:92},{x:68,y:92},{x:410,y:92},
+    {x:220,y:72},{x:410,y:82},{x:68,y:82},{x:220,y:92},{x:410,y:72}
+  ];
   let equipped = false, doorOpen = false, escaped = false;
-  let mode = "intro", startTime = performance.now(), lastTime = startTime;
+  let escapeCount = 0, transitionUntil = 0, transitionTitle = "";
+  let mode = "intro", startTime = performance.now(), lastTime = startTime, battleIntroStart = 0;
+  let bossHits = 0, playerHealth = 6, swordCooldown = 0, swordAnim = 0, playerInvuln = 0;
+  let boss = {x:558,y:252,flash:0,attackTimer:2.2,aoe:null};
   let dialogueTimer = 0, flicker = 0, frame = 0;
   let currentMessage = "Вы медленно приходите в себя...";
   let currentHint = "Сначала нужно открыть глаза.";
@@ -222,6 +235,15 @@ h1{color:#d4e2e4;text-shadow:0 0 12px #76c7d422}
     hint.textContent = help || "";
   }
   function updateUI(){
+    if(mode==="battle" || mode==="battleIntro" || mode==="battleVictory"){
+      itemCount.textContent = bossHits + " / 20";
+      itemSlot.className = "slot filled";
+      itemSlot.innerHTML = '<div class="item-icon">⚔</div><div class="item-name">Тестовый меч</div><div class="item-desc">Короткий удар перед собой. Требуется 20 попаданий.</div>';
+      equipBtn.disabled = true;
+      equipBtn.textContent = "МЕЧ В РУКЕ";
+      objective.textContent = "ПОПАДАНИЯ: " + bossHits + " / 20 · ЦЕЛОСТНОСТЬ: " + playerHealth + " / 6";
+      return;
+    }
     itemCount.textContent = keyItem.found ? "1 / 8" : "0 / 8";
     if(!keyItem.found){
       itemSlot.className = "slot";
@@ -253,13 +275,16 @@ h1{color:#d4e2e4;text-shadow:0 0 12px #76c7d422}
   }
   function blocked(x,y){
     if(x<32||x>W-32||y<32||y>H-32) return true;
-    for(const b of obstacles) if(rectHit(x,y,player.r,b)) return true;
-    // Bars around the starting containment cell.
-    if(x<76 && y>76 && y<434) return true;
-    if(y<86 && x>70 && x<356) return true;
-    if(y>425 && x>70 && x<356) return true;
-    if(x>340 && x<358 && y>76 && y<434){
-      if(!doorOpen || y<251 || y>330) return true;
+    if(escapeCount===0){
+      for(const b of obstacles) if(rectHit(x,y,player.r,b)) return true;
+    }
+    const left=cell.x, top=cell.y, right=cell.x+cell.w, bottom=cell.y+cell.h;
+    if(x<left+8 && y>top+14 && y<bottom-6) return true;
+    if(y<top+14 && x>left+2 && x<right-8) return true;
+    if(y>bottom-7 && x>left+2 && x<right-8) return true;
+    if(x>right-16 && x<right+2 && y>top+12 && y<bottom-6){
+      const inGate=y>=top+180 && y<=top+258;
+      if(!doorOpen || !inGate) return true;
     }
     return false;
   }
@@ -288,7 +313,7 @@ h1{color:#d4e2e4;text-shadow:0 0 12px #76c7d422}
       setText("НАХОДКА","Вы нашли старый ключ.","Он добавлен в инвентарь. Подойдите к двери клетки.");
       return;
     }
-    const gate={x:348,y:288};
+    const gate={x:cell.x+280,y:cell.y+216};
     if(distance(player,gate)<62){
       if(keyItem.found){
         doorOpen=true;
@@ -392,30 +417,31 @@ h1{color:#d4e2e4;text-shadow:0 0 12px #76c7d422}
     ctx.fillStyle="#0a111a";ctx.fillRect(640,209,12,7);
   }
   function drawCell(){
-    // containment frame and bars
-    wall(68,72,288,14);
-    wall(68,426,288,10);
-    ctx.fillStyle="#1b2731";ctx.fillRect(68,86,9,340);
-    ctx.fillStyle="#82929a";ctx.fillRect(77,86,2,340);
-    for(let x=82;x<348;x+=24){
-      ctx.fillStyle="#73838e";ctx.fillRect(x,78,3,8);
-      ctx.fillRect(x,426,3,8);
+    const x=cell.x,y=cell.y,w=cell.w,h=cell.h;
+    wall(x,y,w,14);
+    wall(x,y+h-4,w,10);
+    ctx.fillStyle="#1b2731";ctx.fillRect(x,y+14,9,h-20);
+    ctx.fillStyle="#82929a";ctx.fillRect(x+9,y+14,2,h-20);
+    for(let px=x+14;px<x+w-8;px+=24){
+      ctx.fillStyle="#73838e";ctx.fillRect(px,y+6,3,8);
+      ctx.fillRect(px,y+h-4,3,8);
     }
-    // right-side cage bars with a central gate opening
     ctx.fillStyle="#778894";
-    for(let y=82;y<430;y+=20){
-      if(doorOpen && y>=258 && y<324) continue;
-      ctx.fillRect(349,y,4,13);
+    for(let py=y+10;py<y+h-2;py+=20){
+      if(doorOpen && py>=y+180 && py<y+258) continue;
+      ctx.fillRect(x+w-7,py,4,13);
     }
-    ctx.fillStyle="#a0adb3";ctx.fillRect(345,76,3,176);ctx.fillRect(345,330,3,100);
+    ctx.fillStyle="#a0adb3";
+    ctx.fillRect(x+w-11,y+4,3,176);
+    ctx.fillRect(x+w-11,y+258,3,h-262);
     if(!doorOpen){
-      ctx.fillStyle="#a6b5b9";ctx.fillRect(344,252,8,78);
-      ctx.fillStyle="#5e727d";ctx.fillRect(341,256,4,70);
-      ctx.fillStyle="#d5bb72";ctx.fillRect(343,283,9,10);
-      ctx.fillStyle="#66552f";ctx.fillRect(346,285,3,6);
+      ctx.fillStyle="#a6b5b9";ctx.fillRect(x+w-12,y+180,8,78);
+      ctx.fillStyle="#5e727d";ctx.fillRect(x+w-15,y+184,4,70);
+      ctx.fillStyle="#d5bb72";ctx.fillRect(x+w-13,y+211,9,10);
+      ctx.fillStyle="#66552f";ctx.fillRect(x+w-10,y+213,3,6);
     }else{
-      ctx.fillStyle="#788b93";ctx.fillRect(345,252,5,78);
-      ctx.fillStyle="#202b33";ctx.fillRect(350,252,4,78);
+      ctx.fillStyle="#788b93";ctx.fillRect(x+w-11,y+180,5,78);
+      ctx.fillStyle="#202b33";ctx.fillRect(x+w-6,y+180,4,78);
     }
   }
   function drawLight(){
@@ -481,12 +507,15 @@ h1{color:#d4e2e4;text-shadow:0 0 12px #76c7d422}
     ctx.fillStyle="#382f30";ctx.fillRect(x-3,by(-26),6,2);
 
     // The key is visibly held in the right gauntlet.
-    if(equipped){
+    if(equipped && mode!=="battle" && mode!=="battleVictory"){
       ctx.fillStyle="#e7c66f";ctx.fillRect(x+17,by(-9),13,4);
       ctx.fillRect(x+26,by(-7),3,8);ctx.fillRect(x+29,by(-7),4,3);
       ctx.fillRect(x+20,by(-12),3,5);
       ctx.fillStyle="#fff0b0";ctx.fillRect(x+19,by(-9),9,1);
       ctx.fillStyle="#765c30";ctx.fillRect(x+17,by(-5),5,2);
+    }
+    if(playerInvuln>0 && mode==="battle" && Math.floor(frame/3)%2===0){
+      ctx.fillStyle="rgba(240,245,255,.45)";ctx.fillRect(x-20,by(-45),40,63);
     }
   }
   function drawRoom(){
@@ -513,13 +542,13 @@ h1{color:#d4e2e4;text-shadow:0 0 12px #76c7d422}
     drawLight();
     drawPlayer();
     // room identification
-    ctx.fillStyle="rgba(3,7,12,.7)";ctx.fillRect(48,48,166,19);
-    ctx.fillStyle="#9baeb7";ctx.font="10px monospace";ctx.fillText("CONTAINMENT // 01",56,61);
+    ctx.fillStyle="rgba(3,7,12,.7)";ctx.fillRect(48,48,190,19);
+    ctx.fillStyle="#9baeb7";ctx.font="10px monospace";ctx.fillText("CONTAINMENT // " + String(escapeCount+1).padStart(2,"0"),56,61);
     if(!keyItem.found && distance(player,keyItem)<75){
       ctx.fillStyle="#f0d078";ctx.font="10px monospace";ctx.fillText("E  /  ОСМОТРЕТЬ",keyItem.x-40,keyItem.y-20);
     }
-    if(keyItem.found && !doorOpen && distance(player,{x:348,y:288})<88){
-      ctx.fillStyle="#f0d078";ctx.font="10px monospace";ctx.fillText("E  /  ЗАМОК",309,240);
+    if(keyItem.found && !doorOpen && distance(player,{x:cell.x+280,y:cell.y+216})<88){
+      ctx.fillStyle="#f0d078";ctx.font="10px monospace";ctx.fillText("E  /  ЗАМОК",cell.x+240,cell.y+168);
     }
   }
   function drawIntro(now){
@@ -553,32 +582,236 @@ h1{color:#d4e2e4;text-shadow:0 0 12px #76c7d422}
       updateUI();
     }
   }
-  function drawExitOverlay(){
-    ctx.fillStyle="rgba(3,7,12,.78)";ctx.fillRect(0,0,W,H);
-    ctx.strokeStyle="#9ac4ca";ctx.lineWidth=2;ctx.strokeRect(176,184,416,142);
-    ctx.fillStyle="#e5edf0";ctx.font="bold 18px monospace";ctx.textAlign="center";
-    ctx.fillText("КЛЕТКА ОТКРЫТА",W/2,228);
-    ctx.fillStyle="#a8b9c3";ctx.font="11px monospace";
-    ctx.fillText("Вы вышли из камеры. Прототип первой комнаты завершён.",W/2,257);
-    ctx.fillStyle="#e5c875";ctx.fillText("TEST BUILD 0.1",W/2,290);
+  function beginEscapeTransition(now){
+    escapeCount++;
+    escaped=true;
+    mode="loopTransition";
+    transitionTitle=escapeCount===3 ? "HOW INTERESTING" : "";
+    transitionUntil=now+(escapeCount===3?2600:760);
+    stateLabel.textContent="● LOOP " + Math.min(escapeCount,10) + " / 10";
+    objective.textContent="ПОБЕГИ: " + escapeCount + " / 10";
+    if(escapeCount===3){
+      setText("OBSERVATION","HOW INTERESTING","...");
+    }else if(escapeCount<10){
+      setText("SYSTEM","Комната снова изменилась.","Повторный выход: " + escapeCount + " / 10");
+    }else{
+      setText("SYSTEM","Цикл завершён.","Подготовка следующей проверки...");
+    }
+    updateUI();
+  }
+  function resetLoopRoom(){
+    const p=loopLayouts[Math.min(escapeCount,loopLayouts.length-1)];
+    cell.x=p.x;cell.y=p.y;
+    keyItem.x=cell.x+218;keyItem.y=cell.y+118;keyItem.found=false;
+    player.x=cell.x+110;player.y=cell.y+265;player.dir="up";player.moving=false;
+    doorOpen=false;equipped=false;escaped=false;mode="playing";
+    stateLabel.textContent="● LOOP " + (escapeCount+1) + " / 10";
+    setText("—","Вы снова очнулись в клетке.","Найдите ключ, откройте дверь и выйдите.");
+    updateUI();
+  }
+  function drawLoopTransition(now){
+    const alpha=Math.min(.96,.82+(Math.sin(now*.02)*.05));
+    ctx.fillStyle="rgba(2,5,9,"+alpha+")";ctx.fillRect(0,0,W,H);
+    if(transitionTitle){
+      ctx.textAlign="center";
+      ctx.fillStyle="rgba(218,232,235,.22)";ctx.font="bold 31px monospace";
+      ctx.fillText(transitionTitle,W/2+2,H/2+2);
+      ctx.fillStyle="#edf3f2";ctx.font="bold 30px monospace";
+      ctx.fillText(transitionTitle,W/2,H/2);
+      ctx.fillStyle="#91a4ac";ctx.font="10px monospace";
+      ctx.fillText("SUBJECT OBSERVATION // LOOP 03",W/2,H/2+38);
+      ctx.textAlign="left";
+    }else{
+      ctx.fillStyle="rgba(164,192,198,.35)";ctx.font="10px monospace";ctx.textAlign="center";
+      ctx.fillText("ROOM RESET // " + escapeCount + " / 10",W/2,H/2);
+      ctx.textAlign="left";
+    }
+  }
+  function drawBattleIntro(now){
+    const t=now-battleIntroStart;
+    ctx.fillStyle="#020309";ctx.fillRect(0,0,W,H);
+    ctx.fillStyle="rgba(190,209,214,"+(0.55+Math.sin(now*.008)*.12)+")";
+    ctx.font="bold 20px monospace";ctx.textAlign="center";
+    ctx.fillText("LETS CHECK YOUR BATTLE SYSTEMS",W/2,H/2);
+    ctx.fillStyle="#72858f";ctx.font="10px monospace";
+    ctx.fillText("SYSTEM TEST // COMBAT CALIBRATION",W/2,H/2+35);
+    ctx.textAlign="left";
+    if(t>2800){
+      mode="battle";
+      player.x=190;player.y=350;player.dir="right";player.moving=false;player.speed=184;
+      bossHits=0;playerHealth=6;swordCooldown=0;swordAnim=0;playerInvuln=0;
+      boss={x:558,y:252,flash:0,attackTimer:1.8,aoe:null};
+      stateLabel.textContent="● COMBAT TEST";
+      setText("COMBAT SYSTEM","20 попаданий по механическому двойнику.","WASD / стрелки — движение · Z / SPACE — короткий удар мечом");
+      updateUI();
+    }
+  }
+  function drawMech(){
+    const x=Math.round(boss.x),y=Math.round(boss.y);
+    const pulse=1+Math.sin(frame*.12)*.025;
+    ctx.save();ctx.translate(x,y);ctx.scale(pulse,1/pulse);
+    ctx.fillStyle="rgba(0,0,0,.52)";
+    ctx.beginPath();ctx.ellipse(0,18,38,11,0,0,Math.PI*2);ctx.fill();
+    const metal=boss.flash>0?"#e5edf0":"#56636d";
+    const dark=boss.flash>0?"#acbdc5":"#202d38";
+    ctx.fillStyle=dark;ctx.fillRect(-23,-8,15,28);ctx.fillRect(8,-8,15,28);
+    ctx.fillStyle="#89969d";ctx.fillRect(-25,15,18,7);ctx.fillRect(7,15,18,7);
+    ctx.fillStyle="#26343e";ctx.fillRect(-31,-37,62,42);
+    ctx.fillStyle=metal;ctx.fillRect(-33,-40,66,9);
+    ctx.fillStyle="#75848c";ctx.fillRect(-27,-31,54,30);
+    ctx.fillStyle="#364955";ctx.fillRect(-11,-29,22,25);
+    ctx.fillStyle="#b9cbd0";ctx.fillRect(-8,-24,16,4);
+    ctx.fillStyle="#9dcbd1";ctx.fillRect(-5,-17,10,8);
+    ctx.fillStyle="#111b24";ctx.fillRect(-28,-48,56,15);
+    ctx.fillStyle="#87949a";ctx.fillRect(-26,-52,52,7);
+    ctx.fillStyle="#1b2933";ctx.fillRect(-19,-45,38,10);
+    ctx.fillStyle="#e0b96e";ctx.fillRect(-14,-42,28,3);
+    ctx.fillStyle="#72838c";ctx.fillRect(-39,-35,12,18);ctx.fillRect(27,-35,12,18);
+    ctx.fillStyle="#a7b4ba";ctx.fillRect(-40,-37,13,5);ctx.fillRect(27,-37,13,5);
+    ctx.fillStyle="#374953";ctx.fillRect(-34,-16,9,18);ctx.fillRect(25,-16,9,18);
+    ctx.fillStyle="#9bb1b8";ctx.fillRect(-32,-2,8,5);ctx.fillRect(24,-2,8,5);
+    ctx.fillStyle="#26343e";ctx.fillRect(-5,-55,10,5);
+    ctx.fillStyle="#9bb6bd";ctx.fillRect(-2,-61,4,8);
+    ctx.restore();
+  }
+  function drawSword(){
+    const angle={right:0,down:Math.PI/2,left:Math.PI,up:-Math.PI/2}[player.dir]||0;
+    const x=player.x,y=player.y-13;
+    ctx.save();ctx.translate(x,y);ctx.rotate(angle);
+    if(swordAnim>0)ctx.rotate((swordAnim/.2-.5)*.65);
+    ctx.fillStyle="#5d4830";ctx.fillRect(8,-3,9,6);
+    ctx.fillStyle="#d7bd80";ctx.fillRect(12,-7,3,14);
+    ctx.fillStyle="#aebdc3";ctx.fillRect(18,-2,24,4);
+    ctx.fillStyle="#e5f0f0";ctx.fillRect(20,-1,20,1);
+    ctx.fillStyle="#647783";ctx.fillRect(40,-2,4,4);
+    if(swordAnim>0){
+      ctx.strokeStyle="rgba(214,240,243,"+Math.min(.9,swordAnim*5)+")";
+      ctx.lineWidth=3;ctx.beginPath();ctx.arc(17,0,31,-.72,.72);ctx.stroke();
+    }
+    ctx.restore();
+  }
+  function drawBattleArena(){
+    drawFloor();
+    wall(28,28,712,20);wall(28,28,18,456);wall(722,28,18,456);wall(28,466,712,18);
+    ctx.strokeStyle="rgba(129,163,174,.18)";ctx.lineWidth=2;
+    ctx.strokeRect(82,82,604,348);
+    ctx.beginPath();ctx.arc(W/2,256,118,0,Math.PI*2);ctx.stroke();
+    ctx.fillStyle="rgba(5,12,18,.65)";ctx.fillRect(48,48,230,20);
+    ctx.fillStyle="#a5bac2";ctx.font="10px monospace";ctx.fillText("COMBAT ARENA // TEST 02",56,62);
+    if(boss.aoe){
+      const a=boss.aoe;
+      if(a.phase==="warn"){
+        const pulse=1+Math.sin(frame*.45)*.045;
+        ctx.fillStyle="rgba(207,133,70,.12)";
+        ctx.beginPath();ctx.arc(a.x,a.y,a.radius*pulse,0,Math.PI*2);ctx.fill();
+        ctx.strokeStyle="#e1a36f";ctx.lineWidth=3;ctx.setLineDash([9,6]);
+        ctx.beginPath();ctx.arc(a.x,a.y,a.radius*pulse,0,Math.PI*2);ctx.stroke();ctx.setLineDash([]);
+        ctx.fillStyle="#f1c18b";ctx.font="10px monospace";ctx.textAlign="center";
+        ctx.fillText("WARNING",a.x,a.y-a.radius-12);ctx.textAlign="left";
+      }else{
+        ctx.fillStyle="rgba(230,176,102,.42)";
+        ctx.beginPath();ctx.arc(a.x,a.y,a.radius,0,Math.PI*2);ctx.fill();
+        ctx.strokeStyle="#fff0bc";ctx.lineWidth=4;
+        ctx.beginPath();ctx.arc(a.x,a.y,a.radius*.72,0,Math.PI*2);ctx.stroke();
+      }
+    }
+    drawMech();
+    drawPlayer();
+    drawSword();
+    ctx.fillStyle="#9bb0ba";ctx.font="10px monospace";ctx.textAlign="center";
+    ctx.fillText("MECHANICAL UNIT // " + Math.max(0,20-bossHits) + " HITS LEFT",boss.x,boss.y-76);
+    ctx.textAlign="left";
+    ctx.fillStyle="#e2c77d";ctx.fillRect(48,82,Math.max(0,672*(20-bossHits)/20),4);
+    ctx.fillStyle="#35424c";ctx.fillRect(48,82,672,4);
+    ctx.fillStyle="#92c4cd";ctx.font="10px monospace";
+    ctx.fillText("PLAYER INTEGRITY: " + playerHealth + " / 6",48,104);
+  }
+  function attackPlayer(){
+    if(mode!=="battle" || swordCooldown>0)return;
+    swordCooldown=.36;swordAnim=.2;
+    const v={right:{x:1,y:0},left:{x:-1,y:0},up:{x:0,y:-1},down:{x:0,y:1}}[player.dir];
+    const dx=boss.x-player.x,dy=boss.y-player.y;
+    const forward=dx*v.x+dy*v.y;
+    const side=Math.abs(dx*v.y-dy*v.x);
+    if(forward>4 && forward<82 && side<36){
+      bossHits=Math.min(20,bossHits+1);boss.flash=.18;
+      setText("COMBAT SYSTEM","ПОПАДАНИЕ: "+bossHits+" / 20","Продолжайте атаковать механического двойника.");
+      updateUI();
+      if(bossHits>=20){
+        mode="battleVictory";
+        stateLabel.textContent="● TEST PASSED";
+        setText("SYSTEM","Тест боевой системы пройден.","20 / 20 попаданий зарегистрировано.");
+        updateUI();
+      }
+    }
+  }
+  function updateBattle(dt){
+    swordCooldown=Math.max(0,swordCooldown-dt);
+    swordAnim=Math.max(0,swordAnim-dt);
+    playerInvuln=Math.max(0,playerInvuln-dt);
+    boss.flash=Math.max(0,boss.flash-dt);
+    boss.attackTimer-=dt;
+    if(!boss.aoe && boss.attackTimer<=0){
+      const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+      boss.aoe={x:clamp(player.x,110,658),y:clamp(player.y,112,400),radius:76,phase:"warn",timer:1.05};
+      boss.attackTimer=3.35;
+    }
+    if(boss.aoe){
+      boss.aoe.timer-=dt;
+      if(boss.aoe.phase==="warn" && boss.aoe.timer<=0){
+        boss.aoe.phase="strike";boss.aoe.timer=.34;
+        if(distance(player,boss.aoe)<boss.aoe.radius && playerInvuln<=0){
+          playerHealth--;playerInvuln=1.0;
+          setText("WARNING","Вы попали под площадную атаку.","Уходите из отмеченной зоны до удара.");
+          if(playerHealth<=0){
+            playerHealth=6;player.x=190;player.y=350;player.dir="right";
+            setText("SYSTEM","Игрок восстановлен. Прогресс попаданий сохранён.","Продолжайте тест: осталось " + (20-bossHits) + " попаданий.");
+          }
+          updateUI();
+        }
+      }else if(boss.aoe.phase==="strike" && boss.aoe.timer<=0){
+        boss.aoe=null;
+      }
+    }
+  }
+  function drawBattleVictory(){
+    ctx.fillStyle="rgba(1,4,8,.84)";ctx.fillRect(0,0,W,H);
+    ctx.strokeStyle="#91bdc6";ctx.lineWidth=2;ctx.strokeRect(174,178,420,156);
+    ctx.fillStyle="#edf3f2";ctx.font="bold 24px monospace";ctx.textAlign="center";
+    ctx.fillText("TEST PASSED",W/2,226);
+    ctx.fillStyle="#b9c8cb";ctx.font="12px monospace";
+    ctx.fillText("20 / 20 HITS REGISTERED",W/2,259);
+    ctx.fillStyle="#d8bb78";ctx.font="10px monospace";
+    ctx.fillText("COMBAT SYSTEMS // COMPLETE",W/2,294);
     ctx.textAlign="left";
   }
   function loop(now){
     const dt=Math.min(.04,(now-lastTime)/1000);lastTime=now;frame++;
     if(mode==="intro"){
       drawIntro(now);
-    }else{
-      if(mode==="playing"){
-        move(dt);
-        if(doorOpen && player.x>382 && player.y>244 && player.y<342){
-          escaped=true;mode="escaped";
-          setText("—","Вы покинули клетку.","Первый тестовый эпизод завершён.");
-          objective.textContent="Вы вышли из клетки. Прототип первой комнаты завершён.";
-          stateLabel.textContent="● ROOM CLEARED";
-        }
+    }else if(mode==="playing"){
+      move(dt);
+      if(doorOpen && player.x>cell.x+314 && player.y>cell.y+172 && player.y<cell.y+270){
+        beginEscapeTransition(now);
       }
-      drawRoom();
-      if(mode==="escaped")drawExitOverlay();
+      if(mode==="playing")drawRoom();
+      else {drawRoom();drawLoopTransition(now);}
+    }else if(mode==="loopTransition"){
+      drawRoom();drawLoopTransition(now);
+      if(now>=transitionUntil){
+        if(escapeCount>=10){
+          mode="battleIntro";battleIntroStart=now;
+          stateLabel.textContent="● COMBAT TEST";
+          setText("SYSTEM","LETS CHECK YOUR BATTLE SYSTEMS","...");
+          updateUI();
+        }else resetLoopRoom();
+      }
+    }else if(mode==="battleIntro"){
+      drawBattleIntro(now);
+    }else if(mode==="battle"){
+      move(dt);updateBattle(dt);drawBattleArena();
+    }else if(mode==="battleVictory"){
+      drawBattleArena();drawBattleVictory();
     }
     requestAnimationFrame(loop);
   }
@@ -588,6 +821,7 @@ h1{color:#d4e2e4;text-shadow:0 0 12px #76c7d422}
     if(["ArrowUp","ArrowDown","ArrowLeft","ArrowRight","Space"].includes(code))e.preventDefault();
     keys[code]=true;
     if((code==="KeyE"||code==="Enter")&&!e.repeat)interact();
+    if((code==="KeyZ"||code==="Space")&&!e.repeat)attackPlayer();
   });
   window.addEventListener("keyup",function(e){keys[e.code]=false});
   window.addEventListener("blur",function(){for(const k in keys)keys[k]=false});
@@ -601,6 +835,7 @@ h1{color:#d4e2e4;text-shadow:0 0 12px #76c7d422}
     btn.addEventListener("pointercancel",up);
   });
   $("touchInteract").addEventListener("pointerdown",function(e){e.preventDefault();interact()});
+  $("touchAttack").addEventListener("pointerdown",function(e){e.preventDefault();attackPlayer()});
   canvas.addEventListener("pointerdown",function(){canvas.focus()});
 
   updateUI();
