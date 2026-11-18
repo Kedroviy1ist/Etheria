@@ -121,7 +121,7 @@ canvas{display:block;width:100%;height:auto;aspect-ratio:3/2;image-rendering:pix
 
   const W = canvas.width, H = canvas.height;
   const keys = Object.create(null);
-  const player = {x:178,y:337,r:10,speed:154,dir:"up",moving:false};
+  const player = {x:178,y:337,r:12,speed:154,dir:"up",moving:false};
   const keyItem = {x:286,y:190,found:false};
   let equipped = false, doorOpen = false, escaped = false;
   let mode = "intro", startTime = performance.now(), lastTime = startTime;
@@ -351,34 +351,65 @@ canvas{display:block;width:100%;height:auto;aspect-ratio:3/2;image-rendering:pix
   }
   function drawPlayer(){
     const x=Math.round(player.x),y=Math.round(player.y);
-    const bob=player.moving?Math.sin(frame*.42)*1.8:0;
-    ctx.fillStyle="rgba(0,0,0,.34)";ctx.fillRect(x-11,y+10,22,5);
-    // legs
-    ctx.fillStyle="#202b3b";ctx.fillRect(x-7,y+3+bob,6,9);ctx.fillRect(x+1,y+3-bob,6,9);
-    ctx.fillStyle="#566172";ctx.fillRect(x-8,y+10+bob,8,3);ctx.fillRect(x,y+10-bob,8,3);
-    // coat / torso
-    ctx.fillStyle="#426a78";ctx.fillRect(x-10,y-9+bob,20,16);
-    ctx.fillStyle="#8ab6bb";ctx.fillRect(x-7,y-8+bob,14,3);
-    ctx.fillStyle="#233c4b";ctx.fillRect(x-2,y-6+bob,4,12);
-    // arms, key hand changes silhouette
-    ctx.fillStyle="#d5b69d";
+    const bob=player.moving?Math.sin(frame*.42)*1.15:0;
+    const by=(n)=>Math.round(y+n+bob);
+    // Broad, battle-worn silhouette with layered armor and a heavy mantle.
+    ctx.fillStyle="rgba(0,0,0,.48)";
+    ctx.beginPath();ctx.ellipse(x,y+12,20,7,0,0,Math.PI*2);ctx.fill();
+
+    // Rear mantle.
+    ctx.fillStyle="#18232d";ctx.fillRect(x-13,by(-18),26,27);
+    ctx.fillStyle="#354653";ctx.fillRect(x-11,by(-15),3,22);ctx.fillRect(x+8,by(-15),3,22);
+    ctx.fillStyle="#101821";ctx.fillRect(x-10,by(5),20,8);
+
+    // Legs and reinforced boots.
+    ctx.fillStyle="#202a35";ctx.fillRect(x-11,by(3),9,12);ctx.fillRect(x+2,by(3),9,12);
+    ctx.fillStyle="#596572";ctx.fillRect(x-12,by(11),11,5);ctx.fillRect(x+1,by(11),11,5);
+    ctx.fillStyle="#9aa2a5";ctx.fillRect(x-10,by(11),7,2);ctx.fillRect(x+3,by(11),7,2);
+    ctx.fillStyle="#111923";ctx.fillRect(x-12,by(15),12,3);ctx.fillRect(x+1,by(15),12,3);
+
+    // Broad torso and breastplate.
+    ctx.fillStyle="#263744";ctx.fillRect(x-15,by(-22),30,29);
+    ctx.fillStyle="#526473";ctx.fillRect(x-14,by(-21),28,4);
+    ctx.fillStyle="#354957";ctx.fillRect(x-12,by(-17),24,19);
+    ctx.fillStyle="#17232e";ctx.fillRect(x-4,by(-17),8,20);
+    ctx.fillStyle="#81909a";ctx.fillRect(x-2,by(-17),2,17);
+    ctx.fillStyle="#71808b";ctx.fillRect(x-10,by(-15),7,11);ctx.fillRect(x+3,by(-15),7,11);
+    ctx.fillStyle="#a5afb3";ctx.fillRect(x-9,by(-14),4,2);ctx.fillRect(x+5,by(-14),4,2);
+    ctx.fillStyle="#111923";ctx.fillRect(x-8,by(-7),16,3);
+    // Belt and clasp.
+    ctx.fillStyle="#9a8153";ctx.fillRect(x-12,by(0),24,4);
+    ctx.fillStyle="#d1b36d";ctx.fillRect(x-3,by(-1),6,6);
+    ctx.fillStyle="#4b3b2c";ctx.fillRect(x-1,by(0),2,3);
+
+    // Heavy shoulders and gauntlets.
+    ctx.fillStyle="#697985";ctx.fillRect(x-19,by(-20),8,11);ctx.fillRect(x+11,by(-20),8,11);
+    ctx.fillStyle="#303f4c";ctx.fillRect(x-18,by(-18),7,10);ctx.fillRect(x+11,by(-18),7,10);
+    ctx.fillStyle="#8c9aa0";ctx.fillRect(x-17,by(-19),4,2);ctx.fillRect(x+13,by(-19),4,2);
+    ctx.fillStyle="#263541";ctx.fillRect(x-18,by(-8),7,11);ctx.fillRect(x+11,by(-8),7,11);
+    ctx.fillStyle="#9babb0";ctx.fillRect(x-17,by(1),6,3);ctx.fillRect(x+11,by(1),6,3);
+
+    // Neck, stern face and short dark hair.
+    ctx.fillStyle="#b98f77";ctx.fillRect(x-5,by(-29),10,9);
+    ctx.fillStyle="#c5a18a";ctx.fillRect(x-9,by(-42),18,17);
+    ctx.fillStyle="#302d30";ctx.fillRect(x-10,by(-45),20,8);
+    ctx.fillRect(x-11,by(-41),4,12);ctx.fillRect(x+7,by(-41),4,12);
+    ctx.fillStyle="#1d2229";ctx.fillRect(x-8,by(-36),6,3);ctx.fillRect(x+2,by(-36),6,3);
+    ctx.fillStyle="#292d32";
+    if(player.dir==="left"){ctx.fillRect(x-7,by(-33),3,2);ctx.fillRect(x-8,by(-36),6,2);}
+    else if(player.dir==="right"){ctx.fillRect(x+4,by(-33),3,2);ctx.fillRect(x+2,by(-36),6,2);}
+    else{ctx.fillRect(x-6,by(-34),3,2);ctx.fillRect(x+3,by(-34),3,2);ctx.fillRect(x-8,by(-37),7,2);ctx.fillRect(x+1,by(-37),7,2);}
+    ctx.fillStyle="#765a4e";ctx.fillRect(x-2,by(-29),4,2);
+    ctx.fillStyle="#382f30";ctx.fillRect(x-3,by(-26),6,2);
+
+    // The key is visibly held in the right gauntlet.
     if(equipped){
-      ctx.fillRect(x+8,y-5+bob,5,7);
-      ctx.fillStyle="#e6c66e";ctx.fillRect(x+11,y-7+bob,11,3);
-      ctx.fillRect(x+19,y-9+bob,3,7);ctx.fillRect(x+21,y-8+bob,4,3);
-      ctx.fillStyle="#fff0b0";ctx.fillRect(x+13,y-7+bob,6,1);
-    }else{
-      ctx.fillRect(x-12,y-5+bob,4,7);ctx.fillRect(x+8,y-5+bob,4,7);
+      ctx.fillStyle="#e7c66f";ctx.fillRect(x+17,by(-9),13,4);
+      ctx.fillRect(x+26,by(-7),3,8);ctx.fillRect(x+29,by(-7),4,3);
+      ctx.fillRect(x+20,by(-12),3,5);
+      ctx.fillStyle="#fff0b0";ctx.fillRect(x+19,by(-9),9,1);
+      ctx.fillStyle="#765c30";ctx.fillRect(x+17,by(-5),5,2);
     }
-    // head and hair
-    ctx.fillStyle="#d9b99c";ctx.fillRect(x-7,y-21+bob,14,13);
-    ctx.fillStyle="#4b3a36";ctx.fillRect(x-8,y-23+bob,16,6);
-    ctx.fillRect(x-8,y-19+bob,3,5);ctx.fillRect(x+5,y-19+bob,3,5);
-    ctx.fillStyle="#17212b";
-    if(player.dir==="left")ctx.fillRect(x-5,y-16+bob,2,2);
-    else if(player.dir==="right")ctx.fillRect(x+3,y-16+bob,2,2);
-    else {ctx.fillRect(x-4,y-16+bob,2,2);ctx.fillRect(x+2,y-16+bob,2,2)}
-    ctx.fillStyle="#f1d8bd";ctx.fillRect(x-1,y-12+bob,2,1);
   }
   function drawRoom(){
     drawFloor();
